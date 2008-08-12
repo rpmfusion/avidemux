@@ -4,7 +4,7 @@
 
 Name:           avidemux
 Version:        2.4.2
-Release:        2%{?dist}
+Release:        3%{?dist}
 Summary:        Graphical video editing tool
 
 Group:          Applications/Multimedia
@@ -103,6 +103,7 @@ popd
 %build
 make -f Makefile.dist
 # doesn't seem to fix ppc :/
+# edit: maybe it does? let's find out!
 #--with-newfaad \
 %configure \
   --with-jsapi-include=%{_includedir} \
@@ -111,6 +112,7 @@ make -f Makefile.dist
   --with-qt-dir=%{_libdir}/qt4 \
 %ifarch ppc ppc64
   --enable-altivec \
+  --with-newfaad \
 %endif
 
 # Weird... %%{?_smp_mflags} works locally, but not on the buildsys?
@@ -159,6 +161,9 @@ rm -rf $RPM_BUILD_ROOT
 %endif
 
 %changelog
+* Tue Aug 12 2008 Stewart Adam <s.adam at diffingo.com> - 2.4.2-3
+- ppc64 uint_32 fun
+
 * Sun Aug 03 2008 Thorsten Leemhuis <fedora [AT] leemhuis [DOT] info - 2.4.2-2
 - rebuild
 
