@@ -4,7 +4,7 @@
 
 Name:           avidemux
 Version:        2.4.3
-Release:        1%{?dist}
+Release:        2%{?dist}
 Summary:        Graphical video editing tool
 
 Group:          Applications/Multimedia
@@ -160,6 +160,9 @@ rm -rf $RPM_BUILD_ROOT
 %endif
 
 %changelog
+* Sat Aug 16 2008 Stewart Adam <s.adam at diffingo.com> - 2.4.3-2
+- retag
+
 * Sat Aug 16 2008 Stewart Adam <s.adam at diffingo.com> - 2.4.3-1
 - Update to 2.4.3
 
