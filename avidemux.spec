@@ -3,8 +3,8 @@
 #define svndate 20080521
 
 Name:           avidemux
-Version:        2.4.2
-Release:        3%{?dist}
+Version:        2.4.3
+Release:        1%{?dist}
 Summary:        Graphical video editing tool
 
 Group:          Applications/Multimedia
@@ -14,17 +14,20 @@ Source0:        http://download.berlios.de/avidemux/avidemux_%{version}.tar.gz
 Source1:        %{name}-gtk.desktop
 Source2:        %{name}-qt.desktop
 Patch0:         avidemux-2.4.2-pulseaudio-default.patch
+Patch1:         avidemux-2.4.1-qt4.patch
+Patch2:         avidemux-2.4-i18n.patch
+Patch3:         avidemux-2.4-libdca.patch
+Patch4:         avidemux-2.4.3-lrelease.patch
 #http://bugs.gentoo.org/attachment.cgi?id=160132&action=view
-Patch1:         avidemux-2.4.2-x264-2pass.patch
 BuildRoot:      %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 
-# GTK interface is what people are used to, let's use that be default.
-Requires:       %{name}-gtk
+Requires:       %{name}-gui
 
 # Compiling
-BuildRequires:  libtool >= 1.5.6
+BuildRequires:	cmake
 BuildRequires:  gettext-devel
-BuildRequires:  autoconf
+#BuildRequires:  libtool >= 1.5.6
+#BuildRequires:  autoconf
 
 # Libraries
 BuildRequires:  nasm >= 0.98.38
@@ -36,6 +39,8 @@ BuildRequires:  libXv-devel
 BuildRequires:  libXmu-devel
 # Required by gtk: libXi-devel, libXext-devel, libX11-devel
 # Required by qt: libXt-devel, libXext-devel, libX11-devel
+BuildRequires:	libsamplerate-devel
+BuildRequires:	jack-audio-connection-kit-devel
 
 # Sound out
 BuildRequires:  alsa-lib-devel >= 1.0.3
@@ -49,17 +54,22 @@ BuildRequires:  a52dec-devel >= 0.7.4
 BuildRequires:  faac-devel >= 1.24
 BuildRequires:  faad2-devel >= 2.0
 BuildRequires:  lame-devel >= 3.96.1
-# BuildRequires:  libdca-devel
-# needs libdts/dts_internal.h; but that's not shipped by  libdca-devel because
-# it's an internal lib. Someone needs to report that upstream to get fixed
 BuildRequires:  libmad-devel >= 0.15.1
 BuildRequires:  libogg-devel >= 1.1
 BuildRequires:  libvorbis-devel >= 1.0.1
+
+# needs libdts/dts_internal.h; but that's not shipped by  libdca-devel because
+# it's an internal lib. Someone needs to report that upstream to get fixed
+# ** this is fixed by patch3
+BuildRequires:  libdca-devel
+
 
 # Video Codecs
 BuildRequires:  xvidcore-devel >= 1.0.2
 BuildRequires:  x264-devel
 BuildRequires:  ffmpeg-devel
+
+# FIXME: aften not packaged, add BR when it is
 
 # Finally...
 BuildRequires:  desktop-file-utils
@@ -98,26 +108,14 @@ This package provides the QT interface for %{name}
 pushd avidemux
 %patch0 -b .pulse
 popd
-%patch1 -p1 -b .x264_2pass
+%patch1 -p1 -b .qt4
+%patch2 -p1 -b .i18n
+%patch3 -p1 -b .libdca
+%patch4 -b .lrelease
 
 %build
-make -f Makefile.dist
-# doesn't seem to fix ppc :/
-# edit: maybe it does? let's find out!
-#--with-newfaad \
-%configure \
-  --with-jsapi-include=%{_includedir} \
-  --with-qt-include=%{_includedir} \
-  --with-qt-lib=%{_libdir}/qt4 \
-  --with-qt-dir=%{_libdir}/qt4 \
-%ifarch ppc ppc64
-  --enable-altivec \
-  --with-newfaad \
-%endif
-
-# Weird... %%{?_smp_mflags} works locally, but not on the buildsys?
-make
-
+%cmake
+make %{?_smp_mflags}
 
 %install
 rm -rf $RPM_BUILD_ROOT
@@ -145,6 +143,7 @@ rm -rf $RPM_BUILD_ROOT
 %defattr(-,root,root,-)
 %doc AUTHORS COPYING ChangeLog History README TODO
 %{_bindir}/avidemux2_cli
+%{_datadir}/%{name}/
 
 %if %{with_gtk}
 %files gtk
@@ -161,6 +160,9 @@ rm -rf $RPM_BUILD_ROOT
 %endif
 
 %changelog
+* Sat Aug 16 2008 Stewart Adam <s.adam at diffingo.com> - 2.4.3-1
+- Update to 2.4.3
+
 * Tue Aug 12 2008 Stewart Adam <s.adam at diffingo.com> - 2.4.2-3
 - ppc64 uint_32 fun
 
