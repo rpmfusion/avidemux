@@ -4,7 +4,7 @@
 
 Name:           avidemux
 Version:        2.4.3
-Release:        2%{?dist}
+Release:        3%{?dist}
 Summary:        Graphical video editing tool
 
 Group:          Applications/Multimedia
@@ -18,6 +18,7 @@ Patch1:         avidemux-2.4.1-qt4.patch
 Patch2:         avidemux-2.4-i18n.patch
 Patch3:         avidemux-2.4-libdca.patch
 Patch4:         avidemux-2.4.3-lrelease.patch
+Patch5:         avidemux-2.4-ppc.patch
 #http://bugs.gentoo.org/attachment.cgi?id=160132&action=view
 BuildRoot:      %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 
@@ -112,6 +113,7 @@ popd
 %patch2 -p1 -b .i18n
 %patch3 -p1 -b .libdca
 %patch4 -b .lrelease
+%patch5 -b .ppc
 
 %build
 %cmake
@@ -160,6 +162,9 @@ rm -rf $RPM_BUILD_ROOT
 %endif
 
 %changelog
+* Fri Aug 22 2008 Stewart Adam <s.adam at diffingo.com> - 2.4.3-3
+- Add patch to fix ppc64 build
+
 * Sat Aug 16 2008 Stewart Adam <s.adam at diffingo.com> - 2.4.3-2
 - retag
 
