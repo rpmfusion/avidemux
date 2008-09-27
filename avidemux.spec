@@ -2,7 +2,7 @@
 
 Name:           avidemux
 Version:        2.4.3
-Release:        5%{?dist}
+Release:        6%{?dist}
 Summary:        Graphical video editing and transcoding tool
 
 Group:          Applications/Multimedia
@@ -159,7 +159,10 @@ rm -rf $RPM_BUILD_ROOT
 %{_datadir}/applications/*qt*.desktop
 
 %changelog
-* Thu Sep 18 2008 Stewart Adam <s.adam at diffingo.com> - 2.4.3-5
+* Sat Sep 27 2008 Stewart Adam <s.adam at diffingo.com> - 2.4.3-6
+- Rebuild due to missing .desktop files
+
+* Sat Sep 27 2008 Stewart Adam <s.adam at diffingo.com> - 2.4.3-5
 - Add CMake patch for PPC64
 - Update patches for 2.4.3
 - Remove outdated libmad patch (Nov. 2007)
