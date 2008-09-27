@@ -1,0 +1,48 @@
+diff -p -up avidemux/CMakeLists.txt.libdca avidemux/CMakeLists.txt
+--- avidemux/CMakeLists.txt.libdca	2008-06-28 15:03:51.000000000 +0200
++++ avidemux/CMakeLists.txt	2008-07-24 15:43:18.000000000 +0200
+@@ -331,7 +331,7 @@ endif(USE_AMR_NB AND NOT USE_LATE_BINDIN
+ 
+ #libdts
+ if(USE_LIBDCA AND NOT USE_LATE_BINDING)
+-	add_libs_all_targets(dts)
++	add_libs_all_targets(dca)
+ endif(USE_LIBDCA AND NOT USE_LATE_BINDING)
+ 
+ # Lame
+diff -p -up ConfigureChecks.cmake.libdca ConfigureChecks.cmake
+--- ConfigureChecks.cmake.libdca	2008-07-05 20:24:01.000000000 +0200
++++ ConfigureChecks.cmake	2008-07-24 15:43:18.000000000 +0200
+@@ -475,7 +475,7 @@ SET(CMAKE_REQUIRED_LIBRARIES "-lm")
+ IF (USE_LATE_BINDING)
+ 	CHECK_INCLUDE_FILES(dts.h USE_LIBDCA)
+ ELSE (USE_LATE_BINDING)
+-	ADM_CHECK_HL(libdca dts.h dts dts_init USE_LIBDCA)
++	ADM_CHECK_HL(libdca dts.h dca dca_init USE_LIBDCA)
+ ENDIF (USE_LATE_BINDING)
+ 
+ SET(CMAKE_REQUIRED_LIBRARIES)
+diff -p -up configure.in.in.libdca configure.in.in
+--- configure.in.in.libdca	2008-07-24 15:43:18.000000000 +0200
++++ configure.in.in	2008-07-24 15:51:57.000000000 +0200
+@@ -891,18 +891,14 @@ have_libdca=no
+ if test "x$with_libdca" != "xno"; then
+     have_libdca=yes
+     AC_CHECK_HEADERS([dts.h], , have_libdca=no)
+-    
+-    if test "x$have_libdca" = "xyes"; then
+-    	AC_CHECK_HEADERS([dts_internal.h], , have_libdca=no)
+-    	
++ 	
+     	if test "x$have_libdca" = "xyes"; then
+     		if test "x$use_late_binding" = "xno"; then
+-				AC_CHECK_LIB(dts, dts_init, , have_libdca=no)
++				AC_CHECK_LIB(dca, dca_init, , have_libdca=no)
+ 			fi
+ 		else
+     		AC_MSG_WARN(dts.h is there but I also need dts_internal.h to compile libdca/libdts. Please copy dts_internal.h where dts.h is)
+     	fi
+-    fi
+     
+     if test "x$have_libdca" = "xyes"; then
+ 		AC_DEFINE(USE_LIBDCA, 1, "[libdca detected]")

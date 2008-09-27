@@ -1,0 +1,11 @@
+--- avidemux/prefs.in.old	2008-06-22 15:24:53.000000000 -0400
++++ avidemux/prefs.in	2008-07-19 21:08:03.000000000 -0400
+@@ -55,7 +55,7 @@
+ #else
+ device.audiodevice,			STRING,	ALSA
+ #endif
+-device.audio.alsa_device,               STRING, "dmix"
++device.audio.alsa_device,               STRING, "pulse"
+ device.videodevice,			UINT,	0,	0,	10
+ # Posproc
+ default.postproc_type,			UINT,	3,	0,	7
