@@ -1,6 +1,6 @@
 [Desktop Entry]
-Name=Avidemux Video Editor (QT)
-Comment=Graphical video editing tool
+Name=Avidemux Video Editor (Qt)
+Comment=Graphical video editing tool - Qt interface
 Icon=gnome-multimedia
 Exec=avidemux2_qt4
 Terminal=false

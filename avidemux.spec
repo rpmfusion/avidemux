@@ -1,11 +1,9 @@
-%define with_gtk 1
-%define with_qt 1
 #define svndate 20080521
 
 Name:           avidemux
 Version:        2.4.3
-Release:        4%{?dist}
-Summary:        Graphical video editing tool
+Release:        5%{?dist}
+Summary:        Graphical video editing and transcoding tool
 
 Group:          Applications/Multimedia
 License:        GPLv2+
@@ -14,22 +12,22 @@ Source0:        http://download.berlios.de/avidemux/avidemux_%{version}.tar.gz
 Source1:        %{name}-gtk.desktop
 Source2:        %{name}-qt.desktop
 Patch0:         avidemux-2.4.2-pulseaudio-default.patch
-Patch1:         avidemux-2.4.1-qt4.patch
+Patch1:         avidemux-2.4.3-qt4.patch
 Patch2:         avidemux-2.4-i18n.patch
+# http://ftp.ncnu.edu.tw/Linux/Gentoo/gentoo-portage/media-video/avidemux/files/avidemux-2.4-libdca.patch
 Patch3:         avidemux-2.4-libdca.patch
-Patch4:         avidemux-2.4.3-lrelease.patch
-Patch5:         avidemux-2.4-ppc-libmad.patch
-Patch6:         avidemux-2.4.3-ppc-ptr.patch
+# http://avidemux.org/admForum/viewtopic.php?pid=29582#p29582
+# http://avidemux.org/admForum/viewtopic.php?id=3991
+Patch4:         avidemux-2.4.3-ppc.patch
 #http://bugs.gentoo.org/attachment.cgi?id=160132&action=view
 BuildRoot:      %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 
-Requires:       %{name}-gui
+Requires:       %{name}-cli  = %{version}
+Requires:       %{name}-gui = %{version}
 
 # Compiling
 BuildRequires:	cmake
 BuildRequires:  gettext-devel
-#BuildRequires:  libtool >= 1.5.6
-#BuildRequires:  autoconf
 
 # Libraries
 BuildRequires:  nasm >= 0.98.38
@@ -82,19 +80,26 @@ encoding tasks. It supports many file types, including AVI, DVD compatible
 MPEG files, MP4 and ASF, using a variety of codecs. Tasks can be automated
 using projects, job queue and powerful scripting capabilities.
 
-%if %{with_gtk}
+%package cli
+Summary:        CLI for %{name}
+Group:          Applications/Multimedia
+Provides:       %{name}-cli = %{version}-%{release}
+
+%description cli
+This package provides command-line interface for %{name}
+
 %package gtk
 Summary:        GTK GUI for %{name}
 Group:          Applications/Multimedia
 BuildRequires:  gtk2-devel >= 2.8.0
 BuildRequires:  cairo-devel
+# Slightly higher so it is default, but it can be avoided by installing
+# avidemux-qt directly or it can be removed later once avidemux-qt is installed
 Provides:       %{name}-gui = %{version}-%{release}.1
 
 %description gtk
 This package provides the GTK interface for %{name}
-%endif
 
-%if %{with_qt}
 %package qt
 Summary:        QT GUI for %{name}
 Group:          Applications/Multimedia
@@ -103,21 +108,14 @@ Provides:       %{name}-gui = %{version}-%{release}
 
 %description qt
 This package provides the QT interface for %{name}
-%endif
 
 %prep
 %setup -q -n avidemux_%{version}
-pushd avidemux
 %patch0 -b .pulse
-popd
-%patch1 -p1 -b .qt4
-%patch2 -p1 -b .i18n
-%patch3 -p1 -b .libdca
-%patch4 -b .lrelease
-%patch5 -b .ppc_libmad
-pushd avidemux/ADM_codecs/
-%patch6 -b .ppc_ptr
-popd
+%patch1 -b .qt4
+%patch2 -b .i18n
+%patch3 -b .libdca
+%patch4 -b .ppc
 
 %build
 %cmake
@@ -127,17 +125,13 @@ make %{?_smp_mflags}
 rm -rf $RPM_BUILD_ROOT
 make install DESTDIR=$RPM_BUILD_ROOT
 
-%if %{with_gtk}
 desktop-file-install --vendor livna \
     --dir $RPM_BUILD_ROOT%{_datadir}/applications \
     %{SOURCE1}
-%endif
 
-%if %{with_qt}
 desktop-file-install --vendor livna \
     --dir $RPM_BUILD_ROOT%{_datadir}/applications \
     %{SOURCE2}
-%endif
 
 find $RPM_BUILD_ROOT -type f -name "*.la" -exec rm -f {} ';'
 %find_lang %{name}
@@ -148,24 +142,28 @@ rm -rf $RPM_BUILD_ROOT
 %files -f %{name}.lang
 %defattr(-,root,root,-)
 %doc AUTHORS COPYING ChangeLog History README TODO
-%{_bindir}/avidemux2_cli
 %{_datadir}/%{name}/
 
-%if %{with_gtk}
+%files cli
+%defattr(-,root,root,-)
+%{_bindir}/avidemux2_cli
+
 %files gtk
 %defattr(-,root,root,-)
 %{_bindir}/avidemux2_gtk
 %{_datadir}/applications/*gtk*.desktop
-%endif
 
-%if %{with_qt}
 %files qt
 %defattr(-,root,root,-)
 %{_bindir}/avidemux2_qt4
 %{_datadir}/applications/*qt*.desktop
-%endif
 
 %changelog
+* Thu Sep 18 2008 Stewart Adam <s.adam at diffingo.com> - 2.4.3-5
+- Add CMake patch for PPC64
+- Update patches for 2.4.3
+- Remove outdated libmad patch (Nov. 2007)
+
 * Thu Sep 18 2008 Stewart Adam <s.adam at diffingo.com> - 2.4.3-4
 - Add another patch to fix ppc64 build (pointer type), first
   patch was for libmad

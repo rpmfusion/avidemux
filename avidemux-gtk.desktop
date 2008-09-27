@@ -1,6 +1,6 @@
 [Desktop Entry]
 Name=Avidemux Video Editor (GTK)
-Comment=Graphical video editing tool
+Comment=Graphical video editing tool - GTK interface
 Icon=gnome-multimedia
 Exec=avidemux2_gtk
 Terminal=false
