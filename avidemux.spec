@@ -2,7 +2,7 @@
 
 Name:           avidemux
 Version:        2.4.3
-Release:        5%{?dist}
+Release:        7%{?dist}
 Summary:        Graphical video editing and transcoding tool
 
 Group:          Applications/Multimedia
@@ -83,10 +83,10 @@ using projects, job queue and powerful scripting capabilities.
 %package cli
 Summary:        CLI for %{name}
 Group:          Applications/Multimedia
-Provides:       %{name}-cli = %{version}-%{release}
+Requires:       %{name} = %{version}-%{release}
 
 %description cli
-This package provides command-line interface for %{name}
+This package provides command-line interface for %{name}.
 
 %package gtk
 Summary:        GTK GUI for %{name}
@@ -96,18 +96,20 @@ BuildRequires:  cairo-devel
 # Slightly higher so it is default, but it can be avoided by installing
 # avidemux-qt directly or it can be removed later once avidemux-qt is installed
 Provides:       %{name}-gui = %{version}-%{release}.1
+Requires:       %{name} = %{version}-%{release}
 
 %description gtk
-This package provides the GTK interface for %{name}
+This package provides the GTK interface for %{name}.
 
 %package qt
 Summary:        QT GUI for %{name}
 Group:          Applications/Multimedia
 BuildRequires:  qt4-devel
 Provides:       %{name}-gui = %{version}-%{release}
+Requires:       %{name} = %{version}-%{release}
 
 %description qt
-This package provides the QT interface for %{name}
+This package provides the Qt interface for %{name}.
 
 %prep
 %setup -q -n avidemux_%{version}
@@ -159,6 +161,13 @@ rm -rf $RPM_BUILD_ROOT
 %{_datadir}/applications/*qt*.desktop
 
 %changelog
+* Tue Nov 25 2008 Stewart Adam <s.adam at diffingo.com> - 2.4.3-7
+- Don't uselessly provide avidemux-cli
+- Make GUI and CLI subpackages require the main package (fixes bz#178)
+
+* Tue Nov 25 2008 Stewart Adam <s.adam at diffingo.com> - 2.4.3-6
+- Bump release to fix EVR
+
 * Sat Sep 27 2008 Stewart Adam <s.adam at diffingo.com> - 2.4.3-5
 - Add CMake patch for PPC64
 - Update patches for 2.4.3
