@@ -2,7 +2,7 @@
 
 Name:           avidemux
 Version:        2.4.3
-Release:        7%{?dist}
+Release:        7%{?dist}.1
 Summary:        Graphical video editing and transcoding tool
 
 Group:          Applications/Multimedia
@@ -161,6 +161,9 @@ rm -rf $RPM_BUILD_ROOT
 %{_datadir}/applications/*qt*.desktop
 
 %changelog
+* Fri Dec 5 2008 Stewart Adam <s.adam at diffingo.com> - 2.4.3-7.1
+- Rebuild for 20081202 ffmpeg snapshot
+
 * Tue Nov 25 2008 Stewart Adam <s.adam at diffingo.com> - 2.4.3-7
 - Don't uselessly provide avidemux-cli
 - Make GUI and CLI subpackages require the main package (fixes bz#178)
