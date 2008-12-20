@@ -119,7 +119,7 @@ This package provides the Qt interface for %{name}.
 %patch2 -b .i18n
 %patch3 -b .libdca
 %patch4 -b .ppc
-%patch5 -b .x264
+%patch5 -p1 -b .x264
 
 %build
 %cmake
