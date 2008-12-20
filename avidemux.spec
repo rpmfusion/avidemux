@@ -2,7 +2,7 @@
 
 Name:           avidemux
 Version:        2.4.3
-Release:        7%{?dist}.1
+Release:        8%{?dist}
 Summary:        Graphical video editing and transcoding tool
 
 Group:          Applications/Multimedia
@@ -20,6 +20,7 @@ Patch3:         avidemux-2.4-libdca.patch
 # http://avidemux.org/admForum/viewtopic.php?id=3991
 Patch4:         avidemux-2.4.3-ppc.patch
 #http://bugs.gentoo.org/attachment.cgi?id=160132&action=view
+Patch5:         avidemux-x264.patch
 BuildRoot:      %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 
 Requires:       %{name}-cli  = %{version}
@@ -118,6 +119,7 @@ This package provides the Qt interface for %{name}.
 %patch2 -b .i18n
 %patch3 -b .libdca
 %patch4 -b .ppc
+%patch5 -b .x264
 
 %build
 %cmake
@@ -161,6 +163,9 @@ rm -rf $RPM_BUILD_ROOT
 %{_datadir}/applications/*qt*.desktop
 
 %changelog
+* Sun Dec 14 2008 Dominik Mierzejewski <rpm at greysector.net> - 2.4.3-8
+- Fix build with current x264
+
 * Fri Dec 5 2008 Stewart Adam <s.adam at diffingo.com> - 2.4.3-7.1
 - Rebuild for 20081202 ffmpeg snapshot
 

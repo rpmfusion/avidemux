@@ -1,0 +1,21 @@
+diff -up avidemux_2.4.3/avidemux/ADM_codecs/ADM_x264.cpp.x264 avidemux_2.4.3/avidemux/ADM_codecs/ADM_x264.cpp
+--- avidemux_2.4.3/avidemux/ADM_codecs/ADM_x264.cpp.x264	2008-07-21 19:24:20.000000000 +0200
++++ avidemux_2.4.3/avidemux/ADM_codecs/ADM_x264.cpp	2008-12-14 23:02:00.000000000 +0100
+@@ -109,8 +109,7 @@ uint8_t X264Encoder::preamble (uint32_t 
+   MKPARAM(i_bframe,MaxBFrame);
+   MKPARAM(i_bframe_bias,Bias);
+   MKPARAM( b_bframe_pyramid,BasReference );
+-  MKPARAM(analyse. b_bidir_me,BidirME );
+-  MKPARAM( b_bframe_adaptive, Adaptative);
++  MKPARAM( i_bframe_adaptive, Adaptative);
+   MKPARAM( analyse.b_weighted_bipred, Weighted);
+   MKPARAM( b_cabac , CABAC);
+   MKPARAM( analyse.i_trellis, Trellis);
+@@ -123,7 +122,6 @@ uint8_t X264Encoder::preamble (uint32_t 
+       parity=(zparam->PartitionDecision+1-MIN_RDO)&1;
+       
+       param.analyse.i_subpel_refine=rank;
+-      param.analyse.b_bframe_rdo=parity;
+   }
+   MKPARAM(analyse.b_chroma_me,ChromaME);
+   MKPARAM(b_deblocking_filter,DeblockingFilter);
