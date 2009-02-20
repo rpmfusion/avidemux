@@ -2,7 +2,7 @@
 
 Name:           avidemux
 Version:        2.4.4
-Release:        1%{?dist}
+Release:        2%{?dist}
 Summary:        Graphical video editing and transcoding tool
 
 Group:          Applications/Multimedia
@@ -161,6 +161,9 @@ rm -rf $RPM_BUILD_ROOT
 %{_datadir}/applications/*qt*.desktop
 
 %changelog
+* Fri Feb 20 2009 Stewart Adam <s.adam at diffingo.com> - 2.4.4-2
+- Sync libdca and i18n patches with devel
+
 * Wed Feb 18 2009 Stewart Adam <s.adam at diffingo.com> - 2.4.4-1
 - Update to 2.4.4 final, update patches accordingly
 - Move Qt translation files to qt subpackage
