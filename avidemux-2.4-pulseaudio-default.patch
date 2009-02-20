@@ -1,5 +1,5 @@
---- avidemux/prefs.in.old	2008-06-22 15:24:53.000000000 -0400
-+++ avidemux/prefs.in	2008-07-19 21:08:03.000000000 -0400
+--- avidemux_2.4.4.orig/avidemux/prefs.in	2008-07-23 12:47:32.000000000 -0400
++++ avidemux_2.4.4/avidemux/prefs.in	2009-02-19 00:02:46.000000000 -0500
 @@ -55,7 +55,7 @@
  #else
  device.audiodevice,			STRING,	ALSA
