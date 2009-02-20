@@ -1,8 +1,8 @@
 #define svndate 20080521
 
 Name:           avidemux
-Version:        2.4.3
-Release:        7%{?dist}
+Version:        2.4.4
+Release:        1%{?dist}
 Summary:        Graphical video editing and transcoding tool
 
 Group:          Applications/Multimedia
@@ -11,15 +11,14 @@ URL:            http://www.avidemux.org/
 Source0:        http://download.berlios.de/avidemux/avidemux_%{version}.tar.gz
 Source1:        %{name}-gtk.desktop
 Source2:        %{name}-qt.desktop
-Patch0:         avidemux-2.4.2-pulseaudio-default.patch
-Patch1:         avidemux-2.4.3-qt4.patch
+# Make PulseAudio the default audio out device
+Patch0:         avidemux-2.4-pulseaudio-default.patch
+# Search for lrelease-qt4 instead of lrelease
+Patch1:         avidemux-2.4-qt4.patch
+# Why are i18n files stored in bindir? Move to datadir...
 Patch2:         avidemux-2.4-i18n.patch
 # http://ftp.ncnu.edu.tw/Linux/Gentoo/gentoo-portage/media-video/avidemux/files/avidemux-2.4-libdca.patch
 Patch3:         avidemux-2.4-libdca.patch
-# http://avidemux.org/admForum/viewtopic.php?pid=29582#p29582
-# http://avidemux.org/admForum/viewtopic.php?id=3991
-Patch4:         avidemux-2.4.3-ppc.patch
-#http://bugs.gentoo.org/attachment.cgi?id=160132&action=view
 BuildRoot:      %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 
 Requires:       %{name}-cli  = %{version}
@@ -113,11 +112,10 @@ This package provides the QT interface for %{name}.
 
 %prep
 %setup -q -n avidemux_%{version}
-%patch0 -b .pulse
-%patch1 -b .qt4
-%patch2 -b .i18n
-%patch3 -b .libdca
-%patch4 -b .ppc
+%patch0 -p1 -b .pulse
+%patch1 -p1 -b .qt4
+%patch2 -p1 -b .i18n
+%patch3 -p1 -b .libdca
 
 %build
 %cmake
@@ -144,7 +142,7 @@ rm -rf $RPM_BUILD_ROOT
 %files -f %{name}.lang
 %defattr(-,root,root,-)
 %doc AUTHORS COPYING ChangeLog History README TODO
-%{_datadir}/%{name}/
+%dir %{_datadir}/%{name}
 
 %files cli
 %defattr(-,root,root,-)
@@ -157,10 +155,16 @@ rm -rf $RPM_BUILD_ROOT
 
 %files qt
 %defattr(-,root,root,-)
+%dir %{_datadir}/%{name}/i18n/
+%{_datadir}/%{name}/i18n/*.qm
 %{_bindir}/avidemux2_qt4
 %{_datadir}/applications/*qt*.desktop
 
 %changelog
+* Wed Feb 18 2009 Stewart Adam <s.adam at diffingo.com> - 2.4.4-1
+- Update to 2.4.4 final, update patches accordingly
+- Move Qt translation files to qt subpackage
+
 * Tue Nov 25 2008 Stewart Adam <s.adam at diffingo.com> - 2.4.3-7
 - Don't uselessly provide avidemux-cli
 - Make GUI and CLI subpackages require the main package (fixes bz#178)
