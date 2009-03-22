@@ -120,6 +120,7 @@ This package provides the Qt interface for %{name}.
 %patch1 -p1 -b .qt4
 %patch2 -p1 -b .i18n
 %patch3 -p1 -b .libdca
+%patch4 -p1 -b .gcc44
 
 %build
 %cmake
@@ -165,6 +166,9 @@ rm -rf $RPM_BUILD_ROOT
 %{_datadir}/applications/*qt*.desktop
 
 %changelog
+* Sun Mar 22 2009 Stewart Adam <s.adam at diffingo.com> - 2.4.4-3
+- Apply the patch
+
 * Sun Mar 22 2009 Stewart Adam <s.adam at diffingo.com> - 2.4.4-2
 - Fix build errors when compiling with gcc 4.4 (#386) (thanks to Rathann)
 
