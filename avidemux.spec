@@ -2,7 +2,7 @@
 
 Name:           avidemux
 Version:        2.4.4
-Release:        1%{?dist}
+Release:        2%{?dist}
 Summary:        Graphical video editing and transcoding tool
 
 Group:          Applications/Multimedia
@@ -19,6 +19,10 @@ Patch1:         avidemux-2.4-qt4.patch
 Patch2:         avidemux-2.4-i18n.patch
 # http://ftp.ncnu.edu.tw/Linux/Gentoo/gentoo-portage/media-video/avidemux/files/avidemux-2.4-libdca.patch
 Patch3:         avidemux-2.4-libdca.patch
+# https://bugzilla.rpmfusion.org/attachment.cgi?id=131
+# Upstream report: http://bugs.avidemux.org/index.php?do=details&task_id=592
+Patch4:         avidemux-2.4-gcc44-movq.patch
+
 BuildRoot:      %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 
 Requires:       %{name}-cli  = %{version}
@@ -161,6 +165,9 @@ rm -rf $RPM_BUILD_ROOT
 %{_datadir}/applications/*qt*.desktop
 
 %changelog
+* Sun Mar 22 2009 Stewart Adam <s.adam at diffingo.com> - 2.4.4-2
+- Fix build errors when compiling with gcc 4.4 (#386) (thanks to Rathann)
+
 * Wed Feb 18 2009 Stewart Adam <s.adam at diffingo.com> - 2.4.4-1
 - Update to 2.4.4 final, update patches accordingly
 - Move Qt translation files to qt subpackage
