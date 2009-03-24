@@ -2,7 +2,7 @@
 
 Name:           avidemux
 Version:        2.4.4
-Release:        2%{?dist}
+Release:        3%{?dist}
 Summary:        Graphical video editing and transcoding tool
 
 Group:          Applications/Multimedia
