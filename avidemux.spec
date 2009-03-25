@@ -2,7 +2,7 @@
 
 Name:           avidemux
 Version:        2.4.4
-Release:        3%{?dist}
+Release:        4%{?dist}
 Summary:        Graphical video editing and transcoding tool
 
 Group:          Applications/Multimedia
@@ -107,7 +107,9 @@ This package provides the GTK interface for %{name}.
 %package qt
 Summary:        QT GUI for %{name}
 Group:          Applications/Multimedia
-BuildRequires:  qt4-devel
+# 4.5.0-9 fixes a failure when there are duplicate translated strings
+# https://bugzilla.redhat.com/show_bug.cgi?id=491514
+BuildRequires:  qt4-devel >= 4.5.0-9
 Provides:       %{name}-gui = %{version}-%{release}
 Requires:       %{name} = %{version}-%{release}
 
@@ -166,6 +168,10 @@ rm -rf $RPM_BUILD_ROOT
 %{_datadir}/applications/*qt*.desktop
 
 %changelog
+* Wed Mar 25 2009 Dominik Mierzejewski <rpm at greysector.net> - 2.4.4-4
+- Fix gcc 4.4 patch
+- Improve dca patch
+
 * Sun Mar 22 2009 Stewart Adam <s.adam at diffingo.com> - 2.4.4-3
 - Apply the patch
 

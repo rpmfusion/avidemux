@@ -1,33 +1,15 @@
---- avidemux_2.4.4.orig/configure.in.in	2009-02-06 14:07:37.000000000 -0500
-+++ avidemux_2.4.4/configure.in.in	2009-02-18 23:48:22.000000000 -0500
-@@ -874,18 +874,14 @@
- if test "x$with_libdca" != "xno"; then
-     have_libdca=yes
-     AC_CHECK_HEADERS([dts.h], , have_libdca=no)
--    
--    if test "x$have_libdca" = "xyes"; then
--    	AC_CHECK_HEADERS([dts_internal.h], , have_libdca=no)
-     	
-     	if test "x$have_libdca" = "xyes"; then
-     		if test "x$use_late_binding" = "xno"; then
--				AC_CHECK_LIB(dts, dts_init, , have_libdca=no)
-+				AC_CHECK_LIB(dca, dca_init, , have_libdca=no)
- 			fi
- 		else
-     		AC_MSG_WARN(dts.h is there but I also need dts_internal.h to compile libdca/libdts. Please copy dts_internal.h where dts.h is)
-     	fi
--    fi
-     
-     if test "x$have_libdca" = "xyes"; then
- 		AC_DEFINE(USE_LIBDCA, 1, "[libdca detected]")
---- avidemux_2.4.4.orig/avidemux/CMakeLists.txt	2008-10-03 07:05:09.000000000 -0400
-+++ avidemux_2.4.4/avidemux/CMakeLists.txt	2009-02-18 23:45:12.000000000 -0500
-@@ -315,7 +315,7 @@
+diff -up avidemux_2.4.4/avidemux/CMakeLists.txt.libdca avidemux_2.4.4/avidemux/CMakeLists.txt
+--- avidemux_2.4.4/avidemux/CMakeLists.txt.libdca	2009-03-23 23:08:35.000000000 +0100
++++ avidemux_2.4.4/avidemux/CMakeLists.txt	2009-03-23 23:10:17.000000000 +0100
+@@ -315,7 +315,11 @@ endif(USE_AMR_NB AND NOT USE_LATE_BINDIN
  
  #libdts
  if(USE_LIBDCA AND NOT USE_LATE_BINDING)
--	add_libs_all_targets(dts)
-+	add_libs_all_targets(dca)
++	if(USE_DCA_INSTEAD_OF_DTS)
++		add_libs_all_targets(dca)
++	else(USE_DCA_INSTEAD_OF_DTS)
+ 	add_libs_all_targets(dts)
++	endif(USE_DCA_INSTEAD_OF_DTS)
  endif(USE_LIBDCA AND NOT USE_LATE_BINDING)
  
  # Lame

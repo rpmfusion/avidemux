@@ -58,6 +58,16 @@ diff -up avidemux_2.4.3/avidemux/ADM_osSupport/ADM_fileio.cpp.compile avidemux_2
          char *filename2;
  #ifndef ADM_WIN32		
  	filename = strrchr(str, '/');
+diff -up avidemux_2.4.4/avidemux/ADM_userInterfaces/ADM_QT4/ADM_dialog/DIA_color.cpp.compile avidemux_2.4.4/avidemux/ADM_userInterfaces/ADM_QT4/ADM_dialog/DIA_color.cpp
+--- avidemux_2.4.4/avidemux/ADM_userInterfaces/ADM_QT4/ADM_dialog/DIA_color.cpp.compile	2008-09-25 11:34:33.000000000 +0200
++++ avidemux_2.4.4/avidemux/ADM_userInterfaces/ADM_QT4/ADM_dialog/DIA_color.cpp	2009-03-23 22:59:21.000000000 +0100
+@@ -1,5 +1,5 @@
+ #include <QtGui>
+-
++#include <inttypes.h>
+ #include "../ADM_toolkit/qtToolkit.h"
+ 
+ int DIA_colorSel(uint8_t *r, uint8_t *g, uint8_t *b)
 diff -up avidemux_2.4.3/avidemux/ADM_userInterfaces/ADM_QT4/ADM_gui/ADM_qslider.cpp.compile avidemux_2.4.3/avidemux/ADM_userInterfaces/ADM_QT4/ADM_gui/ADM_qslider.cpp
 --- avidemux_2.4.3/avidemux/ADM_userInterfaces/ADM_QT4/ADM_gui/ADM_qslider.cpp.compile	2009-03-22 14:10:27.000000000 +0100
 +++ avidemux_2.4.3/avidemux/ADM_userInterfaces/ADM_QT4/ADM_gui/ADM_qslider.cpp	2009-03-22 14:15:51.000000000 +0100
@@ -93,6 +103,29 @@ diff -up avidemux_2.4.3/avidemux/ADM_userInterfaces/ADM_QT4/ADM_gui/gui_none.cpp
  #include <QtGui/QApplication>
  #include <QtGui/QDesktopWidget>
  
+diff -up avidemux_2.4.4/avidemux/ADM_video/ADM_vidCNR2_param.h.compile avidemux_2.4.4/avidemux/ADM_video/ADM_vidCNR2_param.h
+--- avidemux_2.4.4/avidemux/ADM_video/ADM_vidCNR2_param.h.compile	2005-07-05 19:23:17.000000000 +0200
++++ avidemux_2.4.4/avidemux/ADM_video/ADM_vidCNR2_param.h	2009-03-23 23:25:00.000000000 +0100
+@@ -14,6 +14,7 @@
+ 
+ #ifndef _CNR2_
+ #define _CNR2_
++#include <inttypes.h>
+ 
+ typedef struct CNR2Param
+ {
+diff -up avidemux_2.4.4/avidemux/ADM_video/ADM_vidColorYuv_param.h.compile avidemux_2.4.4/avidemux/ADM_video/ADM_vidColorYuv_param.h
+--- avidemux_2.4.4/avidemux/ADM_video/ADM_vidColorYuv_param.h.compile	2006-04-17 12:11:17.000000000 +0200
++++ avidemux_2.4.4/avidemux/ADM_video/ADM_vidColorYuv_param.h	2009-03-23 23:26:23.000000000 +0100
+@@ -14,6 +14,8 @@
+ 
+ #ifndef ADM_VID_COLOR_YUV_PARAM_H
+ #define ADM_VID_COLOR_YUV_PARAM_H
++#include <inttypes.h>
++
+ typedef struct COLOR_YUV_PARAM
+ {
+     double y_contrast, y_bright, y_gamma, y_gain;
 diff -up avidemux_2.4.3/avidemux/ADM_video/mmx_macros.h.compile avidemux_2.4.3/avidemux/ADM_video/mmx_macros.h
 --- avidemux_2.4.3/avidemux/ADM_video/mmx_macros.h.compile	2006-10-31 16:35:20.000000000 +0100
 +++ avidemux_2.4.3/avidemux/ADM_video/mmx_macros.h	2009-03-22 13:47:06.000000000 +0100
