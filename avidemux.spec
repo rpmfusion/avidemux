@@ -2,7 +2,7 @@
 
 Name:           avidemux
 Version:        2.4.4
-Release:        5%{?dist}
+Release:        6%{?dist}
 Summary:        Graphical video editing and transcoding tool
 
 Group:          Applications/Multimedia
@@ -24,6 +24,7 @@ Patch3:         avidemux-2.4-libdca.patch
 Patch4:         avidemux-2.4-gcc44-movq.patch
 
 BuildRoot:      %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
+ExcludeArch:    ppc ppc64
 
 Requires:       %{name}-cli  = %{version}
 Requires:       %{name}-gui = %{version}
@@ -168,6 +169,9 @@ rm -rf $RPM_BUILD_ROOT
 %{_datadir}/applications/*qt*.desktop
 
 %changelog
+* Sat Apr 25 2009 Stewart Adam <s.adam at diffingo.com> - 2.4.4-6
+- Rebuild, disable ppc* for now
+
 * Sun Mar 29 2009 Thorsten Leemhuis <fedora [AT] leemhuis [DOT] info> - 2.4.4-5
 - rebuild for new F11 features
 
