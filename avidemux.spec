@@ -2,7 +2,7 @@
 
 Name:           avidemux
 Version:        2.4.4
-Release:        7%{?dist}
+Release:        8%{?dist}
 Summary:        Graphical video editing and transcoding tool
 
 Group:          Applications/Multimedia
@@ -126,17 +126,19 @@ This package provides the Qt interface for %{name}.
 
 %build
 %cmake
+# po/ not smp safe - http://bugs.avidemux.org/index.php?do=details&task_id=605
+make -C po
 make %{?_smp_mflags}
 
 %install
 rm -rf $RPM_BUILD_ROOT
 make install DESTDIR=$RPM_BUILD_ROOT
 
-desktop-file-install --vendor livna \
+desktop-file-install --vendor rpmfusion \
     --dir $RPM_BUILD_ROOT%{_datadir}/applications \
     %{SOURCE1}
 
-desktop-file-install --vendor livna \
+desktop-file-install --vendor rpmfusion \
     --dir $RPM_BUILD_ROOT%{_datadir}/applications \
     %{SOURCE2}
 
@@ -168,6 +170,9 @@ rm -rf $RPM_BUILD_ROOT
 %{_datadir}/applications/*qt*.desktop
 
 %changelog
+* Sun May 03 2009 Rex Dieter <rdieter@fedoraproject.org> - 2.4.4-8
+- skip %%_smp_mflags in po/
+
 * Sat Apr 25 2009 Stewart Adam <s.adam at diffingo.com> - 2.4.4-7
 - Test build with ppc* enabled
 
