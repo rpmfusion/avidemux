@@ -1,5 +1,16 @@
---- avidemux_2.4.4.orig/avidemux/prefs.in	2008-07-23 12:47:32.000000000 -0400
-+++ avidemux_2.4.4/avidemux/prefs.in	2009-02-19 00:02:46.000000000 -0500
+--- ./avidemux/ADM_libraries/ADM_utilities/prefs.cpp.orig	2009-06-19 15:41:02.618558127 -0400
++++ ./avidemux/ADM_libraries/ADM_utilities/prefs.cpp	2009-06-19 15:41:08.552557321 -0400
+@@ -105,7 +105,7 @@
+ #else
+ 	{"device.audiodevice",		STRING,"ALSA",	NULL, NULL, NULL },
+ #endif
+-	{"device.audio.alsa_device",		STRING,"dmix",	NULL, NULL, NULL },
++	{"device.audio.alsa_device",		STRING,"pulse",	NULL, NULL, NULL },
+ 	{"device.videodevice",		UINT,	"0",	NULL,	"0",	"10"	},
+ 	{"default.postproc_type",		UINT,	"3",	NULL,	"0",	"7"	},
+ 	{"default.postproc_value",		UINT,	"3",	NULL,	"0",	"5"	},
+--- avidemux/prefs.in.orig	2008-07-23 12:47:32.000000000 -0400
++++ avidemux/prefs.in	2009-06-19 15:23:43.656584530 -0400
 @@ -55,7 +55,7 @@
  #else
  device.audiodevice,			STRING,	ALSA

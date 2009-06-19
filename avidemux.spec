@@ -2,7 +2,7 @@
 
 Name:           avidemux
 Version:        2.4.4
-Release:        8%{?dist}
+Release:        9%{?dist}
 Summary:        Graphical video editing and transcoding tool
 
 Group:          Applications/Multimedia
@@ -19,9 +19,13 @@ Patch1:         avidemux-2.4-qt4.patch
 Patch2:         avidemux-2.4-i18n.patch
 # http://ftp.ncnu.edu.tw/Linux/Gentoo/gentoo-portage/media-video/avidemux/files/avidemux-2.4-libdca.patch
 Patch3:         avidemux-2.4-libdca.patch
-# https://bugzilla.rpmfusion.org/attachment.cgi?id=131
+# Our report: https://bugzilla.rpmfusion.org/attachment.cgi?id=131
 # Upstream report: http://bugs.avidemux.org/index.php?do=details&task_id=592
-Patch4:         avidemux-2.4-gcc44-movq.patch
+# Patch from: http://sources.gentoo.org/viewcvs.py/gentoo-x86/media-video/avidemux/files/avidemux-2.4.4-gcc-4.4.patch?view=markup
+Patch4:         avidemux-2.4-gcc44.patch
+# Fix building with cmake 2.6.4+
+# Patch from: http://sources.gentoo.org/viewcvs.py/gentoo-x86/media-video/avidemux/files/avidemux-2.4-cmake264.patch?rev=1.1&view=markup
+Patch5:         avidemux-2.4-cmake264.patch
 
 BuildRoot:      %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 
@@ -118,11 +122,12 @@ This package provides the Qt interface for %{name}.
 
 %prep
 %setup -q -n avidemux_%{version}
-%patch0 -p1 -b .pulse
+%patch0 -b .pulse
 %patch1 -p1 -b .qt4
 %patch2 -p1 -b .i18n
 %patch3 -p1 -b .libdca
-%patch4 -p1 -b .gcc44
+%patch4 -b .gcc44
+%patch5 -p1 -b .cmake
 
 %build
 %cmake
@@ -170,6 +175,11 @@ rm -rf $RPM_BUILD_ROOT
 %{_datadir}/applications/*qt*.desktop
 
 %changelog
+* Fri Jun 19 2009 Stewart Adam <s.adam at diffingo.com> - 2.4.4-9
+- Add patch to fix build with CMake 2.6.4
+- Update gcc44 patch to match Gentoo upstream
+- Update PulseAudio patch to work as expected with avidemux 2.4.4
+
 * Sun May 03 2009 Rex Dieter <rdieter@fedoraproject.org> - 2.4.4-8
 - skip %%_smp_mflags in po/
 
