@@ -2,7 +2,7 @@
 
 Name:           avidemux
 Version:        2.4.4
-Release:        2%{?dist}
+Release:        3%{?dist}
 Summary:        Graphical video editing and transcoding tool
 
 Group:          Applications/Multimedia
@@ -19,6 +19,10 @@ Patch1:         avidemux-2.4-qt4.patch
 Patch2:         avidemux-2.4-i18n.patch
 # http://ftp.ncnu.edu.tw/Linux/Gentoo/gentoo-portage/media-video/avidemux/files/avidemux-2.4-libdca.patch
 Patch3:         avidemux-2.4-libdca.patch
+# Fix building with cmake 2.6.4+
+# Patch from: http://sources.gentoo.org/viewcvs.py/gentoo-x86/media-video/avidemux/files/avidemux-2.4-cmake264.patch?rev=1.1&view=markup
+Patch4:         avidemux-2.4-cmake264.patch
+
 BuildRoot:      %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 
 Requires:       %{name}-cli  = %{version}
@@ -112,24 +116,27 @@ This package provides the Qt interface for %{name}.
 
 %prep
 %setup -q -n avidemux_%{version}
-%patch0 -p1 -b .pulse
+%patch0 -b .pulse
 %patch1 -p1 -b .qt4
 %patch2 -p1 -b .i18n
 %patch3 -p1 -b .libdca
+%patch4 -p1 -b .cmake
 
 %build
 %cmake
+# po/ not smp safe - http://bugs.avidemux.org/index.php?do=details&task_id=605
+make -C po
 make %{?_smp_mflags}
 
 %install
 rm -rf $RPM_BUILD_ROOT
 make install DESTDIR=$RPM_BUILD_ROOT
 
-desktop-file-install --vendor livna \
+desktop-file-install --vendor rpmfusion \
     --dir $RPM_BUILD_ROOT%{_datadir}/applications \
     %{SOURCE1}
 
-desktop-file-install --vendor livna \
+desktop-file-install --vendor rpmfusion \
     --dir $RPM_BUILD_ROOT%{_datadir}/applications \
     %{SOURCE2}
 
@@ -161,6 +168,11 @@ rm -rf $RPM_BUILD_ROOT
 %{_datadir}/applications/*qt*.desktop
 
 %changelog
+* Fri Jun 19 2009 Stewart Adam <s.adam at diffingo.com> - 2.4.4-3
+- Add patch to fix build with CMake 2.6.4
+- Update PulseAudio patch to work as expected with avidemux 2.4.4
+- skip %%_smp_mflags in po (Rex Dieter)
+
 * Fri Feb 20 2009 Stewart Adam <s.adam at diffingo.com> - 2.4.4-2
 - Sync libdca and i18n patches with devel
 
