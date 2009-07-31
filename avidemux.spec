@@ -1,6 +1,6 @@
 Name:           avidemux
 Version:        2.5.0
-Release:        2%{?dist}
+Release:        3%{?dist}
 Summary:        Graphical video editing and transcoding tool
 
 Group:          Applications/Multimedia
@@ -21,10 +21,13 @@ Patch3:         avidemux-2.5-filelocations.patch
 # Fixes for gcc 4.4
 # Patch from http://arklinux.ch/~bero/avidemux-2.5.0-gcc-4.4.patch
 Patch4:         avidemux-2.5-gcc-44.patch
+# Fixes altivec build errors on PPC
+Patch5:         avidemux-2.5-libmpeg2enc-altivec.patch
+### Patches for plugins
 # Install to correct libdir on 64bit and moves plugins into avidemux subdir
-Patch5:         avidemux-plugins-2.5-plugdir.patch
+Patch6:         avidemux-plugins-2.5-plugdir.patch
 # Fixes for gcc 4.4 (plugins)
-Patch6:         avidemux-plugins-2.5-gcc44.patch
+Patch7:         avidemux-plugins-2.5-gcc44.patch
 
 BuildRoot:      %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 
@@ -157,8 +160,9 @@ sed -i.bak 's/startDir="lib";/startDir="lib64";/' avidemux/ADM_core/src/ADM_file
 sed -i.bak 's/startDir="lib";/startDir="lib64";/' avidemux/main.cpp
 %endif
 %patch4 -p1 -b .gcc44
-%patch5 -p1 -b .plugdir
-%patch6 -p1 -b .pluggcc44
+%patch5 -p1 -b .altivec
+%patch6 -p1 -b .plugdir
+%patch7 -p1 -b .pluggcc44
 
 %build
 # Out of source build
@@ -244,6 +248,9 @@ rm -rf $RPM_BUILD_ROOT
 %{_includedir}/ADM_coreConfig.h
 
 %changelog
+* Fri Jul 31 2009 Stewart Adam <s.adam at diffingo.com> - 2.5.0-3
+- Add patch to fix Altivec build errors on PPC
+
 * Thu Jul 30 2009 Stewart Adam <s.adam at diffingo.com> - 2.5.0-2
 - Reintegrate plugins package as a subpackage
 
