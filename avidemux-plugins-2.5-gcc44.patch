@@ -1,0 +1,128 @@
+--- avidemux_2.5.0.orig/plugins/ADM_videoEncoder/ADM_vidEnc_x264/guiHelper.cpp	2008-06-04 13:00:03.000000000 -0400
++++ avidemux_2.5.0/plugins/ADM_videoEncoder/ADM_vidEnc_x264/guiHelper.cpp	2009-07-03 20:54:54.422096888 -0400
+@@ -62,8 +62,8 @@
+ 
+ int x264_cqm_parse_jmlist(const char *buf, const char *name, uint8_t *cqm, uint8_t *defaultMatrix, int length)
+ {
+-	char *p;
+-	char *nextvar;
++	const char *p;
++	const char *nextvar;
+ 	int i;
+ 
+ 	p = strstr(buf, name);
+--- avidemux_2.5.0.orig/plugins/ADM_videoFilters/AvisynthResize/qt4/Q_resize.h	2008-09-30 20:03:46.000000000 -0400
++++ avidemux_2.5.0/plugins/ADM_videoFilters/AvisynthResize/qt4/Q_resize.h	2009-07-03 21:03:23.949971298 -0400
+@@ -1,6 +1,7 @@
+ #ifndef Q_resizing_h
+ #define Q_resizing_h
+ 
++#include <stdint.h>
+ #include "ui_resizing.h"
+ 
+ typedef struct resParam
+--- avidemux_2.5.0.orig/plugins/ADM_videoEncoder/ADM_vidEnc_x264/qt4/x264ConfigDialog.h	2009-02-21 11:02:13.000000000 -0500
++++ avidemux_2.5.0/plugins/ADM_videoEncoder/ADM_vidEnc_x264/qt4/x264ConfigDialog.h	2009-07-03 21:15:58.542993276 -0400
+@@ -1,6 +1,7 @@
+ #ifndef x264ConfigDialog_h
+ #define x264ConfigDialog_h
+ 
++#include <stdint.h>
+ #include "ui_x264ConfigDialog.h"
+ #include "../options.h"
+ #include "x264ZoneTableModel.h"
+--- avidemux_2.5.0.orig/plugins/ADM_videoEncoder/ADM_vidEnc_x264/qt4/x264CustomMatrixDialog.h	2009-01-11 08:00:18.000000000 -0500
++++ avidemux_2.5.0/plugins/ADM_videoEncoder/ADM_vidEnc_x264/qt4/x264CustomMatrixDialog.h	2009-07-03 21:16:17.023216696 -0400
+@@ -1,6 +1,7 @@
+ #ifndef x264CustomMatrixDialog_h
+ #define x264CustomMatrixDialog_h
+ 
++#include <stdint.h>
+ #include "ui_x264CustomMatrixDialog.h"
+ 
+ class x264CustomMatrixDialog : public QDialog
+--- avidemux_2.5.0.orig/plugins/ADM_videoEncoder/ADM_vidEnc_x264/qt4/x264ZoneTableModel.h	2008-06-04 13:00:03.000000000 -0400
++++ avidemux_2.5.0/plugins/ADM_videoEncoder/ADM_vidEnc_x264/qt4/x264ZoneTableModel.h	2009-07-03 21:19:27.163971100 -0400
+@@ -1,6 +1,7 @@
+ #ifndef x264ZoneTableModel_h
+ #define x264ZoneTableModel_h
+ 
++#include <stdint.h>
+ #include <QtCore/QAbstractTableModel>
+ #include <QtCore/QPair>
+ #include <QtCore/QList>
+--- avidemux_2.5.0.orig/plugins/ADM_videoEncoder/ADM_vidEnc_x264/qt4/x264ConfigDialog.cpp	2009-04-22 16:52:19.000000000 -0400
++++ avidemux_2.5.0/plugins/ADM_videoEncoder/ADM_vidEnc_x264/qt4/x264ConfigDialog.cpp	2009-07-03 21:22:02.812970995 -0400
+@@ -17,6 +17,7 @@
+  *                                                                         *
+  ***************************************************************************/
+ 
++#include <stdint.h>
+ #include <math.h>
+ #include <QtGui/QFileDialog>
+ 
+--- avidemux_2.5.0.orig/plugins/ADM_videoFilters/MplayerResize/qt4/Q_resize.cpp	2008-10-01 11:09:22.000000000 -0400
++++ avidemux_2.5.0/plugins/ADM_videoFilters/MplayerResize/qt4/Q_resize.cpp	2009-07-03 21:47:39.378097028 -0400
+@@ -13,6 +13,7 @@
+  ***************************************************************************/
+ 
+ #include <math.h>
++#include <stdint.h>
+ 
+ #include "Q_resize.h"
+ #include "DIA_coreToolkit.h"
+--- avidemux_2.5.0.orig/plugins/ADM_videoFilters/MplayerResize/qt4/Q_resize.h	2009-07-03 21:49:19.116971495 -0400
++++ avidemux_2.5.0/plugins/ADM_videoFilters/MplayerResize/qt4/Q_resize.h	2009-07-03 21:49:26.191970527 -0400
+@@ -1,6 +1,7 @@
+ #ifndef Q_resizing_h
+ #define Q_resizing_h
+ 
++#include <stdint.h>
+ #include "ui_resizing.h"
+ 
+ typedef struct resParam
+--- avidemux_2.5.0.orig/plugins/ADM_videoFilters/CNR2/ADM_vidCNR2_param.h	2008-06-04 13:00:03.000000000 -0400
++++ avidemux_2.5.0/plugins/ADM_videoFilters/CNR2/ADM_vidCNR2_param.h	2009-07-03 21:51:25.800096682 -0400
+@@ -15,6 +15,8 @@
+ #ifndef _CNR2_
+ #define _CNR2_
+ 
++#include <stdint.h>
++
+ typedef struct CNR2Param
+ {
+         double scdthr;          // Scene change threshold in % default 10
+--- avidemux_2.5.0.orig/plugins/ADM_videoFilters/colorYUV/ADM_vidColorYuv_param.h	2008-06-04 13:00:03.000000000 -0400
++++ avidemux_2.5.0/plugins/ADM_videoFilters/colorYUV/ADM_vidColorYuv_param.h	2009-07-03 21:52:07.184096982 -0400
+@@ -14,6 +14,9 @@
+ 
+ #ifndef ADM_VID_COLOR_YUV_PARAM_H
+ #define ADM_VID_COLOR_YUV_PARAM_H
++
++#include <stdint.h>
++
+ typedef struct COLOR_YUV_PARAM
+ {
+     double y_contrast, y_bright, y_gamma, y_gain;
+--- avidemux_2.5.0.orig/plugins/ADM_videoFilters/MPDelogo/ADM_vidMPdelogo.h	2008-06-04 13:00:03.000000000 -0400
++++ avidemux_2.5.0/plugins/ADM_videoFilters/MPDelogo/ADM_vidMPdelogo.h	2009-07-03 21:52:59.329096895 -0400
+@@ -12,6 +12,9 @@
+  ***************************************************************************/
+ #ifndef ADM_DELOGO_H
+ #define ADM_DELOGO_H
++
++#include <stdint.h>
++
+ typedef struct MPDELOGO_PARAM
+ {
+         uint32_t xoff;
+--- avidemux_2.5.0.orig/avidemux/ADM_plugin/ADM_vidEnc_plugin.h	2009-03-04 17:49:41.000000000 -0500
++++ avidemux_2.5.0/avidemux/ADM_plugin/ADM_vidEnc_plugin.h	2009-07-03 22:18:01.394215102 -0400
+@@ -42,6 +42,7 @@
+ 
+ #define ADM_VIDENC_REQ_NULL_FLUSH 1
+ 
++#include <stdint.h>
+ #include "DIA_uiTypes.h"
+ 
+ #define ADM_VIDENC_FLAG_GLOBAL_HEADER 1
