@@ -1,6 +1,6 @@
 Name:           avidemux
 Version:        2.5.0
-Release:        3%{?dist}
+Release:        4%{?dist}
 Summary:        Graphical video editing and transcoding tool
 
 Group:          Applications/Multimedia
@@ -30,6 +30,9 @@ Patch6:         avidemux-plugins-2.5-plugdir.patch
 Patch7:         avidemux-plugins-2.5-gcc44.patch
 
 BuildRoot:      %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
+
+# Upstream has been informed http://avidemux.org/admForum/viewtopic.php?id=6447
+ExcludeArch: ppc ppc64
 
 Requires:       %{name}-cli  = %{version}-%{release}
 Requires:       %{name}-gui = %{version}-%{release}
@@ -248,6 +251,9 @@ rm -rf $RPM_BUILD_ROOT
 %{_includedir}/ADM_coreConfig.h
 
 %changelog
+* Mon Aug 3 2009 Stewart Adam <s.adam at diffingo.com> - 2.5.0-4
+- Disable building on ppc and ppc64
+
 * Fri Jul 31 2009 Stewart Adam <s.adam at diffingo.com> - 2.5.0-3
 - Add patch to fix Altivec build errors on PPC
 
