@@ -1,6 +1,6 @@
 Name:           avidemux
 Version:        2.5.0
-Release:        4%{?dist}
+Release:        5%{?dist}
 Summary:        Graphical video editing and transcoding tool
 
 Group:          Applications/Multimedia
@@ -172,8 +172,11 @@ sed -i.bak 's/startDir="lib";/startDir="lib64";/' avidemux/main.cpp
 mkdir build build_plugins && cd build
 %cmake ../
 # po/ not smp safe - http://bugs.avidemux.org/index.php?do=details&task_id=605
-make -C po
-make %{?_smp_mflags}
+#make -C po
+# smp_mflags seems to break on the buildsys
+#make %{?_smp_mflags}
+make
+
 # Do a local install to build plugins
 make install DESTDIR=%{_builddir}/avidemux_%{version}/localinstall
 
@@ -184,7 +187,9 @@ cd ../build_plugins
        -DAVIDEMUX_CORECONFIG_DIR=%{_builddir}/avidemux_%{version}/build/config \
        -DAVIDEMUX_INSTALL_PREFIX=%{_builddir}/avidemux_%{version}/localinstall/%{_prefix} \
        ../plugins
-make %{?_smp_mflags}
+# See note above, this doesn't always work properly
+#make %{?_smp_mflags}
+make
 
 
 %install
@@ -251,6 +256,9 @@ rm -rf $RPM_BUILD_ROOT
 %{_includedir}/ADM_coreConfig.h
 
 %changelog
+* Mon Aug 3 2009 Stewart Adam <s.adam at diffingo.com> - 2.5.0-5
+- Disable smp_mflags
+
 * Mon Aug 3 2009 Stewart Adam <s.adam at diffingo.com> - 2.5.0-4
 - Disable building on ppc and ppc64
 
