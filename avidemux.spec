@@ -1,6 +1,6 @@
 Name:           avidemux
 Version:        2.5.0
-Release:        5%{?dist}
+Release:        6%{?dist}
 Summary:        Graphical video editing and transcoding tool
 
 Group:          Applications/Multimedia
@@ -31,8 +31,8 @@ Patch7:         avidemux-plugins-2.5-gcc44.patch
 
 BuildRoot:      %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 
-# Upstream has been informed http://avidemux.org/admForum/viewtopic.php?id=6447
-ExcludeArch: ppc ppc64
+## Upstream has been informed http://avidemux.org/admForum/viewtopic.php?id=6447
+#ExcludeArch: ppc ppc64
 
 Requires:       %{name}-cli  = %{version}-%{release}
 Requires:       %{name}-gui = %{version}-%{release}
@@ -256,6 +256,9 @@ rm -rf $RPM_BUILD_ROOT
 %{_includedir}/ADM_coreConfig.h
 
 %changelog
+* Mon Aug 5 2009 Stewart Adam <s.adam at diffingo.com> - 2.5.0-6
+- Attempt a build with ppc enabled, smp_mflags disabled
+
 * Mon Aug 3 2009 Stewart Adam <s.adam at diffingo.com> - 2.5.0-5
 - Disable smp_mflags
 
