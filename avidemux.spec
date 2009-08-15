@@ -1,33 +1,29 @@
 Name:           avidemux
 Version:        2.5.0
-Release:        6%{?dist}
+Release:        7.20090814svn%{?dist}
 Summary:        Graphical video editing and transcoding tool
 
 Group:          Applications/Multimedia
 License:        GPLv2+
 URL:            http://www.avidemux.org/
-Source0:        http://download.berlios.de/avidemux/avidemux_%{version}.tar.gz
+#Source0:        http://download.berlios.de/avidemux/avidemux_%{version}.tar.gz
+# svn co svn://svn.berlios.de/avidemux/branches/avidemux_2.5_branch_gruntster
+# svn export . ../avidemux-2.5.0-20090814-r5245
+# tar cfj avidemux-2.5.0-20090814-r5245.tar.bz2 avidemux-2.5.0-20090814-r5245
+Source0:        avidemux-%{version}-20090814-r5245.tar.bz2
 Source1:        %{name}-gtk.desktop
 Source2:        %{name}-qt.desktop
-# Make PulseAudio the default audio out device
-Patch0:         avidemux-2.5-pulseaudio-default.patch
-# Search for lrelease-qt4 instead of lrelease
-Patch1:         avidemux-2.4-qt4.patch
-# Move translations out of bindir
-Patch2:         avidemux-2.5-i18n.patch
-# Fix libdir location on 64bit
-# Move scripts & plugins avidemux subdir instead of in libdir or datadir
-Patch3:         avidemux-2.5-filelocations.patch
-# Fixes for gcc 4.4
-# Patch from http://arklinux.ch/~bero/avidemux-2.5.0-gcc-4.4.patch
-Patch4:         avidemux-2.5-gcc-44.patch
-# Fixes altivec build errors on PPC
-Patch5:         avidemux-2.5-libmpeg2enc-altivec.patch
-### Patches for plugins
-# Install to correct libdir on 64bit and moves plugins into avidemux subdir
-Patch6:         avidemux-plugins-2.5-plugdir.patch
-# Fixes for gcc 4.4 (plugins)
-Patch7:         avidemux-plugins-2.5-gcc44.patch
+Patch0:         avidemux-2.5-multilib.patch
+# Patches 1-3 obtained from avidemux-2.5.0-patches-1.tar.bz2:
+# http://mirror.csclub.uwaterloo.ca/gentoo-distfiles/distfiles/avidemux-2.5.0-patches-1.tar.bz2
+Patch1:         2.5.0-build-plugins.patch
+Patch2:         2.5.0-coreImage-parallel-build.patch
+Patch3:         2.5.0-fake-inst-dir.patch
+Patch4:         avidemux-2.5-pulseaudio-default.patch
+Patch5:         avidemux-2.4-qt4.patch
+Patch6:         avidemux-2.5-i18n.patch
+Patch7:         avidemux-2.5-libmpeg2enc-altivec.patch
+Patch8:         avidemux-2.5-checkfunction-includes.patch
 
 BuildRoot:      %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 
@@ -152,57 +148,44 @@ Requires:       %{name}-libs = %{version}-%{release}
 This package contains various plugins for avidemux.
 
 %prep
-%setup -q -n avidemux_%{version}
-%patch0 -p1 -b .pulse
-%patch1 -p1 -b .qt4
-%patch2 -p1 -b .i18n
-%patch3 -p1 -b .lib64
+%setup -q -n avidemux-%{version}-20090814-r5245
+
 # change hardcoded libdir paths
-%ifarch x86_64
+%ifarch x86_64 ppc64
 sed -i.bak 's/startDir="lib";/startDir="lib64";/' avidemux/ADM_core/src/ADM_fileio.cpp
 sed -i.bak 's/startDir="lib";/startDir="lib64";/' avidemux/main.cpp
 %endif
-%patch4 -p1 -b .gcc44
-%patch5 -p1 -b .altivec
-%patch6 -p1 -b .plugdir
-%patch7 -p1 -b .pluggcc44
+
+%patch0 -p1 -b .multilib
+%patch1 -p1 -b .plugins
+%patch2 -p1 -b .ciparallel
+%patch3 -p1 -b .fakeinstdir
+%patch4 -b .pulse
+%patch5 -p1 -b .qt4
+%patch6 -p1 -b .i18n
+%patch7 -p1 -b .altivec
+%patch8 -p1 -b .cfincludes
+
 
 %build
 # Out of source build
-mkdir build build_plugins && cd build
-%cmake ../
-# po/ not smp safe - http://bugs.avidemux.org/index.php?do=details&task_id=605
-#make -C po
-# smp_mflags seems to break on the buildsys
-#make %{?_smp_mflags}
-make
-
-# Do a local install to build plugins
-make install DESTDIR=%{_builddir}/avidemux_%{version}/localinstall
-
-mkdir avidemux_%{version}/build_plugins avidemux_%{version}/build && cd avidemux_%{version}/build
-%cmake ../
-cd ../build_plugins
-%cmake -DAVIDEMUX_SOURCE_DIR=%{_builddir}/avidemux_%{version} \
-       -DAVIDEMUX_CORECONFIG_DIR=%{_builddir}/avidemux_%{version}/build/config \
-       -DAVIDEMUX_INSTALL_PREFIX=%{_builddir}/avidemux_%{version}/localinstall/%{_prefix} \
-       ../plugins
-# See note above, this doesn't always work properly
-#make %{?_smp_mflags}
-make
+mkdir build && cd build
+%cmake -DAVIDEMUX_SOURCE_DIR=%{_builddir}/avidemux-%{version}-20090814-r5245 \
+       -DAVIDEMUX_INSTALL_PREFIX=%{_builddir}/avidemux-%{version}-20090814-r5245/build \
+       -DAVIDEMUX_CORECONFIG_DIR=%{_builddir}/avidemux-%{version}-20090814-r5245/build/config \
+       ../
+make %{?_smp_mflags}
+make -C plugins %{?_smp_mflags}
 
 
 %install
 rm -rf $RPM_BUILD_ROOT
-# Install main to $RPM_BUILD_ROOT
 cd build
 make install DESTDIR=$RPM_BUILD_ROOT
+make -C plugins install DESTDIR=$RPM_BUILD_ROOT
+# Install the build configuration for devel package
 install -d -m755 $RPM_BUILD_ROOT%{_includedir}
 install -m644 config/ADM_coreConfig.h $RPM_BUILD_ROOT%{_includedir}/ADM_coreConfig.h
-%find_lang %{name}
-# Install plugins to $RPM_BUILD_ROOT
-cd ../build_plugins
-make install DESTDIR=$RPM_BUILD_ROOT
 
 # Find and remove all la files
 find $RPM_BUILD_ROOT -type f -name "*.la" -exec rm -f {} ';'
@@ -215,6 +198,8 @@ desktop-file-install --vendor rpmfusion \
 desktop-file-install --vendor rpmfusion \
     --dir $RPM_BUILD_ROOT%{_datadir}/applications \
     %{SOURCE2}
+
+%find_lang %{name}
 
 %clean
 rm -rf $RPM_BUILD_ROOT
@@ -229,7 +214,7 @@ rm -rf $RPM_BUILD_ROOT
 %files libs -f build/%{name}.lang
 %doc AUTHORS COPYING README TODO
 %dir %{_datadir}/%{name}
-%{_datadir}/%{name}/ADM_scripts/
+%{_datadir}/ADM_scripts/
 %{_libdir}/libADM*
 
 %files cli
@@ -256,6 +241,11 @@ rm -rf $RPM_BUILD_ROOT
 %{_includedir}/ADM_coreConfig.h
 
 %changelog
+* Fri Aug 14 2009 Stewart Adam <s.adam at diffingo.com> - 2.5.0-7.20090814svn
+- Update to 2.5.0 subversion r5245
+- Apply additional patches from Gentoo ebuild
+- Re-enable PPC* builds as well as smp_mflags
+
 * Mon Aug 5 2009 Stewart Adam <s.adam at diffingo.com> - 2.5.0-6
 - Attempt a build with ppc enabled, smp_mflags disabled
 
