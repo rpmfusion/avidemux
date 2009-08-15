@@ -1,6 +1,6 @@
 Name:           avidemux
 Version:        2.5.0
-Release:        7.20090814svn%{?dist}
+Release:        8.20090814svn%{?dist}
 Summary:        Graphical video editing and transcoding tool
 
 Group:          Applications/Multimedia
@@ -160,7 +160,7 @@ sed -i.bak 's/startDir="lib";/startDir="lib64";/' avidemux/main.cpp
 %patch1 -p1 -b .plugins
 %patch2 -p1 -b .ciparallel
 %patch3 -p1 -b .fakeinstdir
-%patch4 -b .pulse
+%patch4 -p1 -b .pulse
 %patch5 -p1 -b .qt4
 %patch6 -p1 -b .i18n
 %patch7 -p1 -b .altivec
@@ -241,6 +241,9 @@ rm -rf $RPM_BUILD_ROOT
 %{_includedir}/ADM_coreConfig.h
 
 %changelog
+* Fri Aug 14 2009 Stewart Adam <s.adam at diffingo.com> - 2.5.0-8.20090814svn
+- Fix arguments for pulse patch (got mixed up with the 2.4 patch)
+
 * Fri Aug 14 2009 Stewart Adam <s.adam at diffingo.com> - 2.5.0-7.20090814svn
 - Update to 2.5.0 subversion r5245
 - Apply additional patches from Gentoo ebuild
