@@ -1,6 +1,6 @@
 Name:           avidemux
 Version:        2.5.0
-Release:        8.20090814svn%{?dist}
+Release:        9.20090814svn%{?dist}
 Summary:        Graphical video editing and transcoding tool
 
 Group:          Applications/Multimedia
@@ -27,8 +27,8 @@ Patch8:         avidemux-2.5-checkfunction-includes.patch
 
 BuildRoot:      %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 
-## Upstream has been informed http://avidemux.org/admForum/viewtopic.php?id=6447
-#ExcludeArch: ppc ppc64
+# Upstream has been informed http://avidemux.org/admForum/viewtopic.php?id=6447
+ExcludeArch: ppc ppc64
 
 Requires:       %{name}-cli  = %{version}-%{release}
 Requires:       %{name}-gui = %{version}-%{release}
@@ -67,7 +67,6 @@ BuildRequires:  lame-devel >= 3.96.1
 BuildRequires:  libmad-devel >= 0.15.1
 BuildRequires:  libogg-devel >= 1.1
 BuildRequires:  libvorbis-devel >= 1.0.1
-
 BuildRequires:  libdca-devel
 
 
@@ -241,6 +240,9 @@ rm -rf $RPM_BUILD_ROOT
 %{_includedir}/ADM_coreConfig.h
 
 %changelog
+* Sat Aug 15 2009 Stewart Adam <s.adam at diffingo.com> - 2.5.0-9.20090814svn
+- Disable PPC* as it still fails to build even with new patches
+
 * Fri Aug 14 2009 Stewart Adam <s.adam at diffingo.com> - 2.5.0-8.20090814svn
 - Fix arguments for pulse patch (got mixed up with the 2.4 patch)
 
