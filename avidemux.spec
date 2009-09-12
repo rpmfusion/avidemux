@@ -1,6 +1,6 @@
 Name:           avidemux
-Version:        2.5.0
-Release:        9.20090814svn%{?dist}
+Version:        2.5.1
+Release:        1.20090911svn%{?dist}
 Summary:        Graphical video editing and transcoding tool
 
 Group:          Applications/Multimedia
@@ -8,22 +8,27 @@ License:        GPLv2+
 URL:            http://www.avidemux.org/
 #Source0:        http://download.berlios.de/avidemux/avidemux_%{version}.tar.gz
 # svn co svn://svn.berlios.de/avidemux/branches/avidemux_2.5_branch_gruntster
-# svn export . ../avidemux-2.5.0-20090814-r5245
-# tar cfj avidemux-2.5.0-20090814-r5245.tar.bz2 avidemux-2.5.0-20090814-r5245
-Source0:        avidemux-%{version}-20090814-r5245.tar.bz2
+# svn export avidemux_2.5_branch_gruntster avidemux-2.5.1-20090911svn-r5328
+# pushd avidemux-2.5.1-20090911svn-r5328/avidemux/ADM_libraries
+# rm {ffmpeg,libswscale}*.tar.gz
+##(cmake/admFFmpegBuild.cmake provides the up-to-date SVN revision numbers)
+# svn co svn://svn.ffmpeg.org/ffmpeg/trunk -r 19733 --ignore-externals ffmpeg
+# tar cfz ffmpeg_r19733.tar.gz ffmpeg && rm -rf ffmpeg
+# svn co svn://svn.ffmpeg.org/mplayer/trunk/libswscale -r 29569 libswscaleg
+# tar cfz libswscale_r29569.tar.gz libswscale && rm -rf libswscale
+# popd
+# tar cfj avidemux-2.5.1-20090911svn-r5328.tar.bz2 avidemux-2.5.1-20090911svn-r5328
+Source0:        avidemux-%{version}-20090911svn-r5328.tar.bz2
 Source1:        %{name}-gtk.desktop
 Source2:        %{name}-qt.desktop
-Patch0:         avidemux-2.5-multilib.patch
-# Patches 1-3 obtained from avidemux-2.5.0-patches-1.tar.bz2:
+# Patch0 obtained from avidemux-2.5.0-patches-1.tar.bz2:
 # http://mirror.csclub.uwaterloo.ca/gentoo-distfiles/distfiles/avidemux-2.5.0-patches-1.tar.bz2
-Patch1:         2.5.0-build-plugins.patch
-Patch2:         2.5.0-coreImage-parallel-build.patch
-Patch3:         2.5.0-fake-inst-dir.patch
-Patch4:         avidemux-2.5-pulseaudio-default.patch
-Patch5:         avidemux-2.4-qt4.patch
-Patch6:         avidemux-2.5-i18n.patch
-Patch7:         avidemux-2.5-libmpeg2enc-altivec.patch
-Patch8:         avidemux-2.5-checkfunction-includes.patch
+Patch0:         2.5.0-coreImage-parallel-build.patch
+Patch1:         avidemux-2.5-pulseaudio-default.patch
+Patch2:         avidemux-2.4-qt4.patch
+Patch3:         avidemux-2.5-i18n.patch
+Patch4:         avidemux-2.5-libmpeg2enc-altivec.patch
+Patch5:         avidemux-2.5-checkfunction-includes.patch
 
 BuildRoot:      %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 
@@ -147,7 +152,7 @@ Requires:       %{name}-libs = %{version}-%{release}
 This package contains various plugins for avidemux.
 
 %prep
-%setup -q -n avidemux-%{version}-20090814-r5245
+%setup -q -n avidemux-%{version}-20090911svn-r5328
 
 # change hardcoded libdir paths
 %ifarch x86_64 ppc64
@@ -155,36 +160,37 @@ sed -i.bak 's/startDir="lib";/startDir="lib64";/' avidemux/ADM_core/src/ADM_file
 sed -i.bak 's/startDir="lib";/startDir="lib64";/' avidemux/main.cpp
 %endif
 
-%patch0 -p1 -b .multilib
-%patch1 -p1 -b .plugins
-%patch2 -p1 -b .ciparallel
-%patch3 -p1 -b .fakeinstdir
-%patch4 -p1 -b .pulse
-%patch5 -p1 -b .qt4
-%patch6 -p1 -b .i18n
-%patch7 -p1 -b .altivec
-%patch8 -p1 -b .cfincludes
+%patch0 -p1 -b .parallel
+%patch1 -p1 -b .pulse
+%patch2 -p1 -b .qt4
+%patch3 -p1 -b .i18n
+%patch4 -p1 -b .altivec
+%patch5 -p1 -b .cfincludes
 
 
 %build
 # Out of source build
 mkdir build && cd build
-%cmake -DAVIDEMUX_SOURCE_DIR=%{_builddir}/avidemux-%{version}-20090814-r5245 \
-       -DAVIDEMUX_INSTALL_PREFIX=%{_builddir}/avidemux-%{version}-20090814-r5245/build \
-       -DAVIDEMUX_CORECONFIG_DIR=%{_builddir}/avidemux-%{version}-20090814-r5245/build/config \
-       ../
+%cmake -DAVIDEMUX_INSTALL_PREFIX=%{_prefix} \
+       -DAVIDEMUX_SOURCE_DIR="%{_builddir}/avidemux-%{version}-20090911svn-r5328" \
+       -DAVIDEMUX_CORECONFIG_DIR="%{_builddir}/avidemux-%{version}-20090911svn-r5328/build/config" \
+       ..
 make %{?_smp_mflags}
-make -C plugins %{?_smp_mflags}
+mkdir ../build_plugins && cd ../build_plugins
+%cmake -DAVIDEMUX_INSTALL_PREFIX=%{_prefix} \
+       -DAVIDEMUX_SOURCE_DIR="%{_builddir}/avidemux-%{version}-20090911svn-r5328" \
+       -DAVIDEMUX_CORECONFIG_DIR="%{_builddir}/avidemux-%{version}-20090911svn-r5328/build/config" \
+       ../plugins
+make %{?_smp_mflags}
 
 
 %install
 rm -rf $RPM_BUILD_ROOT
-cd build
-make install DESTDIR=$RPM_BUILD_ROOT
-make -C plugins install DESTDIR=$RPM_BUILD_ROOT
+make -C build install DESTDIR=$RPM_BUILD_ROOT
+make -C build_plugins install DESTDIR=$RPM_BUILD_ROOT
 # Install the build configuration for devel package
 install -d -m755 $RPM_BUILD_ROOT%{_includedir}
-install -m644 config/ADM_coreConfig.h $RPM_BUILD_ROOT%{_includedir}/ADM_coreConfig.h
+install -m644 build/config/ADM_coreConfig.h $RPM_BUILD_ROOT%{_includedir}/ADM_coreConfig.h
 
 # Find and remove all la files
 find $RPM_BUILD_ROOT -type f -name "*.la" -exec rm -f {} ';'
@@ -210,7 +216,7 @@ rm -rf $RPM_BUILD_ROOT
 %defattr(-,root,root,-)
 # metapackage, no files
 
-%files libs -f build/%{name}.lang
+%files libs -f %{name}.lang
 %doc AUTHORS COPYING README TODO
 %dir %{_datadir}/%{name}
 %{_datadir}/ADM_scripts/
@@ -240,6 +246,9 @@ rm -rf $RPM_BUILD_ROOT
 %{_includedir}/ADM_coreConfig.h
 
 %changelog
+* Fri Sep 11 2009 Stewart Adam <s.adam at diffingo.com> - 2.5.1-1.20090911svn
+- Update to 2.5.1 subversion r5328
+
 * Sat Aug 15 2009 Stewart Adam <s.adam at diffingo.com> - 2.5.0-9.20090814svn
 - Disable PPC* as it still fails to build even with new patches
 
