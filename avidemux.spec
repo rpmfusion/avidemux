@@ -13,9 +13,11 @@ URL:            http://www.avidemux.org/
 # rm {ffmpeg,libswscale}*.tar.gz
 ##(cmake/admFFmpegBuild.cmake provides the up-to-date SVN revision numbers)
 # svn co svn://svn.ffmpeg.org/ffmpeg/trunk -r 19733 --ignore-externals ffmpeg
-# tar cfz ffmpeg_r19733.tar.gz ffmpeg && rm -rf ffmpeg
-# svn co svn://svn.ffmpeg.org/mplayer/trunk/libswscale -r 29569 libswscaleg
-# tar cfz libswscale_r29569.tar.gz libswscale && rm -rf libswscale
+# rm -rf ffmpeg/.svn
+# tar cfz ffmpeg_r19733.tar.gz ffmpeg && rm -rf ffmpeg{,_r19733}
+# svn co svn://svn.ffmpeg.org/mplayer/trunk/libswscale -r 29569 libswscale
+# svn export libswscale libswscale_r29569
+# tar cfz libswscale_r29569.tar.gz libswscale_r29569 && rm -rf libswscale{,_r29569}
 # popd
 # tar cfj avidemux-2.5.1-20090911svn-r5328.tar.bz2 avidemux-2.5.1-20090911svn-r5328
 Source0:        avidemux-%{version}-20090911svn-r5328.tar.bz2
