@@ -1,6 +1,6 @@
 Name:           avidemux
 Version:        2.5.1
-Release:        1.20090911svn%{?dist}
+Release:        2.20090911svn%{?dist}
 Summary:        Graphical video editing and transcoding tool
 
 Group:          Applications/Multimedia
@@ -12,12 +12,12 @@ URL:            http://www.avidemux.org/
 # pushd avidemux-2.5.1-20090911svn-r5328/avidemux/ADM_libraries
 # rm {ffmpeg,libswscale}*.tar.gz
 ##(cmake/admFFmpegBuild.cmake provides the up-to-date SVN revision numbers)
-# svn co svn://svn.ffmpeg.org/ffmpeg/trunk -r 19733 --ignore-externals ffmpeg
-# rm -rf ffmpeg/.svn
-# tar cfz ffmpeg_r19733.tar.gz ffmpeg && rm -rf ffmpeg{,_r19733}
-# svn co svn://svn.ffmpeg.org/mplayer/trunk/libswscale -r 29569 libswscale
-# svn export libswscale libswscale_r29569
-# tar cfz libswscale_r29569.tar.gz libswscale_r29569 && rm -rf libswscale{,_r29569}
+# svn co svn://svn.ffmpeg.org/ffmpeg/trunk -r 19733 --ignore-externals ffmpeg_r19733
+# svn export --ignore-externals ffmpeg{_r19733,}
+# tar cfz ffmpeg.tar.gz ffmpeg && rm -rf ffmpeg{_r19733,}
+# svn co svn://svn.ffmpeg.org/mplayer/trunk/libswscale -r 29569 libswscale_r29569
+# svn export libswscale{_r29569,}
+# tar cfz libswscale.tar.gz libswscale && rm -rf libswscale{_r29569,}
 # popd
 # tar cfj avidemux-2.5.1-20090911svn-r5328.tar.bz2 avidemux-2.5.1-20090911svn-r5328
 Source0:        avidemux-%{version}-20090911svn-r5328.tar.bz2
@@ -248,6 +248,9 @@ rm -rf $RPM_BUILD_ROOT
 %{_includedir}/ADM_coreConfig.h
 
 %changelog
+* Tue Sep 15 2009 Stewart Adam <s.adam at diffingo.com> 2.5.1-2.20090911svn
+- Bump for rebuild
+
 * Fri Sep 11 2009 Stewart Adam <s.adam at diffingo.com> - 2.5.1-1.20090911svn
 - Update to 2.5.1 subversion r5328
 
