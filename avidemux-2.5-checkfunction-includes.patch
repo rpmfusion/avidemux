@@ -1,0 +1,11 @@
+--- avidemux-2.5.0-20090814-r5245.orig/cmake/admConfigHelper.cmake	2009-08-14 19:01:01.828383207 -0400
++++ avidemux-2.5.0-20090814-r5245/cmake/admConfigHelper.cmake	2009-08-14 19:02:02.895383035 -0400
+@@ -91,7 +91,7 @@
+ 	SET(CHECK_FUNCTION_DEFINE "-DCHECK_FUNCTION_EXISTS=${_function}" ${ARGV4})
+ 	SET(CHECK_FUNCTION_LIB ${_lib} ${ARGV3})
+ 
+-	ADM_COMPILE(CheckFunctionExists.c "${CHECK_FUNCTION_DEFINE}" "" "${CHECK_FUNCTION_LIB}" ${_varToSet} OUTPUT)
++	ADM_COMPILE(CheckFunctionExists.c "${CHECK_FUNCTION_DEFINE}" "${AVIDEMUX_SOURCE_DIR}/cmake_compile_check" "${CHECK_FUNCTION_LIB}" ${_varToSet} OUTPUT)
+ 
+ 	IF (${_varToSet})
+ 		MESSAGE(STATUS "Found ${_function} in ${_lib}")

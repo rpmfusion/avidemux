@@ -1,39 +1,50 @@
 #define svndate 20080521
 
 Name:           avidemux
-Version:        2.4.4
-Release:        9%{?dist}
+Version:        2.5.1
+Release:        2.20091010svn%{?dist}
 Summary:        Graphical video editing and transcoding tool
 
 Group:          Applications/Multimedia
 License:        GPLv2+
 URL:            http://www.avidemux.org/
-Source0:        http://download.berlios.de/avidemux/avidemux_%{version}.tar.gz
+#Source0:        http://download.berlios.de/avidemux/avidemux_%{version}.tar.gz
+# svn co svn://svn.berlios.de/avidemux/branches/avidemux_2.5_branch_gruntster
+# svn export avidemux_2.5_branch_gruntster avidemux-2.5.1-20091010svn-r5371
+# pushd avidemux-2.5.1-20091010svn-r5371/avidemux/ADM_libraries
+# rm {ffmpeg,libswscale}*.tar.gz
+##(cmake/admFFmpegBuild.cmake provides the up-to-date SVN revision numbers)
+# svn co svn://svn.ffmpeg.org/ffmpeg/trunk -r 19894 --ignore-externals ffmpeg_r19894
+# svn export ffmpeg{_r19894,} --ignore-externals
+# tar cfz ffmpeg_r19894.tar.gz ffmpeg && rm -rf ffmpeg{,_r19894}
+# svn co svn://svn.ffmpeg.org/mplayer/trunk/libswscale -r 29686 libswscale_r29686
+# svn export libswscale{_r29686,}
+# tar cfz libswscale_r29686.tar.gz libswscale && rm -rf libswscale{,_r29686}
+# popd
+# tar cfj avidemux-2.5.1-20091010svn-r5371.tar.bz2 avidemux-2.5.1-20091010svn-r5371
+Source0:        avidemux-%{version}-20091010svn-r5371.tar.bz2
 Source1:        %{name}-gtk.desktop
 Source2:        %{name}-qt.desktop
-# Make PulseAudio the default audio out device
-Patch0:         avidemux-2.4-pulseaudio-default.patch
-# Search for lrelease-qt4 instead of lrelease
-Patch1:         avidemux-2.4-qt4.patch
-# Why are i18n files stored in bindir? Move to datadir...
-Patch2:         avidemux-2.4-i18n.patch
-# http://ftp.ncnu.edu.tw/Linux/Gentoo/gentoo-portage/media-video/avidemux/files/avidemux-2.4-libdca.patch
-Patch3:         avidemux-2.4-libdca.patch
-# Our report: https://bugzilla.rpmfusion.org/attachment.cgi?id=131
-# Upstream report: http://bugs.avidemux.org/index.php?do=details&task_id=592
-# Patch from: http://sources.gentoo.org/viewcvs.py/gentoo-x86/media-video/avidemux/files/avidemux-2.4.4-gcc-4.4.patch?view=markup
-Patch4:         avidemux-2.4-gcc44.patch
-# Fix building with cmake 2.6.4+
-# Patch from: http://sources.gentoo.org/viewcvs.py/gentoo-x86/media-video/avidemux/files/avidemux-2.4-cmake264.patch?rev=1.1&view=markup
-Patch5:         avidemux-2.4-cmake264.patch
+# Patch0 obtained from avidemux-2.5.0-patches-1.tar.bz2:
+# http://mirror.csclub.uwaterloo.ca/gentoo-distfiles/distfiles/avidemux-2.5.0-patches-1.tar.bz2
+Patch0:         2.5.0-coreImage-parallel-build.patch
+Patch1:         avidemux-2.5-pulseaudio-default.patch
+Patch2:         avidemux-2.4-qt4.patch
+Patch3:         avidemux-2.5-i18n.patch
+Patch4:         avidemux-2.5-libmpeg2enc-altivec.patch
+Patch5:         avidemux-2.5-checkfunction-includes.patch
 
 BuildRoot:      %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 
-Requires:       %{name}-cli  = %{version}
-Requires:       %{name}-gui = %{version}
+# Upstream has been informed http://avidemux.org/admForum/viewtopic.php?id=6447
+ExcludeArch: ppc ppc64
+
+Requires:       %{name}-cli  = %{version}-%{release}
+Requires:       %{name}-gui = %{version}-%{release}
+Requires:       %{name}-plugins = %{version}
 
 # Compiling
-BuildRequires:	cmake
+BuildRequires:  cmake
 BuildRequires:  gettext-devel
 
 # Libraries
@@ -46,12 +57,13 @@ BuildRequires:  libXv-devel
 BuildRequires:  libXmu-devel
 # Required by gtk: libXi-devel, libXext-devel, libX11-devel
 # Required by qt: libXt-devel, libXext-devel, libX11-devel
-BuildRequires:	libsamplerate-devel
-BuildRequires:	jack-audio-connection-kit-devel
+BuildRequires:  libsamplerate-devel
+BuildRequires:  jack-audio-connection-kit-devel
 
 # Sound out
 BuildRequires:  alsa-lib-devel >= 1.0.3
 BuildRequires:  esound-devel >= 0.2.0
+BuildRequires:  pulseaudio-libs-devel
 
 # Video out 
 BuildRequires:  SDL-devel >= 1.2.7
@@ -64,10 +76,6 @@ BuildRequires:  lame-devel >= 3.96.1
 BuildRequires:  libmad-devel >= 0.15.1
 BuildRequires:  libogg-devel >= 1.1
 BuildRequires:  libvorbis-devel >= 1.0.1
-
-# needs libdts/dts_internal.h; but that's not shipped by  libdca-devel because
-# it's an internal lib. Someone needs to report that upstream to get fixed
-# ** this is fixed by patch3
 BuildRequires:  libdca-devel
 
 
@@ -87,58 +95,108 @@ encoding tasks. It supports many file types, including AVI, DVD compatible
 MPEG files, MP4 and ASF, using a variety of codecs. Tasks can be automated
 using projects, job queue and powerful scripting capabilities.
 
+For compatability reasons, avidemux is a meta-package which installs the
+graphical, command line and plugin packages. If you want a smaller setup,
+you may selectively install one or more of the avidemux-* subpackages.
+
 %package cli
 Summary:        CLI for %{name}
 Group:          Applications/Multimedia
-Requires:       %{name} = %{version}-%{release}
+Requires:       %{name}-libs = %{version}-%{release}
 
 %description cli
-This package provides command-line interface for %{name}.
+This package provides a command-line interface to editing videos with %{name}.
+
+%package libs
+Summary:        Libraries for %{name}
+Group:          System Environment/Libraries
+
+%description libs
+This package contains the runtime libraries for %{name}.
 
 %package gtk
-Summary:        GTK GUI for %{name}
+Summary:        GTK interface for %{name}
 Group:          Applications/Multimedia
 BuildRequires:  gtk2-devel >= 2.8.0
 BuildRequires:  cairo-devel
 # Slightly higher so it is default, but it can be avoided by installing
 # avidemux-qt directly or it can be removed later once avidemux-qt is installed
 Provides:       %{name}-gui = %{version}-%{release}.1
-Requires:       %{name} = %{version}-%{release}
+Requires:       %{name}-libs = %{version}-%{release}
 
 %description gtk
-This package provides the GTK interface for %{name}.
+This package provides the GTK graphical interface for %{name}.
 
 %package qt
-Summary:        QT GUI for %{name}
+Summary:        Qt interface for %{name}
 Group:          Applications/Multimedia
 # 4.5.0-9 fixes a failure when there are duplicate translated strings
 # https://bugzilla.redhat.com/show_bug.cgi?id=491514
 BuildRequires:  qt4-devel >= 4.5.0-9
 Provides:       %{name}-gui = %{version}-%{release}
-Requires:       %{name} = %{version}-%{release}
+Requires:       %{name}-libs = %{version}-%{release}
 
 %description qt
-This package provides the Qt interface for %{name}.
+This package contains the Qt graphical interface for %{name}.
+
+%package devel
+Summary:        Development files for %{name}
+Group:          Development/Libraries
+Requires:       %{name}-libs = %{version}-%{release}
+
+%description devel
+This package contains files required to develop with or extend %{name}.
+
+%package plugins
+Summary:        Plugins for the avidemux video editing and transcoding tool
+Group:          Applications/Multimedia
+Requires:       %{name}-libs = %{version}-%{release}
+
+%description plugins
+This package contains various plugins for avidemux.
 
 %prep
-%setup -q -n avidemux_%{version}
-%patch0 -b .pulse
-%patch1 -p1 -b .qt4
-%patch2 -p1 -b .i18n
-%patch3 -p1 -b .libdca
-%patch4 -b .gcc44
-%patch5 -p1 -b .cmake
+%setup -q -n avidemux-%{version}-20091010svn-r5371
+
+# change hardcoded libdir paths
+%ifarch x86_64 ppc64
+sed -i.bak 's/startDir="lib";/startDir="lib64";/' avidemux/ADM_core/src/ADM_fileio.cpp
+sed -i.bak 's/startDir="lib";/startDir="lib64";/' avidemux/main.cpp
+%endif
+
+%patch0 -p1 -b .parallel
+%patch1 -p1 -b .pulse
+%patch2 -p1 -b .qt4
+%patch3 -p1 -b .i18n
+%patch4 -p1 -b .altivec
+%patch5 -p1 -b .cfincludes
 
 %build
-%cmake
-# po/ not smp safe - http://bugs.avidemux.org/index.php?do=details&task_id=605
-make -C po
+# Out of source build
+mkdir build && cd build
+%cmake -DAVIDEMUX_INSTALL_PREFIX=%{_prefix} \
+       -DAVIDEMUX_SOURCE_DIR="%{_builddir}/avidemux-%{version}-20091010svn-r5371" \
+       -DAVIDEMUX_CORECONFIG_DIR="%{_builddir}/avidemux-%{version}-20091010svn-r5371/build/config" \
+       ..
 make %{?_smp_mflags}
-
+mkdir ../build_plugins && cd ../build_plugins
+%cmake -DAVIDEMUX_INSTALL_PREFIX=%{_prefix} \
+       -DAVIDEMUX_SOURCE_DIR="%{_builddir}/avidemux-%{version}-20091010svn-r5371" \
+       -DAVIDEMUX_CORECONFIG_DIR="%{_builddir}/avidemux-%{version}-20091010svn-r5371/build/config" \
+       ../plugins
+make %{?_smp_mflags}
 %install
 rm -rf $RPM_BUILD_ROOT
-make install DESTDIR=$RPM_BUILD_ROOT
+make -C build install DESTDIR=$RPM_BUILD_ROOT
+make -C build_plugins install DESTDIR=$RPM_BUILD_ROOT
+# Install the build configuration for devel package
+install -d -m755 $RPM_BUILD_ROOT%{_includedir}
+install -m644 build/config/ADM_coreConfig.h $RPM_BUILD_ROOT%{_includedir}/ADM_coreConfig.h
 
+# Find and remove all la files
+find $RPM_BUILD_ROOT -type f -name "*.la" -exec rm -f {} ';'
+
+# Install .desktop shortcuts
 desktop-file-install --vendor rpmfusion \
     --dir $RPM_BUILD_ROOT%{_datadir}/applications \
     %{SOURCE1}
@@ -147,16 +205,23 @@ desktop-file-install --vendor rpmfusion \
     --dir $RPM_BUILD_ROOT%{_datadir}/applications \
     %{SOURCE2}
 
-find $RPM_BUILD_ROOT -type f -name "*.la" -exec rm -f {} ';'
 %find_lang %{name}
 
 %clean
 rm -rf $RPM_BUILD_ROOT
 
-%files -f %{name}.lang
+%post -p /sbin/ldconfig
+%postun -p /sbin/ldconfig
+
+%files
 %defattr(-,root,root,-)
-%doc AUTHORS COPYING ChangeLog History README TODO
+# metapackage, no files
+
+%files libs -f %{name}.lang
+%doc AUTHORS COPYING README TODO
 %dir %{_datadir}/%{name}
+%{_datadir}/ADM_scripts/
+%{_libdir}/libADM*
 
 %files cli
 %defattr(-,root,root,-)
@@ -169,12 +234,22 @@ rm -rf $RPM_BUILD_ROOT
 
 %files qt
 %defattr(-,root,root,-)
-%dir %{_datadir}/%{name}/i18n/
-%{_datadir}/%{name}/i18n/*.qm
+%{_datadir}/%{name}/i18n/
 %{_bindir}/avidemux2_qt4
 %{_datadir}/applications/*qt*.desktop
 
+%files plugins
+%defattr(-,root,root,-)
+%{_libdir}/ADM_plugins/
+
+%files devel
+%defattr(-,root,root,-)
+%{_includedir}/ADM_coreConfig.h
+
 %changelog
+* Sat Oct 10 2009 Stewart Adam <s.adam at diffingo.com> - 2.5.1-2.20091010svn
+- Update to 2.5.1 subversion r5371
+
 * Fri Jun 19 2009 Stewart Adam <s.adam at diffingo.com> - 2.4.4-9
 - Add patch to fix build with CMake 2.6.4
 - Update gcc44 patch to match Gentoo upstream
