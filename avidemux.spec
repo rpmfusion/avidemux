@@ -1,6 +1,6 @@
 Name:           avidemux
 Version:        2.5.1
-Release:        2.20090911svn%{?dist}
+Release:        2.20091010svn%{?dist}
 Summary:        Graphical video editing and transcoding tool
 
 Group:          Applications/Multimedia
@@ -8,19 +8,17 @@ License:        GPLv2+
 URL:            http://www.avidemux.org/
 #Source0:        http://download.berlios.de/avidemux/avidemux_%{version}.tar.gz
 # svn co svn://svn.berlios.de/avidemux/branches/avidemux_2.5_branch_gruntster
-# svn export avidemux_2.5_branch_gruntster avidemux-2.5.1-20090911svn-r5328
-# pushd avidemux-2.5.1-20090911svn-r5328/avidemux/ADM_libraries
+# svn export avidemux_2.5_branch_gruntster avidemux-2.5.1-20091010svn-r5371
+# pushd avidemux-2.5.1-20091010svn-r5371/avidemux/ADM_libraries
 # rm {ffmpeg,libswscale}*.tar.gz
 ##(cmake/admFFmpegBuild.cmake provides the up-to-date SVN revision numbers)
-# svn co svn://svn.ffmpeg.org/ffmpeg/trunk -r 19733 --ignore-externals ffmpeg_r19733
-# svn export --ignore-externals ffmpeg{_r19733,}
-# tar cfz ffmpeg.tar.gz ffmpeg && rm -rf ffmpeg{_r19733,}
-# svn co svn://svn.ffmpeg.org/mplayer/trunk/libswscale -r 29569 libswscale_r29569
-# svn export libswscale{_r29569,}
-# tar cfz libswscale.tar.gz libswscale && rm -rf libswscale{_r29569,}
-# popd
-# tar cfj avidemux-2.5.1-20090911svn-r5328.tar.bz2 avidemux-2.5.1-20090911svn-r5328
-Source0:        avidemux-%{version}-20090911svn-r5328.tar.bz2
+# svn co svn://svn.ffmpeg.org/ffmpeg/trunk -r 19894 --ignore-externals ffmpeg_r19894
+# svn export ffmpeg{_r19894,} --ignore-externals
+# tar cfz ffmpeg_r19894.tar.gz ffmpeg && rm -rf ffmpeg{,_r19894}
+# svn co svn://svn.ffmpeg.org/mplayer/trunk/libswscale -r 29686 libswscale_r29686
+# svn export libswscale{_r29686,}
+# tar cfz libswscale_r29686.tar.gz libswscale && rm -rf libswscale{,_r29686}
+Source0:        avidemux-%{version}-20091010svn-r5371.tar.bz2
 Source1:        %{name}-gtk.desktop
 Source2:        %{name}-qt.desktop
 # Patch0 obtained from avidemux-2.5.0-patches-1.tar.bz2:
@@ -154,7 +152,7 @@ Requires:       %{name}-libs = %{version}-%{release}
 This package contains various plugins for avidemux.
 
 %prep
-%setup -q -n avidemux-%{version}-20090911svn-r5328
+%setup -q -n avidemux-%{version}-20091010svn-r5371
 
 # change hardcoded libdir paths
 %ifarch x86_64 ppc64
@@ -174,14 +172,14 @@ sed -i.bak 's/startDir="lib";/startDir="lib64";/' avidemux/main.cpp
 # Out of source build
 mkdir build && cd build
 %cmake -DAVIDEMUX_INSTALL_PREFIX=%{_prefix} \
-       -DAVIDEMUX_SOURCE_DIR="%{_builddir}/avidemux-%{version}-20090911svn-r5328" \
-       -DAVIDEMUX_CORECONFIG_DIR="%{_builddir}/avidemux-%{version}-20090911svn-r5328/build/config" \
+       -DAVIDEMUX_SOURCE_DIR="%{_builddir}/avidemux-%{version}-20091010svn-r5371" \
+       -DAVIDEMUX_CORECONFIG_DIR="%{_builddir}/avidemux-%{version}-20091010svn-r5371/build/config" \
        ..
 make %{?_smp_mflags}
 mkdir ../build_plugins && cd ../build_plugins
 %cmake -DAVIDEMUX_INSTALL_PREFIX=%{_prefix} \
-       -DAVIDEMUX_SOURCE_DIR="%{_builddir}/avidemux-%{version}-20090911svn-r5328" \
-       -DAVIDEMUX_CORECONFIG_DIR="%{_builddir}/avidemux-%{version}-20090911svn-r5328/build/config" \
+       -DAVIDEMUX_SOURCE_DIR="%{_builddir}/avidemux-%{version}-20091010svn-r5371" \
+       -DAVIDEMUX_CORECONFIG_DIR="%{_builddir}/avidemux-%{version}-20091010svn-r5371/build/config" \
        ../plugins
 make %{?_smp_mflags}
 
@@ -248,6 +246,9 @@ rm -rf $RPM_BUILD_ROOT
 %{_includedir}/ADM_coreConfig.h
 
 %changelog
+* Sat Oct 10 2009 Stewart Adam <s.adam at diffingo.com> - 2.5.1-2.20091010svn
+- Update to 2.5.1 subversion r5371
+
 * Tue Sep 15 2009 Stewart Adam <s.adam at diffingo.com> 2.5.1-2.20090911svn
 - Bump for rebuild
 
