@@ -1,6 +1,6 @@
 Name:           avidemux
 Version:        2.5.1
-Release:        2.20091010svn%{?dist}
+Release:        3.20091010svn%{?dist}
 Summary:        Graphical video editing and transcoding tool
 
 Group:          Applications/Multimedia
@@ -29,6 +29,7 @@ Patch2:         avidemux-2.4-qt4.patch
 Patch3:         avidemux-2.5-i18n.patch
 Patch4:         avidemux-2.5-libmpeg2enc-altivec.patch
 Patch5:         avidemux-2.5-checkfunction-includes.patch
+Patch6:         avidemux-2.5.1-tmplinktarget.patch
 
 BuildRoot:      %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 
@@ -166,6 +167,7 @@ sed -i.bak 's/startDir="lib";/startDir="lib64";/' avidemux/main.cpp
 %patch3 -p1 -b .i18n
 %patch4 -p1 -b .altivec
 %patch5 -p1 -b .cfincludes
+%patch6 -p0 -b .tmplinktarget
 
 
 %build
@@ -175,9 +177,14 @@ mkdir build && cd build
        -DAVIDEMUX_SOURCE_DIR="%{_builddir}/avidemux-%{version}-20091010svn-r5371" \
        -DAVIDEMUX_CORECONFIG_DIR="%{_builddir}/avidemux-%{version}-20091010svn-r5371/build/config" \
        ..
-make %{?_smp_mflags}
+make %{?_smp_mplags}
+# Create the temp link directory manuall since otherwise it happens too early
+mkdir -p %{_builddir}/avidemux-%{version}-20091010svn-r5371/build/%{_lib}
+find %{_builddir}/avidemux-%{version}-20091010svn-r5371/build/avidemux -name '*.so*' | \
+     xargs ln -sft %{_builddir}/avidemux-%{version}-20091010svn-r5371/build/%{_lib}
+                      
 mkdir ../build_plugins && cd ../build_plugins
-%cmake -DAVIDEMUX_INSTALL_PREFIX=%{_prefix} \
+%cmake -DAVIDEMUX_INSTALL_PREFIX="%{_builddir}/avidemux-%{version}-20091010svn-r5371/build/" \
        -DAVIDEMUX_SOURCE_DIR="%{_builddir}/avidemux-%{version}-20091010svn-r5371" \
        -DAVIDEMUX_CORECONFIG_DIR="%{_builddir}/avidemux-%{version}-20091010svn-r5371/build/config" \
        ../plugins
@@ -246,6 +253,9 @@ rm -rf $RPM_BUILD_ROOT
 %{_includedir}/ADM_coreConfig.h
 
 %changelog
+* Sat Oct 10 2009 Stewart Adam <s.adam at diffingo.com> - 2.5.1-3.20091010svn
+- Fix AVIDEMUX_INSTALL_PREFIX define so plugins can link correctly
+
 * Sat Oct 10 2009 Stewart Adam <s.adam at diffingo.com> - 2.5.1-2.20091010svn
 - Update to 2.5.1 subversion r5371
 
