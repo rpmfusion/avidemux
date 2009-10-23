@@ -2,7 +2,7 @@
 
 Name:           avidemux
 Version:        2.5.1
-Release:        3.20091010svn%{?dist}
+Release:        4.20091010svn%{?dist}
 Summary:        Graphical video editing and transcoding tool
 
 Group:          Applications/Multimedia
@@ -253,6 +253,9 @@ rm -rf $RPM_BUILD_ROOT
 %{_includedir}/ADM_coreConfig.h
 
 %changelog
+* Fri Oct 23 2009 Orcan Ogetbil <oged[DOT]fedora[AT]gmail[DOT]com> - 2.5.1-4.20091010svn
+- Update desktop file according to F-12 FedoraStudio feature
+
 * Sat Oct 10 2009 Stewart Adam <s.adam at diffingo.com> - 2.5.1-3.20091010svn
 - Fix AVIDEMUX_INSTALL_PREFIX define so plugins can link correctly
 
