@@ -1,6 +1,6 @@
 Name:           avidemux
 Version:        2.5.1
-Release:        3.20091010svn%{?dist}
+Release:        4.20091010svn%{?dist}
 Summary:        Graphical video editing and transcoding tool
 
 Group:          Applications/Multimedia
@@ -18,6 +18,8 @@ URL:            http://www.avidemux.org/
 # svn co svn://svn.ffmpeg.org/mplayer/trunk/libswscale -r 29686 libswscale_r29686
 # svn export libswscale{_r29686,}
 # tar cfz libswscale_r29686.tar.gz libswscale && rm -rf libswscale{,_r29686}
+# popd
+# tar cfj avidemux-2.5.1-20091010svn-r5371.tar.bz2 avidemux-2.5.1-20091010svn-r5371
 Source0:        avidemux-%{version}-20091010svn-r5371.tar.bz2
 Source1:        %{name}-gtk.desktop
 Source2:        %{name}-qt.desktop
@@ -177,12 +179,12 @@ mkdir build && cd build
        -DAVIDEMUX_SOURCE_DIR="%{_builddir}/avidemux-%{version}-20091010svn-r5371" \
        -DAVIDEMUX_CORECONFIG_DIR="%{_builddir}/avidemux-%{version}-20091010svn-r5371/build/config" \
        ..
-make %{?_smp_mplags}
+make %{?_smp_mflags}
 # Create the temp link directory manuall since otherwise it happens too early
 mkdir -p %{_builddir}/avidemux-%{version}-20091010svn-r5371/build/%{_lib}
 find %{_builddir}/avidemux-%{version}-20091010svn-r5371/build/avidemux -name '*.so*' | \
      xargs ln -sft %{_builddir}/avidemux-%{version}-20091010svn-r5371/build/%{_lib}
-                      
+
 mkdir ../build_plugins && cd ../build_plugins
 %cmake -DAVIDEMUX_INSTALL_PREFIX="%{_builddir}/avidemux-%{version}-20091010svn-r5371/build/" \
        -DAVIDEMUX_SOURCE_DIR="%{_builddir}/avidemux-%{version}-20091010svn-r5371" \
@@ -253,6 +255,9 @@ rm -rf $RPM_BUILD_ROOT
 %{_includedir}/ADM_coreConfig.h
 
 %changelog
+* Sat Oct 24 2009 Stewart Adam <s.adam at diffingo.com> - 2.5.1-4.20091010svn
+- Fix a few typoes in the spec
+
 * Sat Oct 10 2009 Stewart Adam <s.adam at diffingo.com> - 2.5.1-3.20091010svn
 - Fix AVIDEMUX_INSTALL_PREFIX define so plugins can link correctly
 
