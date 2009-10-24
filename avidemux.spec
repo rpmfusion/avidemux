@@ -1,8 +1,6 @@
-#define svndate 20080521
-
 Name:           avidemux
 Version:        2.5.1
-Release:        4.20091010svn%{?dist}
+Release:        5.20091010svn%{?dist}
 Summary:        Graphical video editing and transcoding tool
 
 Group:          Applications/Multimedia
@@ -71,7 +69,7 @@ BuildRequires:  SDL-devel >= 1.2.7
 
 # Audio Codecs
 BuildRequires:  a52dec-devel >= 0.7.4
-BuildRequires:  faac-devel >= 1.24
+#BuildRequires:  faac-devel >= 1.24
 BuildRequires:  faad2-devel >= 2.0
 BuildRequires:  lame-devel >= 3.96.1
 BuildRequires:  libmad-devel >= 0.15.1
@@ -173,6 +171,7 @@ sed -i.bak 's/startDir="lib";/startDir="lib64";/' avidemux/main.cpp
 %patch5 -p1 -b .cfincludes
 %patch6 -p0 -b .tmplinktarget
 
+
 %build
 # Out of source build
 mkdir build && cd build
@@ -182,6 +181,7 @@ mkdir build && cd build
        ..
 make %{?_smp_mflags}
 # Create the temp link directory manuall since otherwise it happens too early
+mkdir %{_builddir}/avidemux-%{version}-20091010svn-r5371/build/%{_lib}
 find %{_builddir}/avidemux-%{version}-20091010svn-r5371/build/avidemux -name '*.so*' | \
      xargs ln -sft %{_builddir}/avidemux-%{version}-20091010svn-r5371/build/%{_lib}
 
@@ -191,6 +191,8 @@ mkdir ../build_plugins && cd ../build_plugins
        -DAVIDEMUX_CORECONFIG_DIR="%{_builddir}/avidemux-%{version}-20091010svn-r5371/build/config" \
        ../plugins
 make %{?_smp_mflags}
+
+
 %install
 rm -rf $RPM_BUILD_ROOT
 make -C build install DESTDIR=$RPM_BUILD_ROOT
@@ -253,6 +255,10 @@ rm -rf $RPM_BUILD_ROOT
 %{_includedir}/ADM_coreConfig.h
 
 %changelog
+* Sat Oct 24 2009 Stewart Adam <s.adam at diffingo.com> - 2.5.1-5.20091010svn
+- Temporarily disable FAAC as per discussion on RF-dev ML
+- Create temporary linking dir before running find | xargs
+
 * Fri Oct 23 2009 Orcan Ogetbil <oged[DOT]fedora[AT]gmail[DOT]com> - 2.5.1-4.20091010svn
 - Update desktop file according to F-12 FedoraStudio feature
 
