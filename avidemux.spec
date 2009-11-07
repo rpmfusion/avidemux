@@ -1,6 +1,6 @@
 Name:           avidemux
 Version:        2.5.1
-Release:        5.20091010svn%{?dist}
+Release:        6.20091010svn%{?dist}
 Summary:        Graphical video editing and transcoding tool
 
 Group:          Applications/Multimedia
@@ -32,6 +32,7 @@ Patch3:         avidemux-2.5-i18n.patch
 Patch4:         avidemux-2.5-libmpeg2enc-altivec.patch
 Patch5:         avidemux-2.5-checkfunction-includes.patch
 Patch6:         avidemux-2.5.1-tmplinktarget.patch
+Patch7:         avidemux-2.5-bf_20091105.patch
 
 BuildRoot:      %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 
@@ -170,6 +171,7 @@ sed -i.bak 's/startDir="lib";/startDir="lib64";/' avidemux/main.cpp
 %patch4 -p1 -b .altivec
 %patch5 -p1 -b .cfincludes
 %patch6 -p0 -b .tmplinktarget
+%patch7 -p0 -b .bf
 
 
 %build
@@ -255,6 +257,9 @@ rm -rf $RPM_BUILD_ROOT
 %{_includedir}/ADM_coreConfig.h
 
 %changelog
+* Thu Nov  5 2009 Nicolas Chauvet <kwizart@fedoraproject.org> - 2.5.1-6.20091010svn
+- Update bugfix to 20091105
+
 * Sat Oct 24 2009 Stewart Adam <s.adam at diffingo.com> - 2.5.1-5.20091010svn
 - Temporarily disable FAAC as per discussion on RF-dev ML
 - Create temporary linking dir before running find | xargs
