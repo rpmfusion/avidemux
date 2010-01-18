@@ -1,12 +1,15 @@
+%define _pkgbuilddir %{_builddir}/%{name}_%{version}
+
 Name:           avidemux
-Version:        2.5.1
-Release:        6.20091010svn%{?dist}
+Version:        2.5.2
+Release:        1%{?dist}
 Summary:        Graphical video editing and transcoding tool
 
 Group:          Applications/Multimedia
 License:        GPLv2+
 URL:            http://www.avidemux.org/
-#Source0:        http://download.berlios.de/avidemux/avidemux_%{version}.tar.gz
+Source0:        http://download.berlios.de/avidemux/avidemux_%{version}.tar.gz
+## This procedure is used to make a SVN checkout
 # svn co svn://svn.berlios.de/avidemux/branches/avidemux_2.5_branch_gruntster
 # svn export avidemux_2.5_branch_gruntster avidemux-2.5.1-20091010svn-r5371
 # pushd avidemux-2.5.1-20091010svn-r5371/avidemux/ADM_libraries
@@ -20,7 +23,7 @@ URL:            http://www.avidemux.org/
 # tar cfz libswscale_r29686.tar.gz libswscale && rm -rf libswscale{,_r29686}
 # popd
 # tar cfj avidemux-2.5.1-20091010svn-r5371.tar.bz2 avidemux-2.5.1-20091010svn-r5371
-Source0:        avidemux-%{version}-20091010svn-r5371.tar.bz2
+#Source0:        avidemux-%{version}-20091010svn-r5371.tar.bz2
 Source1:        %{name}-gtk.desktop
 Source2:        %{name}-qt.desktop
 # Patch0 obtained from avidemux-2.5.0-patches-1.tar.bz2:
@@ -32,7 +35,6 @@ Patch3:         avidemux-2.5-i18n.patch
 Patch4:         avidemux-2.5-libmpeg2enc-altivec.patch
 Patch5:         avidemux-2.5-checkfunction-includes.patch
 Patch6:         avidemux-2.5.1-tmplinktarget.patch
-Patch7:         avidemux-2.5-bf_20091105.patch
 
 BuildRoot:      %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 
@@ -156,7 +158,7 @@ Requires:       %{name}-libs = %{version}-%{release}
 This package contains various plugins for avidemux.
 
 %prep
-%setup -q -n avidemux-%{version}-20091010svn-r5371
+%setup -q -n avidemux_%{version}
 
 # change hardcoded libdir paths
 %ifarch x86_64 ppc64
@@ -171,26 +173,25 @@ sed -i.bak 's/startDir="lib";/startDir="lib64";/' avidemux/main.cpp
 %patch4 -p1 -b .altivec
 %patch5 -p1 -b .cfincludes
 %patch6 -p0 -b .tmplinktarget
-%patch7 -p0 -b .bf
 
 
 %build
 # Out of source build
 mkdir build && cd build
 %cmake -DAVIDEMUX_INSTALL_PREFIX=%{_prefix} \
-       -DAVIDEMUX_SOURCE_DIR="%{_builddir}/avidemux-%{version}-20091010svn-r5371" \
-       -DAVIDEMUX_CORECONFIG_DIR="%{_builddir}/avidemux-%{version}-20091010svn-r5371/build/config" \
+       -DAVIDEMUX_SOURCE_DIR="%{_pkgbuilddir}" \
+       -DAVIDEMUX_CORECONFIG_DIR="%{_pkgbuilddir}/build/config" \
        ..
 make %{?_smp_mflags}
 # Create the temp link directory manuall since otherwise it happens too early
-mkdir %{_builddir}/avidemux-%{version}-20091010svn-r5371/build/%{_lib}
-find %{_builddir}/avidemux-%{version}-20091010svn-r5371/build/avidemux -name '*.so*' | \
-     xargs ln -sft %{_builddir}/avidemux-%{version}-20091010svn-r5371/build/%{_lib}
+mkdir %{_pkgbuilddir}/build/%{_lib}
+find %{_pkgbuilddir}/build/avidemux -name '*.so*' | \
+     xargs ln -sft %{_pkgbuilddir}/build/%{_lib}
 
 mkdir ../build_plugins && cd ../build_plugins
-%cmake -DAVIDEMUX_INSTALL_PREFIX="%{_builddir}/avidemux-%{version}-20091010svn-r5371/build/" \
-       -DAVIDEMUX_SOURCE_DIR="%{_builddir}/avidemux-%{version}-20091010svn-r5371" \
-       -DAVIDEMUX_CORECONFIG_DIR="%{_builddir}/avidemux-%{version}-20091010svn-r5371/build/config" \
+%cmake -DAVIDEMUX_INSTALL_PREFIX="%{_pkgbuilddir}/build/" \
+       -DAVIDEMUX_SOURCE_DIR="%{_pkgbuilddir}" \
+       -DAVIDEMUX_CORECONFIG_DIR="%{_pkgbuilddir}/build/config" \
        ../plugins
 make %{?_smp_mflags}
 
@@ -257,6 +258,9 @@ rm -rf $RPM_BUILD_ROOT
 %{_includedir}/ADM_coreConfig.h
 
 %changelog
+* Mon Jan 18 2010 Stewart Adam <s.adam at diffingo.com> - 2.5.2
+- Update to 2.5.2 release
+
 * Thu Nov  5 2009 Nicolas Chauvet <kwizart@fedoraproject.org> - 2.5.1-6.20091010svn
 - Update bugfix to 20091105
 
