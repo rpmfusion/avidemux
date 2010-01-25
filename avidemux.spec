@@ -2,7 +2,7 @@
 
 Name:           avidemux
 Version:        2.5.2
-Release:        1%{?dist}
+Release:        2%{?dist}
 Summary:        Graphical video editing and transcoding tool
 
 Group:          Applications/Multimedia
@@ -198,6 +198,9 @@ make %{?_smp_mflags}
 
 %install
 rm -rf $RPM_BUILD_ROOT
+# Temporary workaround since the i18n files aren't being built
+mkdir $RPM_BUILD_ROOT/%{_datadir}/%{name}
+
 make -C build install DESTDIR=$RPM_BUILD_ROOT
 make -C build_plugins install DESTDIR=$RPM_BUILD_ROOT
 # Install the build configuration for devel package
@@ -258,7 +261,10 @@ rm -rf $RPM_BUILD_ROOT
 %{_includedir}/ADM_coreConfig.h
 
 %changelog
-* Mon Jan 18 2010 Stewart Adam <s.adam at diffingo.com> - 2.5.2
+* Mon Jan 25 2010 Stewart Adam <s.adam at diffingo.com> - 2.5.2-2
+- Temporary workaround for build failure on rawhide
+
+* Mon Jan 18 2010 Stewart Adam <s.adam at diffingo.com> - 2.5.2-1
 - Update to 2.5.2 release
 
 * Thu Nov  5 2009 Nicolas Chauvet <kwizart@fedoraproject.org> - 2.5.1-6.20091010svn
