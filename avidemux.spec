@@ -2,7 +2,7 @@
 
 Name:           avidemux
 Version:        2.5.2
-Release:        2%{?dist}
+Release:        3%{?dist}
 Summary:        Graphical video editing and transcoding tool
 
 Group:          Applications/Multimedia
@@ -199,7 +199,7 @@ make %{?_smp_mflags}
 %install
 rm -rf $RPM_BUILD_ROOT
 # Temporary workaround since the i18n files aren't being built
-mkdir $RPM_BUILD_ROOT/%{_datadir}/%{name}
+mkdir -p $RPM_BUILD_ROOT/%{_datadir}/%{name}
 
 make -C build install DESTDIR=$RPM_BUILD_ROOT
 make -C build_plugins install DESTDIR=$RPM_BUILD_ROOT
@@ -261,6 +261,9 @@ rm -rf $RPM_BUILD_ROOT
 %{_includedir}/ADM_coreConfig.h
 
 %changelog
+* Tue Jan 26 2010 Stewart Adam <s.adam at diffingo.com> - 2.5.2-3
+- Fix stupid mistake in mkdir command (add -p for subdir creation)
+
 * Mon Jan 25 2010 Stewart Adam <s.adam at diffingo.com> - 2.5.2-2
 - Temporary workaround for build failure on rawhide
 
