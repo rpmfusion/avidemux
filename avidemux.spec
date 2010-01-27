@@ -2,7 +2,7 @@
 
 Name:           avidemux
 Version:        2.5.2
-Release:        3%{?dist}
+Release:        4%{?dist}
 Summary:        Graphical video editing and transcoding tool
 
 Group:          Applications/Multimedia
@@ -248,7 +248,7 @@ rm -rf $RPM_BUILD_ROOT
 
 %files qt
 %defattr(-,root,root,-)
-%{_datadir}/%{name}/i18n/
+#{_datadir}/%{name}/i18n/
 %{_bindir}/avidemux2_qt4
 %{_datadir}/applications/*qt*.desktop
 
@@ -261,6 +261,10 @@ rm -rf $RPM_BUILD_ROOT
 %{_includedir}/ADM_coreConfig.h
 
 %changelog
+* Wed Jan 27 2010 Stewart Adam <s.adam at diffingo.com> - 2.5.2-4
+- Remove the i18n folder from %%files, as it seems it does not get created nor
+  populated with any files on rawhide.
+
 * Tue Jan 26 2010 Stewart Adam <s.adam at diffingo.com> - 2.5.2-3
 - Fix stupid mistake in mkdir command (add -p for subdir creation)
 
