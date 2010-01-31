@@ -72,7 +72,7 @@ BuildRequires:  SDL-devel >= 1.2.7
 
 # Audio Codecs
 BuildRequires:  a52dec-devel >= 0.7.4
-#BuildRequires:  faac-devel >= 1.24
+%{?_with_faac:BuildRequires:  faac-devel >= 1.24}
 BuildRequires:  faad2-devel >= 2.0
 BuildRequires:  lame-devel >= 3.96.1
 BuildRequires:  libmad-devel >= 0.15.1
