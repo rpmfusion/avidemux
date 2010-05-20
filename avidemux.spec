@@ -1,7 +1,7 @@
 %define _pkgbuilddir %{_builddir}/%{name}_%{version}
 
 Name:           avidemux
-Version:        2.5.2
+Version:        2.5.3
 Release:        1%{?dist}
 Summary:        Graphical video editing and transcoding tool
 
@@ -31,11 +31,15 @@ Source2:        %{name}-qt.desktop
 Patch0:         2.5.0-coreImage-parallel-build.patch
 Patch1:         avidemux-2.5-pulseaudio-default.patch
 Patch2:         avidemux-2.4-qt4.patch
-Patch3:         avidemux-2.5-i18n.patch
-Patch4:         avidemux-2.5-libmpeg2enc-altivec.patch
-Patch5:         avidemux-2.5-checkfunction-includes.patch
-Patch6:         avidemux-2.5.1-tmplinktarget.patch
-
+# Prevents avidemux from creating the symlinks for .so files, which we do below
+Patch3:         avidemux-2.5.3-tmplinktarget.patch
+# Fixes multiple definitions of mjpeg_log
+# http://fixounet.free.fr/2.6/2.5.3_mjpeg_fix.diff
+Patch4:         2.5.3_mjpeg_fix.diff
+# libADM_xvidRateCtl.so and libADM_vidEnc_pluginOptions.so are supposed to be
+# build statically according to upstream... Let's get them installed instead
+Patch5:         avidemux-2.5.3-mpeg2enc.patch
+Patch6:         avidemux-2.5.3-pluginlibs.patch
 BuildRoot:      %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 
 # Upstream has been informed http://avidemux.org/admForum/viewtopic.php?id=6447
@@ -57,8 +61,6 @@ BuildRequires:  freetype-devel
 BuildRequires:  js-devel
 BuildRequires:  libXv-devel
 BuildRequires:  libXmu-devel
-# Required by gtk: libXi-devel, libXext-devel, libX11-devel
-# Required by qt: libXt-devel, libXext-devel, libX11-devel
 BuildRequires:  libsamplerate-devel
 BuildRequires:  jack-audio-connection-kit-devel
 
@@ -97,7 +99,7 @@ encoding tasks. It supports many file types, including AVI, DVD compatible
 MPEG files, MP4 and ASF, using a variety of codecs. Tasks can be automated
 using projects, job queue and powerful scripting capabilities.
 
-For compatability reasons, avidemux is a meta-package which installs the
+For compatibility reasons, avidemux is a meta-package which installs the
 graphical, command line and plugin packages. If you want a smaller setup,
 you may selectively install one or more of the avidemux-* subpackages.
 
@@ -169,10 +171,10 @@ sed -i.bak 's/startDir="lib";/startDir="lib64";/' avidemux/main.cpp
 %patch0 -p1 -b .parallel
 %patch1 -p1 -b .pulse
 %patch2 -p1 -b .qt4
-%patch3 -p1 -b .i18n
-%patch4 -p1 -b .altivec
-%patch5 -p1 -b .cfincludes
-%patch6 -p0 -b .tmplinktarget
+%patch3 -p1 -b .tmplinktarget
+%patch4 -p1 -b .mjpeg_log
+%patch5 -p1 -b .mpeg2enc
+%patch6 -p1 -b .pluginlibs
 
 
 %build
@@ -183,7 +185,7 @@ mkdir build && cd build
        -DAVIDEMUX_CORECONFIG_DIR="%{_pkgbuilddir}/build/config" \
        ..
 make %{?_smp_mflags}
-# Create the temp link directory manuall since otherwise it happens too early
+# Create the temp link directory manually since otherwise it happens too early
 mkdir -p %{_pkgbuilddir}/build/%{_lib}
 find %{_pkgbuilddir}/build/avidemux -name '*.so*' | \
      xargs ln -sft %{_pkgbuilddir}/build/%{_lib}
@@ -203,6 +205,8 @@ make -C build_plugins install DESTDIR=$RPM_BUILD_ROOT
 # Install the build configuration for devel package
 install -d -m755 $RPM_BUILD_ROOT%{_includedir}
 install -m644 build/config/ADM_coreConfig.h $RPM_BUILD_ROOT%{_includedir}/ADM_coreConfig.h
+install -d -m755 $RPM_BUILD_ROOT%{_datadir}/pixmaps
+install -m644 avidemux/ADM_userInterfaces/ADM_QT4/ADM_gui/pics/avidemux_icon.png $RPM_BUILD_ROOT%{_datadir}/pixmaps/avidemux.png
 
 # Find and remove all la files
 find $RPM_BUILD_ROOT -type f -name "*.la" -exec rm -f {} ';'
@@ -221,8 +225,8 @@ desktop-file-install --vendor rpmfusion \
 %clean
 rm -rf $RPM_BUILD_ROOT
 
-%post -p /sbin/ldconfig
-%postun -p /sbin/ldconfig
+%post libs -p /sbin/ldconfig
+%postun libs -p /sbin/ldconfig
 
 %files
 %defattr(-,root,root,-)
@@ -232,6 +236,7 @@ rm -rf $RPM_BUILD_ROOT
 %doc AUTHORS COPYING README TODO
 %dir %{_datadir}/%{name}
 %{_datadir}/ADM_scripts/
+%{_datadir}/pixmaps/avidemux.png
 %{_libdir}/libADM*
 
 %files cli
@@ -258,6 +263,12 @@ rm -rf $RPM_BUILD_ROOT
 %{_includedir}/ADM_coreConfig.h
 
 %changelog
+* Thu May 20 2010 Stewart Adam <s.adam at diffingo.com> - 2.5.3-1
+- Update to 2.5.3 release
+- Use avidemux.png as icon in the desktop shorcuts to fix problem on KDE
+- Make ldconfig run in post/postun of libs package
+- Fix typo in %%description of main package
+
 * Mon Jan 18 2010 Stewart Adam <s.adam at diffingo.com> - 2.5.2
 - Update to 2.5.2 release
 
