@@ -2,7 +2,7 @@
 
 Name:           avidemux
 Version:        2.5.3
-Release:        1%{?dist}
+Release:        2%{?dist}
 Summary:        Graphical video editing and transcoding tool
 
 Group:          Applications/Multimedia
@@ -54,7 +54,7 @@ BuildRequires:  cmake
 BuildRequires:  gettext-devel
 
 # Libraries
-BuildRequires:  nasm >= 0.98.38
+BuildRequires:  yasm-devel
 BuildRequires:  libxml2-devel >= 2.6.8
 BuildRequires:  fontconfig-devel
 BuildRequires:  freetype-devel
@@ -262,6 +262,9 @@ rm -rf $RPM_BUILD_ROOT
 %{_includedir}/ADM_coreConfig.h
 
 %changelog
+* Tue May 25 2010 Stewart Adam <s.adam at diffingo.com> - 2.5.3-2
+- Replace nasm BR with yasm-devel
+
 * Thu May 20 2010 Stewart Adam <s.adam at diffingo.com> - 2.5.3-1
 - Update to 2.5.3 release
 - Use avidemux.png as icon in the desktop shorcuts to fix problem on KDE
