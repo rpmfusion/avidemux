@@ -1,0 +1,9 @@
+--- avidemux_2.5.3/avidemux/CMakeLists.txt.orig	2010-04-30 12:30:20.000000000 -0400
++++ avidemux_2.5.3/avidemux/CMakeLists.txt	2010-05-19 14:25:31.456566543 -0400
+@@ -490,5 +490,5 @@
+ ENDMACRO (ADM_SYMLINK_LIBS)
+ IF (UNIX AND NOT APPLE)
+    # Some plugins link to ADM_coreImage (e.g., ADM_vf_addborders) and thus need the symlink in ${CMAKE_BINARY_DIR}/lib${LIB_SUFFIX}
+-   ADM_SYMLINK_LIBS(ffmpeg ADM_coreImage)
++   #ADM_SYMLINK_LIBS(ffmpeg ADM_coreImage)
+ ENDIF(UNIX AND NOT APPLE)
