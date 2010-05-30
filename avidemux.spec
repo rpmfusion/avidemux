@@ -2,7 +2,7 @@
 
 Name:           avidemux
 Version:        2.5.3
-Release:        2%{?dist}
+Release:        3%{?dist}
 Summary:        Graphical video editing and transcoding tool
 
 Group:          Applications/Multimedia
@@ -137,6 +137,7 @@ Group:          Applications/Multimedia
 # 4.5.0-9 fixes a failure when there are duplicate translated strings
 # https://bugzilla.redhat.com/show_bug.cgi?id=491514
 BuildRequires:  qt4-devel >= 4.5.0-9
+BuildRequires:  %{_bindir}/xsltproc
 Provides:       %{name}-gui = %{version}-%{release}
 Requires:       %{name}-libs = %{version}-%{release}
 
@@ -263,6 +264,9 @@ rm -rf $RPM_BUILD_ROOT
 %{_includedir}/ADM_coreConfig.h
 
 %changelog
+* Sun May 30 2010 Stewart Adam <s.adam at diffingo.com> - 2.5.3-3
+- Add /usr/bin/xsltproc BR for qt4 subpackage
+
 * Wed May 26 2010 Stewart Adam <s.adam at diffingo.com> - 2.5.3-2
 - Replace nasm BR with yasm-devel
 
