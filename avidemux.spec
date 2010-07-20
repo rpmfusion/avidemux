@@ -2,7 +2,7 @@
 
 Name:           avidemux
 Version:        2.5.3
-Release:        3%{?dist}
+Release:        4%{?dist}
 Summary:        Graphical video editing and transcoding tool
 
 Group:          Applications/Multimedia
@@ -263,6 +263,9 @@ rm -rf $RPM_BUILD_ROOT
 %{_includedir}/ADM_coreConfig.h
 
 %changelog
+* Tue Jul 20 2010 Stewart Adam <s.adam at diffingo.com> - 2.5.3-4
+- Rebuild for new x264
+
 * Sun May 30 2010 Stewart Adam <s.adam at diffingo.com> - 2.5.3-3
 - Add /usr/bin/xsltproc BR for qt4 subpackage
 
