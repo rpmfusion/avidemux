@@ -2,7 +2,7 @@
 
 Name:           avidemux
 Version:        2.5.3
-Release:        4%{?dist}
+Release:        5%{?dist}
 Summary:        Graphical video editing and transcoding tool
 
 Group:          Applications/Multimedia
@@ -40,13 +40,17 @@ Patch4:         2.5.3_mjpeg_fix.diff
 # build statically according to upstream... Let's get them installed instead
 Patch5:         avidemux-2.5.3-mpeg2enc.patch
 Patch6:         avidemux-2.5.3-pluginlibs.patch
+# Patch7 obtained from http://fixounet.free.fr/2.6/2.5.3_field_asm_fix.diff
+Patch7:         avidemux-2.5.3-field-asm-fix.diff
+# Patch8 obtained from http://lists.rpmfusion.org/pipermail/rpmfusion-developers/2010-October/008645.html
+Patch8:         avidemux_2.5.3-ffmpeg-aac.patch
 BuildRoot:      %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 
 # Upstream has been informed http://avidemux.org/admForum/viewtopic.php?id=6447
 ExcludeArch: ppc ppc64
 
 Requires:       %{name}-cli  = %{version}-%{release}
-Requires:       %{name}-gui = %{version}-%{release}
+Requires:       %{name}-gui = %{version}
 Requires:       %{name}-plugins = %{version}
 
 # Compiling
@@ -174,7 +178,8 @@ sed -i.bak 's/startDir="lib";/startDir="lib64";/' avidemux/main.cpp
 %patch4 -p1 -b .mjpeg_log
 %patch5 -p1 -b .mpeg2enc
 %patch6 -p1 -b .pluginlibs
-
+%patch7 -p1 -b .x264asm
+%patch8 -p1 -b .ffmpegaac
 
 %build
 # Out of source build
@@ -263,6 +268,11 @@ rm -rf $RPM_BUILD_ROOT
 %{_includedir}/ADM_coreConfig.h
 
 %changelog
+* Tue Oct 26 2010 Stewart Adam <s.adam at diffingo.com> - 2.5.3-5
+- Add x264 field asm patch to fix F-14 build (#1447)
+- Fix main package's dependency on the GUI subpackage (Bernie Innocentie)
+- Enable ffmpeg's AAC encoder (Kevin Kofler)
+
 * Tue Jul 20 2010 Stewart Adam <s.adam at diffingo.com> - 2.5.3-4
 - Rebuild for new x264
 
