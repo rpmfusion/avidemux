@@ -2,7 +2,7 @@
 
 Name:           avidemux
 Version:        2.5.3
-Release:        5%{?dist}
+Release:        6%{?dist}
 Summary:        Graphical video editing and transcoding tool
 
 Group:          Applications/Multimedia
@@ -239,7 +239,6 @@ rm -rf $RPM_BUILD_ROOT
 
 %files libs -f %{name}.lang
 %doc AUTHORS COPYING README TODO
-%dir %{_datadir}/%{name}
 %{_datadir}/ADM_scripts/
 %{_datadir}/pixmaps/avidemux.png
 %{_libdir}/libADM*
@@ -268,6 +267,9 @@ rm -rf $RPM_BUILD_ROOT
 %{_includedir}/ADM_coreConfig.h
 
 %changelog
+* Fri Nov 5 2010 Stewart Adam <s.adam at diffingo.com> - 2.5.3-6
+- Remove dir /usr/share/avidemux as nothing installs there anymore
+
 * Tue Oct 26 2010 Stewart Adam <s.adam at diffingo.com> - 2.5.3-5
 - Add x264 field asm patch to fix F-14 build (#1447)
 - Fix main package's dependency on the GUI subpackage (Bernie Innocentie)
