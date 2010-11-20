@@ -1,8 +1,8 @@
-diff -ur avidemux_2.5.3/plugins/ADM_audioEncoders/lavcodec/audioencoder_lavcodec.cpp avidemux_2.5.3-ffmpeg-aac/plugins/ADM_audioEncoders/lavcodec/audioencoder_lavcodec.cpp
---- avidemux_2.5.3/plugins/ADM_audioEncoders/lavcodec/audioencoder_lavcodec.cpp	2010-02-23 19:21:06.000000000 +0100
-+++ avidemux_2.5.3-ffmpeg-aac/plugins/ADM_audioEncoders/lavcodec/audioencoder_lavcodec.cpp	2010-10-02 03:34:42.000000000 +0200
-@@ -29,13 +29,16 @@
- 
+diff -ur avidemux_2.5.4/plugins/ADM_audioEncoders/lavcodec/audioencoder_lavcodec.cpp avidemux_2.5.4-ffmpeg-aac/plugins/ADM_audioEncoders/lavcodec/audioencoder_lavcodec.cpp
+--- avidemux_2.5.4/plugins/ADM_audioEncoders/lavcodec/audioencoder_lavcodec.cpp.ffmpegaac	2010-05-25 16:48:57.000000000 -0400
++++ avidemux_2.5.4/plugins/ADM_audioEncoders/lavcodec/audioencoder_lavcodec.cpp	2010-11-20 16:26:36.756237795 -0500
+@@ -25,13 +25,16 @@
+ #include "ADM_lavcodec.h"
  
  #define Join(x,y) x##_##y
 -#if defined(ADM_LAV_MP2) && !defined(ADM_LAV_AC3)
@@ -20,7 +20,7 @@ diff -ur avidemux_2.5.3/plugins/ADM_audioEncoders/lavcodec/audioencoder_lavcodec
   #else
     #error
   #endif
-@@ -64,13 +67,19 @@
+@@ -60,13 +63,19 @@
    2,                    // Max channels
    1,0,0,                // Version
  #else
@@ -42,7 +42,7 @@ diff -ur avidemux_2.5.3/plugins/ADM_audioEncoders/lavcodec/audioencoder_lavcodec
  #endif
    makeName(WAV),
  
-@@ -136,7 +145,9 @@
+@@ -132,7 +141,9 @@
  #endif
    _wavheader->byterate=(lavConfig.bitrate*1000)>>3;         
        
@@ -53,9 +53,10 @@ diff -ur avidemux_2.5.3/plugins/ADM_audioEncoders/lavcodec/audioencoder_lavcodec
      _chunk = 1152*_wavheader->channels;
  #else
      _chunk = 1536*_wavheader->channels; // AC3
-diff -ur avidemux_2.5.3/plugins/ADM_audioEncoders/lavcodec/CMakeLists.txt avidemux_2.5.3-ffmpeg-aac/plugins/ADM_audioEncoders/lavcodec/CMakeLists.txt
---- avidemux_2.5.3/plugins/ADM_audioEncoders/lavcodec/CMakeLists.txt	2010-02-28 21:32:28.000000000 +0100
-+++ avidemux_2.5.3-ffmpeg-aac/plugins/ADM_audioEncoders/lavcodec/CMakeLists.txt	2010-10-02 03:30:48.000000000 +0200
+
+diff -ur avidemux_2.5.4/plugins/ADM_audioEncoders/lavcodec/CMakeLists.txt avidemux_2.5.4-ffmpeg-aac/plugins/ADM_audioEncoders/lavcodec/CMakeLists.txt
+--- avidemux_2.5.4/plugins/ADM_audioEncoders/lavcodec/CMakeLists.txt.ffmpegaac	2010-05-25 16:48:57.000000000 -0400
++++ avidemux_2.5.4/plugins/ADM_audioEncoders/lavcodec/CMakeLists.txt	2010-11-20 16:24:10.171164293 -0500
 @@ -27,3 +27,12 @@
  
  	INIT_AUDIO_ENCODER(ADM_ae_lav_ac3)
