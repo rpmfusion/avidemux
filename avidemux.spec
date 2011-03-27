@@ -2,7 +2,7 @@
 
 Name:           avidemux
 Version:        2.5.3
-Release:        4%{?dist}
+Release:        5%{?dist}
 Summary:        Graphical video editing and transcoding tool
 
 Group:          Applications/Multimedia
@@ -263,6 +263,9 @@ rm -rf $RPM_BUILD_ROOT
 %{_includedir}/ADM_coreConfig.h
 
 %changelog
+* Sun Mar 27 2011 Nicolas Chauvet <kwizart@gmail.com> - 2.5.3-5
+- Rebuild for x264
+
 * Tue Jul 20 2010 Stewart Adam <s.adam at diffingo.com> - 2.5.3-4
 - Rebuild for new x264
 
