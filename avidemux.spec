@@ -275,7 +275,7 @@ rm -rf $RPM_BUILD_ROOT
 %{_includedir}/ADM_coreConfig.h
 
 %changelog
-* Sat Apr 15 2011 Richard Shaw <hobbes1069@gmail.com> - 2.5.4-2
+* Sat Apr 16 2011 Richard Shaw <hobbes1069@gmail.com> - 2.5.4-2
 - Upload missing patch to CVS.
 
 * Sat Apr 16 2011 Richard Shaw <hobbes1069@gmail.com> - 2.5.4-1
