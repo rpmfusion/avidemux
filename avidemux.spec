@@ -2,7 +2,7 @@
 
 Name:           avidemux
 Version:        2.5.4
-Release:        1%{?dist}
+Release:        2%{?dist}
 Summary:        Graphical video editing and transcoding tool
 
 Group:          Applications/Multimedia
@@ -275,6 +275,9 @@ rm -rf $RPM_BUILD_ROOT
 %{_includedir}/ADM_coreConfig.h
 
 %changelog
+* Sat Apr 15 2011 Richard Shaw <hobbes1069@gmail.com> - 2.5.4-2
+- Upload missing patch to CVS.
+
 * Sat Apr 16 2011 Richard Shaw <hobbes1069@gmail.com> - 2.5.4-1
 - Updated to version 2.5.4.
 
