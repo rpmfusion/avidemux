@@ -1,8 +1,8 @@
 %define _pkgbuilddir %{_builddir}/%{name}_%{version}
 
 Name:           avidemux
-Version:        2.5.3
-Release:        5%{?dist}
+Version:        2.5.4
+Release:        1%{?dist}
 Summary:        Graphical video editing and transcoding tool
 
 Group:          Applications/Multimedia
@@ -33,25 +33,25 @@ Patch1:         avidemux-2.5-pulseaudio-default.patch
 Patch2:         avidemux-2.4-qt4.patch
 # Prevents avidemux from creating the symlinks for .so files, which we do below
 Patch3:         avidemux-2.5.3-tmplinktarget.patch
-# Fixes multiple definitions of mjpeg_log
-# http://fixounet.free.fr/2.6/2.5.3_mjpeg_fix.diff
-Patch4:         2.5.3_mjpeg_fix.diff
 # libADM_xvidRateCtl.so and libADM_vidEnc_pluginOptions.so are supposed to be
 # build statically according to upstream... Let's get them installed instead
-Patch5:         avidemux-2.5.3-mpeg2enc.patch
-Patch6:         avidemux-2.5.3-pluginlibs.patch
+Patch4:         avidemux-2.5.3-mpeg2enc.patch
+Patch5:         avidemux-2.5.3-pluginlibs.patch
+# Patch8 obtained from http://lists.rpmfusion.org/pipermail/rpmfusion-developers/2010-October/008645.html
+Patch6:         avidemux_2.5.4-ffmpeg-aac.patch
 BuildRoot:      %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 
 # Upstream has been informed http://avidemux.org/admForum/viewtopic.php?id=6447
 ExcludeArch: ppc ppc64
 
 Requires:       %{name}-cli  = %{version}-%{release}
-Requires:       %{name}-gui = %{version}-%{release}
+Requires:       %{name}-gui = %{version}
 Requires:       %{name}-plugins = %{version}
 
 # Compiling
 BuildRequires:  cmake
 BuildRequires:  gettext-devel
+BuildRequires:  libxslt
 
 # Libraries
 BuildRequires:  yasm-devel
@@ -171,10 +171,9 @@ sed -i.bak 's/startDir="lib";/startDir="lib64";/' avidemux/main.cpp
 %patch1 -p1 -b .pulse
 %patch2 -p1 -b .qt4
 %patch3 -p1 -b .tmplinktarget
-%patch4 -p1 -b .mjpeg_log
-%patch5 -p1 -b .mpeg2enc
-%patch6 -p1 -b .pluginlibs
-
+%patch4 -p1 -b .mpeg2enc
+%patch5 -p1 -b .pluginlibs
+%patch6 -p1 -b .ffmpegaac
 
 %build
 # Out of source build
@@ -211,6 +210,11 @@ install -m644 avidemux/ADM_userInterfaces/ADM_QT4/ADM_gui/pics/avidemux_icon.png
 # Find and remove all la files
 find $RPM_BUILD_ROOT -type f -name "*.la" -exec rm -f {} ';'
 
+# Remove Windows-only executables
+# Must check this for new Linux-relevant files upon new avidemux releases
+rm -rf $RPM_BUILD_ROOT%{_datadir}/ADM_addons/avsfilter
+rmdir $RPM_BUILD_ROOT%{_datadir}/ADM_addons/
+
 # Install .desktop shortcuts
 desktop-file-install --vendor rpmfusion \
     --dir $RPM_BUILD_ROOT%{_datadir}/applications \
@@ -220,6 +224,15 @@ desktop-file-install --vendor rpmfusion \
     --dir $RPM_BUILD_ROOT%{_datadir}/applications \
     %{SOURCE2}
 
+# Remove duplicated Qt translations
+rm -f $RPM_BUILD_ROOT%{_datadir}/%{name}/i18n/qt_*.qm
+# find_lang.sh doesn't recognize this one, and there already is avidemux_sr.qm
+rm -f $RPM_BUILD_ROOT%{_datadir}/%{name}/i18n/avidemux_sr@latin.qm
+
+# Qt-style translations
+%find_lang %{name} --with-qt --without-mo
+mv -f %{name}.lang %{name}-qt.lang
+# Gettext-style translations
 %find_lang %{name}
 
 %clean
@@ -232,9 +245,8 @@ rm -rf $RPM_BUILD_ROOT
 %defattr(-,root,root,-)
 # metapackage, no files
 
-%files libs -f %{name}.lang
+%files libs
 %doc AUTHORS COPYING README TODO
-%dir %{_datadir}/%{name}
 %{_datadir}/ADM_scripts/
 %{_datadir}/pixmaps/avidemux.png
 %{_libdir}/libADM*
@@ -243,16 +255,16 @@ rm -rf $RPM_BUILD_ROOT
 %defattr(-,root,root,-)
 %{_bindir}/avidemux2_cli
 
-%files gtk
+%files gtk -f %{name}.lang
 %defattr(-,root,root,-)
 %{_bindir}/avidemux2_gtk
 %{_datadir}/applications/*gtk*.desktop
 
-%files qt
+%files qt -f %{name}-qt.lang
 %defattr(-,root,root,-)
-%{_datadir}/%{name}/i18n/
 %{_bindir}/avidemux2_qt4
 %{_datadir}/applications/*qt*.desktop
+%dir %{_datadir}/%{name}/i18n
 
 %files plugins
 %defattr(-,root,root,-)
@@ -263,6 +275,9 @@ rm -rf $RPM_BUILD_ROOT
 %{_includedir}/ADM_coreConfig.h
 
 %changelog
+* Sat Apr 16 2011 Richard Shaw <hobbes1069@gmail.com> - 2.5.4-1
+- Updated to version 2.5.4.
+
 * Sun Mar 27 2011 Nicolas Chauvet <kwizart@gmail.com> - 2.5.3-5
 - Rebuild for x264
 
