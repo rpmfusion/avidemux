@@ -2,7 +2,7 @@
 
 Name:           avidemux
 Version:        2.5.4
-Release:        2%{?dist}
+Release:        3%{?dist}
 Summary:        Graphical video editing and transcoding tool
 
 Group:          Applications/Multimedia
@@ -39,7 +39,10 @@ Patch4:         avidemux-2.5.3-mpeg2enc.patch
 Patch5:         avidemux-2.5.3-pluginlibs.patch
 # Patch8 obtained from http://lists.rpmfusion.org/pipermail/rpmfusion-developers/2010-October/008645.html
 Patch6:         avidemux_2.5.4-ffmpeg-aac.patch
-BuildRoot:      %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
+Patch7:         avidemux-2.5.4-gcc46_tmp_fix.patch
+Patch8:         avidemux-2.5.4-gtk_menu_crash_fix.patch
+# Patch needed for version of x264 in F15/rawhide.
+Patch9:         avidemux-2.5.4-x264_fix.patch
 
 # Upstream has been informed http://avidemux.org/admForum/viewtopic.php?id=6447
 ExcludeArch: ppc ppc64
@@ -174,6 +177,9 @@ sed -i.bak 's/startDir="lib";/startDir="lib64";/' avidemux/main.cpp
 %patch4 -p1 -b .mpeg2enc
 %patch5 -p1 -b .pluginlibs
 %patch6 -p1 -b .ffmpegaac
+%patch7 -p1 -b .gcc46tmpfix
+%patch8 -b .gtk_menu
+%patch9 -p1 -b .x264fix
 
 %build
 # Out of source build
@@ -275,6 +281,11 @@ rm -rf $RPM_BUILD_ROOT
 %{_includedir}/ADM_coreConfig.h
 
 %changelog
+* Tue Apr 19 2011 Richard Shaw <hobbes1069@gmail.com> - 2.5.4-3
+- Fixes gcc 4.6 errors that used to be warnings.
+- Fixes compile issues with x264 being too new.
+- Fixes potential crash betwen gtk and opengl.
+
 * Sat Apr 16 2011 Richard Shaw <hobbes1069@gmail.com> - 2.5.4-2
 - Upload missing patch to CVS.
 
