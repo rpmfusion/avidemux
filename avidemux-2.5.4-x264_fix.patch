@@ -1,0 +1,63 @@
+diff -Naur avidemux_2.5.4.orig/plugins/ADM_videoEncoder/ADM_vidEnc_x264/qt4/x264ConfigDialog.cpp avidemux_2.5.4/plugins/ADM_videoEncoder/ADM_vidEnc_x264/qt4/x264ConfigDialog.cpp
+--- avidemux_2.5.4.orig/plugins/ADM_videoEncoder/ADM_vidEnc_x264/qt4/x264ConfigDialog.cpp	2010-09-29 15:20:48.000000000 -0500
++++ avidemux_2.5.4/plugins/ADM_videoEncoder/ADM_vidEnc_x264/qt4/x264ConfigDialog.cpp	2011-04-17 16:10:58.327555878 -0500
+@@ -94,6 +94,13 @@
+ 	connect(ui.dct8x8CheckBox, SIGNAL(toggled(bool)), this, SLOT(dct8x8CheckBox_toggled(bool)));
+ 	connect(ui.p8x8CheckBox, SIGNAL(toggled(bool)), this, SLOT(p8x8CheckBox_toggled(bool)));
+ 
++#if X264_BUILD < 110
++	ui.weightedPPredictComboBox->clear();
++	ui.weightedPPredictComboBox->addItem(tr("Disabled"));
++	ui.weightedPPredictComboBox->addItem(tr("Blind Offset"));
++	ui.weightedPPredictComboBox->addItem(tr("Smart Analysis"));
++#endif
++
+ 	// Frame tab
+ 	connect(ui.loopFilterCheckBox, SIGNAL(toggled(bool)), this, SLOT(loopFilterCheckBox_toggled(bool)));
+ 
+diff -Naur avidemux_2.5.4.orig/plugins/ADM_videoEncoder/ADM_vidEnc_x264/x264Options.cpp avidemux_2.5.4/plugins/ADM_videoEncoder/ADM_vidEnc_x264/x264Options.cpp
+--- avidemux_2.5.4.orig/plugins/ADM_videoEncoder/ADM_vidEnc_x264/x264Options.cpp	2011-04-17 16:17:26.318246984 -0500
++++ avidemux_2.5.4/plugins/ADM_videoEncoder/ADM_vidEnc_x264/x264Options.cpp	2011-04-17 16:17:48.213370981 -0500
+@@ -1386,9 +1386,15 @@
+ 		case X264_WEIGHTP_NONE:
+ 			strcpy((char*)xmlBuffer, "none");
+ 			break;
++#if X264_BUILD < 110
+ 		case X264_WEIGHTP_BLIND:
+ 			strcpy((char*)xmlBuffer, "blind");
+ 			break;
++#else
++		case X264_WEIGHTP_SIMPLE:
++			strcpy((char*)xmlBuffer, "simple");
++			break;
++#endif
+ 		case X264_WEIGHTP_SMART:
+ 			strcpy((char*)xmlBuffer, "smart");
+ 			break;
+@@ -1895,8 +1901,13 @@
+ 			{
+ 				int weightedPredPFrames = X264_WEIGHTP_NONE;
+ 
++#if X264_BUILD < 110
+ 				if (strcmp(content, "blind") == 0)
+ 					weightedPredPFrames = X264_WEIGHTP_BLIND;
++#else
++				if (strcmp(content, "simple") == 0)
++					weightedPredPFrames = X264_WEIGHTP_SIMPLE;
++#endif
+ 				else if (strcmp(content, "smart") == 0)
+ 					weightedPredPFrames = X264_WEIGHTP_SMART;
+ 
+diff -Naur avidemux_2.5.4.orig/plugins/ADM_videoEncoder/ADM_vidEnc_x264/x264Param.xsd avidemux_2.5.4/plugins/ADM_videoEncoder/ADM_vidEnc_x264/x264Param.xsd
+--- avidemux_2.5.4.orig/plugins/ADM_videoEncoder/ADM_vidEnc_x264/x264Param.xsd	2010-09-29 14:48:29.000000000 -0500
++++ avidemux_2.5.4/plugins/ADM_videoEncoder/ADM_vidEnc_x264/x264Param.xsd	2011-04-17 16:19:10.877113040 -0500
+@@ -335,7 +335,9 @@
+                       <xs:simpleType>
+                         <xs:restriction base="xs:string">
+                           <xs:enumeration value="none"/>
++						  <!-- blind deprecated core 110 -->
+                           <xs:enumeration value="blind"/>
++						  <xs:enumeration value="simple"/>
+                           <xs:enumeration value="smart"/>
+                         </xs:restriction>
+                       </xs:simpleType>

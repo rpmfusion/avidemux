@@ -2,7 +2,7 @@
 
 Name:           avidemux
 Version:        2.5.4
-Release:        1%{?dist}
+Release:        4%{?dist}
 Summary:        Graphical video editing and transcoding tool
 
 Group:          Applications/Multimedia
@@ -38,8 +38,12 @@ Patch3:         avidemux-2.5.3-tmplinktarget.patch
 Patch4:         avidemux-2.5.3-mpeg2enc.patch
 Patch5:         avidemux-2.5.3-pluginlibs.patch
 # Patch8 obtained from http://lists.rpmfusion.org/pipermail/rpmfusion-developers/2010-October/008645.html
-Patch6:         avidemux_2.5.4-ffmpeg-aac.patch
-BuildRoot:      %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
+#Patch6:         avidemux_2.5.4-ffmpeg-aac.patch
+Patch7:         avidemux-2.5.4-gcc46_tmp_fix.patch
+Patch8:         avidemux-2.5.4-gtk_menu_crash_fix.patch
+# Patch needed for version of x264 in F15/rawhide.
+Patch9:         avidemux-2.5.4-x264_fix.patch
+#Patch10:        avidemux-2.5.4-ext_lib_cmake_fix.patch
 
 # Upstream has been informed http://avidemux.org/admForum/viewtopic.php?id=6447
 ExcludeArch: ppc ppc64
@@ -80,6 +84,9 @@ BuildRequires:  libmad-devel >= 0.15.1
 BuildRequires:  libogg-devel >= 1.1
 BuildRequires:  libvorbis-devel >= 1.0.1
 BuildRequires:  libdca-devel
+BuildRequires:  opencore-amr-devel
+# VP8 support, decoding only?
+BuildRequires:  libvpx-devel
 
 
 # Video Codecs
@@ -161,6 +168,10 @@ This package contains various plugins for avidemux.
 %prep
 %setup -q -n avidemux_%{version}
 
+# Remove unneeded external libraries
+# Currently breaks building if it doesn't exist.
+#rm -rf avidemux/ADM_script
+
 # change hardcoded libdir paths
 %ifarch x86_64 ppc64
 sed -i.bak 's/startDir="lib";/startDir="lib64";/' avidemux/ADM_core/src/ADM_fileio.cpp
@@ -173,7 +184,13 @@ sed -i.bak 's/startDir="lib";/startDir="lib64";/' avidemux/main.cpp
 %patch3 -p1 -b .tmplinktarget
 %patch4 -p1 -b .mpeg2enc
 %patch5 -p1 -b .pluginlibs
-%patch6 -p1 -b .ffmpegaac
+# Does not work as is. Disabled for now.
+#%patch6 -p1 -b .ffmpegaac
+%patch7 -p1 -b .gcc46tmpfix
+%patch8 -b .gtk_menu
+%patch9 -p1 -b .x264fix
+# Fixes cmake configuration but build fails.
+#%patch10 -p1 -b .extlibfix
 
 %build
 # Out of source build
@@ -181,6 +198,7 @@ mkdir build && cd build
 %cmake -DAVIDEMUX_INSTALL_PREFIX=%{_prefix} \
        -DAVIDEMUX_SOURCE_DIR="%{_pkgbuilddir}" \
        -DAVIDEMUX_CORECONFIG_DIR="%{_pkgbuilddir}/build/config" \
+       -DUSE_SYSTEM_SPIDERMONKEY:BOOL=ON \
        ..
 make %{?_smp_mflags}
 # Create the temp link directory manually since otherwise it happens too early
@@ -275,17 +293,24 @@ rm -rf $RPM_BUILD_ROOT
 %{_includedir}/ADM_coreConfig.h
 
 %changelog
-* Sat Nov 20 2010 Stewart Adam <s.adam at diffingo.com> - 2.5.4-1
-- Update to 2.5.4
-- Fix Qt translations (Kevin Kofler)
+* Wed Apr 20 2011 Richard Shaw <hobbes1069@gmail.com> - 2.5.4-4
+- Disabled non-working patch for experimental aac encoding with ffmpeg.
+- Removed dependency on bundled javascript library. Now uses system library.
+- Added optional opencore-amr decoding support.
 
-* Fri Nov 5 2010 Stewart Adam <s.adam at diffingo.com> - 2.5.3-6
-- Remove dir /usr/share/avidemux as nothing installs there anymore
+* Tue Apr 19 2011 Richard Shaw <hobbes1069@gmail.com> - 2.5.4-3
+- Fixes gcc 4.6 errors that used to be warnings.
+- Fixes compile issues with x264 being too new.
+- Fixes potential crash betwen gtk and opengl.
 
-* Tue Oct 26 2010 Stewart Adam <s.adam at diffingo.com> - 2.5.3-5
-- Add x264 field asm patch to fix F-14 build (#1447)
-- Fix main package's dependency on the GUI subpackage (Bernie Innocentie)
-- Enable ffmpeg's AAC encoder (Kevin Kofler)
+* Sat Apr 16 2011 Richard Shaw <hobbes1069@gmail.com> - 2.5.4-2
+- Upload missing patch to CVS.
+
+* Sat Apr 16 2011 Richard Shaw <hobbes1069@gmail.com> - 2.5.4-1
+- Updated to version 2.5.4.
+
+* Sun Mar 27 2011 Nicolas Chauvet <kwizart@gmail.com> - 2.5.3-5
+- Rebuild for x264
 
 * Tue Jul 20 2010 Stewart Adam <s.adam at diffingo.com> - 2.5.3-4
 - Rebuild for new x264
