@@ -43,7 +43,8 @@ Patch7:         avidemux-2.5.4-gcc46_tmp_fix.patch
 Patch8:         avidemux-2.5.4-gtk_menu_crash_fix.patch
 # Patch needed for version of x264 in F15/rawhide.
 Patch9:         avidemux-2.5.4-x264_fix.patch
-Patch10:        avidemux-2.5.4-ext_lib_cmake_fix.patch
+# Work in progress
+#Patch10:        avidemux-2.5.4-ext_lib_cmake_fix.patch
 Patch11:        avidemux-2.5.4-audio_prefs.patch
 Patch12:        avidemux-2.5.4-ffmpeg_perms.patch
 
