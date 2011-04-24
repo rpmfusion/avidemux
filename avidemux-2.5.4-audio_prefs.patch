@@ -1,0 +1,13 @@
+diff -Naur avidemux_2.5.4.orig/cmake/config.h.cmake avidemux_2.5.4/cmake/config.h.cmake
+--- avidemux_2.5.4.orig/cmake/config.h.cmake	2010-09-29 14:01:12.000000000 -0500
++++ avidemux_2.5.4/cmake/config.h.cmake	2011-04-22 10:52:22.664268351 -0500
+@@ -76,9 +76,7 @@
+ /* use Nvwa memory leak detector */
+ #cmakedefine FIND_LEAKS
+ 
+-#if defined(OSS_SUPPORT) || defined (USE_ARTS) || defined(USE_SDL) || defined(__APPLE__) || defined(__WIN32) || defined(ALSA_SUPPORT)
+ #define HAVE_AUDIO
+-#endif
+ 
+ #define HAVE_ENCODER
+ 

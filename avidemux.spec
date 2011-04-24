@@ -2,7 +2,7 @@
 
 Name:           avidemux
 Version:        2.5.4
-Release:        4%{?dist}
+Release:        5%{?dist}
 Summary:        Graphical video editing and transcoding tool
 
 Group:          Applications/Multimedia
@@ -38,12 +38,14 @@ Patch3:         avidemux-2.5.3-tmplinktarget.patch
 Patch4:         avidemux-2.5.3-mpeg2enc.patch
 Patch5:         avidemux-2.5.3-pluginlibs.patch
 # Patch8 obtained from http://lists.rpmfusion.org/pipermail/rpmfusion-developers/2010-October/008645.html
-#Patch6:         avidemux_2.5.4-ffmpeg-aac.patch
+Patch6:         avidemux_2.5.4-ffmpeg-aac.patch
 Patch7:         avidemux-2.5.4-gcc46_tmp_fix.patch
 Patch8:         avidemux-2.5.4-gtk_menu_crash_fix.patch
 # Patch needed for version of x264 in F15/rawhide.
 Patch9:         avidemux-2.5.4-x264_fix.patch
-#Patch10:        avidemux-2.5.4-ext_lib_cmake_fix.patch
+Patch10:        avidemux-2.5.4-ext_lib_cmake_fix.patch
+Patch11:        avidemux-2.5.4-audio_prefs.patch
+Patch12:        avidemux-2.5.4-ffmpeg_perms.patch
 
 # Upstream has been informed http://avidemux.org/admForum/viewtopic.php?id=6447
 ExcludeArch: ppc ppc64
@@ -184,13 +186,14 @@ sed -i.bak 's/startDir="lib";/startDir="lib64";/' avidemux/main.cpp
 %patch3 -p1 -b .tmplinktarget
 %patch4 -p1 -b .mpeg2enc
 %patch5 -p1 -b .pluginlibs
-# Does not work as is. Disabled for now.
-#%patch6 -p1 -b .ffmpegaac
+%patch6 -p1 -b .ffmpegaac
 %patch7 -p1 -b .gcc46tmpfix
 %patch8 -b .gtk_menu
 %patch9 -p1 -b .x264fix
 # Fixes cmake configuration but build fails.
 #%patch10 -p1 -b .extlibfix
+%patch11 -p1 -b .audioprefs
+%patch12 -p1 -b .ffmpegperms
 
 %build
 # Out of source build
@@ -293,6 +296,11 @@ rm -rf $RPM_BUILD_ROOT
 %{_includedir}/ADM_coreConfig.h
 
 %changelog
+* Sun Apr 24 2011 Richard Shaw <hobbes1069@gmail.com> - 2.5.4-5
+- AAC encoding now working. (Kevin Kolfer)
+- Fedora 15 build dependecy fixed. (Kevin Kolfer)
+- Audio device peferences now remembered.
+
 * Wed Apr 20 2011 Richard Shaw <hobbes1069@gmail.com> - 2.5.4-4
 - Disabled non-working patch for experimental aac encoding with ffmpeg.
 - Removed dependency on bundled javascript library. Now uses system library.
