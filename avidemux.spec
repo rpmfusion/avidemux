@@ -43,7 +43,8 @@ Patch7:         avidemux-2.5.4-gcc46_tmp_fix.patch
 Patch8:         avidemux-2.5.4-gtk_menu_crash_fix.patch
 # Patch needed for version of x264 in F15/rawhide.
 Patch9:         avidemux-2.5.4-x264_fix.patch
-Patch10:        avidemux-2.5.4-ext_lib_cmake_fix.patch
+# Work in progress
+#Patch10:        avidemux-2.5.4-ext_lib_cmake_fix.patch
 Patch11:        avidemux-2.5.4-audio_prefs.patch
 Patch12:        avidemux-2.5.4-ffmpeg_perms.patch
 
@@ -296,9 +297,13 @@ rm -rf $RPM_BUILD_ROOT
 %{_includedir}/ADM_coreConfig.h
 
 %changelog
+* Sun Apr 24 2011 Richard Shaw <hobbes1069@gmail.com> - 2.5.4-6
+- Really fix AAC this time.
+- Really fix x264 this time.
+
 * Sun Apr 24 2011 Richard Shaw <hobbes1069@gmail.com> - 2.5.4-5
-- AAC encoding now working. (Kevin Kolfer)
-- Fedora 15 build dependecy fixed. (Kevin Kolfer)
+- AAC encoding now working. (Kevin Kofler)
+- Fedora 15 build dependecy fixed. (Kevin Kofler)
 - Audio device peferences now remembered.
 
 * Wed Apr 20 2011 Richard Shaw <hobbes1069@gmail.com> - 2.5.4-4
