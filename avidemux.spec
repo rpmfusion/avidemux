@@ -2,7 +2,7 @@
 
 Name:           avidemux
 Version:        2.5.4
-Release:        5%{?dist}
+Release:        6%{?dist}
 Summary:        Graphical video editing and transcoding tool
 
 Group:          Applications/Multimedia
@@ -297,9 +297,13 @@ rm -rf $RPM_BUILD_ROOT
 %{_includedir}/ADM_coreConfig.h
 
 %changelog
+* Sun Apr 24 2011 Richard Shaw <hobbes1069@gmail.com> - 2.5.4-6
+- Really fix AAC this time.
+- Really fix x264 this time.
+
 * Sun Apr 24 2011 Richard Shaw <hobbes1069@gmail.com> - 2.5.4-5
-- AAC encoding now working. (Kevin Kolfer)
-- Fedora 15 build dependecy fixed. (Kevin Kolfer)
+- AAC encoding now working. (Kevin Kofler)
+- Fedora 15 build dependecy fixed. (Kevin Kofler)
 - Audio device peferences now remembered.
 
 * Wed Apr 20 2011 Richard Shaw <hobbes1069@gmail.com> - 2.5.4-4
