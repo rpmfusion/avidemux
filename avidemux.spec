@@ -2,7 +2,7 @@
 
 Name:           avidemux
 Version:        2.5.4
-Release:        6%{?dist}
+Release:        7%{?dist}
 Summary:        Graphical video editing and transcoding tool
 
 Group:          Applications/Multimedia
@@ -297,6 +297,9 @@ rm -rf $RPM_BUILD_ROOT
 %{_includedir}/ADM_coreConfig.h
 
 %changelog
+* Sun May 15 2011 Richard Shaw <hobbes1069@gmail.com> - 2.5.4-7
+- Rebuild for updated js (spidermonkey)
+
 * Sun Apr 24 2011 Richard Shaw <hobbes1069@gmail.com> - 2.5.4-6
 - Really fix AAC this time.
 - Really fix x264 this time.
