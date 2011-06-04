@@ -2,7 +2,7 @@
 
 Name:           avidemux
 Version:        2.5.4
-Release:        9%{?dist}
+Release:        10%{?dist}
 Summary:        Graphical video editing and transcoding tool
 
 Group:          Applications/Multimedia
@@ -43,10 +43,15 @@ Patch7:         avidemux-2.5.4-gcc46_tmp_fix.patch
 Patch8:         avidemux-2.5.4-gtk_menu_crash_fix.patch
 # Patch needed for version of x264 in F15/rawhide.
 Patch9:         avidemux-2.5.4-x264_fix.patch
-# Work in progress
-#Patch10:        avidemux-2.5.4-ext_lib_cmake_fix.patch
-Patch11:        avidemux-2.5.4-audio_prefs.patch
-Patch12:        avidemux-2.5.4-ffmpeg_perms.patch
+Patch10:        avidemux-2.5.4-audio_prefs.patch
+Patch11:        avidemux-2.5.4-ffmpeg_perms.patch
+# Use system libraries
+Patch12:        avidemux-2.5.4-libass.patch
+Patch13:        avidemux-2.5.4-liba52.patch
+Patch14:        avidemux-2.5.4-libmad.patch
+Patch15:        avidemux-2.5.4-libtwolame.patch
+# Uses a header file not found in the standard package
+#Patch16:        avidemux-2.5.4-mpeg2enc.patch
 
 # Upstream has been informed http://avidemux.org/admForum/viewtopic.php?id=6447
 ExcludeArch: ppc ppc64
@@ -70,6 +75,7 @@ BuildRequires:  libXv-devel
 BuildRequires:  libXmu-devel
 BuildRequires:  libsamplerate-devel
 BuildRequires:  jack-audio-connection-kit-devel
+BuildRequires:  libass-devel
 
 # Sound out
 BuildRequires:  alsa-lib-devel >= 1.0.3
@@ -90,12 +96,13 @@ BuildRequires:  libdca-devel
 BuildRequires:  opencore-amr-devel
 # VP8 support, decoding only?
 BuildRequires:  libvpx-devel
-
+BuildRequires:  twolame-devel
 
 # Video Codecs
 BuildRequires:  xvidcore-devel >= 1.0.2
 BuildRequires:  x264-devel
 BuildRequires:  ffmpeg-devel
+#BuildRequires:  mjpegtools-devel
 
 # FIXME: aften not packaged, add BR when it is
 
@@ -172,14 +179,26 @@ This package contains various plugins for avidemux.
 %setup -q -n avidemux_%{version}
 
 # Remove unneeded external libraries
-# Currently breaks building if it doesn't exist.
-#rm -rf avidemux/ADM_script
+#rm -rf avidemux/ADM_libraries/ADM_smjs
+rm -rf plugins/ADM_videoFilters/Ass/ADM_libAss
+rm -rf plugins/ADM_audioEncoders/twolame/ADM_libtwolame
+rm -rf plugins/ADM_audioDecoders/ADM_ad_mad/ADM_libMad
+rm -rf plugins/ADM_audioDecoders/ADM_ad_ac3/ADM_liba52
+#rm -rf plugins/ADM_videoEncoder/ADM_vidEnc_mpeg2enc/mpeg2enc
 
 # change hardcoded libdir paths
 %ifarch x86_64 ppc64
 sed -i.bak 's/startDir="lib";/startDir="lib64";/' avidemux/ADM_core/src/ADM_fileio.cpp
 sed -i.bak 's/startDir="lib";/startDir="lib64";/' avidemux/main.cpp
 %endif
+
+# Fix build with version of js introduced in F15.
+#find avidemux/ADM_script -name '*.h' -exec \
+#sed -i -e '/#include "jsapi.h"/ i\
+##undef malloc \
+##undef calloc \
+##undef realloc \
+##undef free' {} \;
 
 %patch0 -p1 -b .parallel
 %patch1 -p1 -b .pulse
@@ -191,31 +210,34 @@ sed -i.bak 's/startDir="lib";/startDir="lib64";/' avidemux/main.cpp
 %patch7 -p1 -b .gcc46tmpfix
 %patch8 -b .gtk_menu
 %patch9 -p1 -b .x264fix
-# Fixes cmake configuration but build fails.
-#%patch10 -p1 -b .extlibfix
-%patch11 -p1 -b .audioprefs
-%patch12 -p1 -b .ffmpegperms
+%patch10 -p1 -b .audioprefs
+%patch11 -p1 -b .ffmpegperms
+%patch12 -p1 -b .libass
+%patch13 -p1 -b .liba52
+%patch14 -p1 -b .libmad
+%patch15 -p1 -b .libtwolame
+#%patch16 -p1 -b .mpeg2enc
+
 
 %build
-# Out of source build
-mkdir build && cd build
-%cmake -DAVIDEMUX_INSTALL_PREFIX=%{_prefix} \
-       -DAVIDEMUX_SOURCE_DIR="%{_pkgbuilddir}" \
-       -DAVIDEMUX_CORECONFIG_DIR="%{_pkgbuilddir}/build/config" \
-       -DUSE_SYSTEM_SPIDERMONKEY:BOOL=ON \
+# Cmake requires out of source build
+mkdir -p build && pushd build
+%cmake -DUSE_SYSTEM_SPIDERMONKEY:BOOL=OFF \
        ..
 make %{?_smp_mflags}
 # Create the temp link directory manually since otherwise it happens too early
 mkdir -p %{_pkgbuilddir}/build/%{_lib}
 find %{_pkgbuilddir}/build/avidemux -name '*.so*' | \
      xargs ln -sft %{_pkgbuilddir}/build/%{_lib}
+popd
 
-mkdir ../build_plugins && cd ../build_plugins
+mkdir -p build_plugins && pushd build_plugins
 %cmake -DAVIDEMUX_INSTALL_PREFIX="%{_pkgbuilddir}/build/" \
        -DAVIDEMUX_SOURCE_DIR="%{_pkgbuilddir}" \
        -DAVIDEMUX_CORECONFIG_DIR="%{_pkgbuilddir}/build/config" \
        ../plugins
 make %{?_smp_mflags}
+popd
 
 
 %install
@@ -223,6 +245,7 @@ rm -rf $RPM_BUILD_ROOT
 
 make -C build install DESTDIR=$RPM_BUILD_ROOT
 make -C build_plugins install DESTDIR=$RPM_BUILD_ROOT
+
 # Install the build configuration for devel package
 install -d -m755 $RPM_BUILD_ROOT%{_includedir}
 install -m644 build/config/ADM_coreConfig.h $RPM_BUILD_ROOT%{_includedir}/ADM_coreConfig.h
@@ -297,11 +320,15 @@ rm -rf $RPM_BUILD_ROOT
 %{_includedir}/ADM_coreConfig.h
 
 %changelog
-* Tue May 31 2011 Richard Shaw <hobbes1069@gmail.com> - 2.5.4-9
-- Rebuild for updated js package.
+* Sat Jun 04 2011 Richard Shaw <hobbes1069@gmail.com> - 2.5.4-10
+- New version of js in Fedora 15 breaks build.
+- Re-enable built-in javascript for Fedora 15.
 
-* Sun May 15 2011 Richard Shaw <hobbes1069@gmail.com> - 2.5.4-7
-- Rebuild for updated js (spidermonkey)
+* Wed May 26 2011 Richard Shaw <hobbes1069@gmail.com> - 2.5.4-8
+- Use system libass (subtitles).
+- Use system liba52 (ac3 decoding).
+- Use system libmad.
+- Use system libtwolame.
 
 * Sun Apr 24 2011 Richard Shaw <hobbes1069@gmail.com> - 2.5.4-6
 - Really fix AAC this time.
