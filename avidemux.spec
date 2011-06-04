@@ -2,7 +2,7 @@
 
 Name:           avidemux
 Version:        2.5.4
-Release:        8%{?dist}
+Release:        9%{?dist}
 Summary:        Graphical video editing and transcoding tool
 
 Group:          Applications/Multimedia
@@ -179,7 +179,7 @@ This package contains various plugins for avidemux.
 %setup -q -n avidemux_%{version}
 
 # Remove unneeded external libraries
-rm -rf avidemux/ADM_libraries/ADM_smjs
+#rm -rf avidemux/ADM_libraries/ADM_smjs
 rm -rf plugins/ADM_videoFilters/Ass/ADM_libAss
 rm -rf plugins/ADM_audioEncoders/twolame/ADM_libtwolame
 rm -rf plugins/ADM_audioDecoders/ADM_ad_mad/ADM_libMad
@@ -191,6 +191,14 @@ rm -rf plugins/ADM_audioDecoders/ADM_ad_ac3/ADM_liba52
 sed -i.bak 's/startDir="lib";/startDir="lib64";/' avidemux/ADM_core/src/ADM_fileio.cpp
 sed -i.bak 's/startDir="lib";/startDir="lib64";/' avidemux/main.cpp
 %endif
+
+# Fix build with version of js introduced in F15.
+#find avidemux/ADM_script -name '*.h' -exec \
+#sed -i -e '/#include "jsapi.h"/ i\
+##undef malloc \
+##undef calloc \
+##undef realloc \
+##undef free' {} \;
 
 %patch0 -p1 -b .parallel
 %patch1 -p1 -b .pulse
@@ -214,10 +222,7 @@ sed -i.bak 's/startDir="lib";/startDir="lib64";/' avidemux/main.cpp
 %build
 # Cmake requires out of source build
 mkdir -p build && pushd build
-%cmake -DAVIDEMUX_INSTALL_PREFIX=%{_prefix} \
-       -DAVIDEMUX_SOURCE_DIR="%{_pkgbuilddir}" \
-       -DAVIDEMUX_CORECONFIG_DIR="%{_pkgbuilddir}/build/config" \
-       -DUSE_SYSTEM_SPIDERMONKEY:BOOL=ON \
+%cmake -DUSE_SYSTEM_SPIDERMONKEY:BOOL=OFF \
        ..
 make %{?_smp_mflags}
 # Create the temp link directory manually since otherwise it happens too early
@@ -315,6 +320,10 @@ rm -rf $RPM_BUILD_ROOT
 %{_includedir}/ADM_coreConfig.h
 
 %changelog
+* Sat Jun 04 2011 Richard Shaw <hobbes1069@gmail.com> - 2.5.4-9
+- New version of js in Fedora 15 breaks build.
+- Re-enable built-in javascript for Fedora 15.
+
 * Wed May 26 2011 Richard Shaw <hobbes1069@gmail.com> - 2.5.4-8
 - Use system libass (subtitles).
 - Use system liba52 (ac3 decoding).
