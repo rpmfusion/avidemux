@@ -320,11 +320,9 @@ rm -rf $RPM_BUILD_ROOT
 %{_includedir}/ADM_coreConfig.h
 
 %changelog
-* Sat Jun 04 2011 Richard Shaw <hobbes1069@gmail.com> - 2.5.4-10
-- New version of js in Fedora 15 breaks build.
+* Sat Jun 04 2011 Richard Shaw <hobbes1069@gmail.com> - 2.5.4-11
+- New version of js in Fedora 15 breaks build. (BZ#1756)
 - Re-enable built-in javascript for Fedora 15.
-
-* Wed May 26 2011 Richard Shaw <hobbes1069@gmail.com> - 2.5.4-8
 - Use system libass (subtitles).
 - Use system liba52 (ac3 decoding).
 - Use system libmad.
