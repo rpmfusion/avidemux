@@ -2,7 +2,7 @@
 
 Name:           avidemux
 Version:        2.5.5
-Release:        1%{?dist}
+Release:        2%{?dist}
 Summary:        Graphical video editing and transcoding tool
 
 Group:          Applications/Multimedia
@@ -177,7 +177,7 @@ This package contains various plugins for avidemux.
 %setup -q -n avidemux_%{version}
 
 # Remove unneeded external libraries
-%if 0%{?fedora} <= 15
+%if 0%{?fedora} <= 14
 rm -rf avidemux/ADM_libraries/ADM_smjs
 %endif
 rm -rf plugins/ADM_videoFilters/Ass/ADM_libAss
@@ -218,7 +218,7 @@ sed -i.bak 's/startDir="lib";/startDir="lib64";/' avidemux/main.cpp
 %build
 # Cmake requires out of source build
 mkdir -p build && pushd build
-%if 0%{?fedora} <= 15
+%if 0%{?fedora} <= 14
 %cmake -DUSE_SYSTEM_SPIDERMONKEY:BOOL=ON \
 %else
 %cmake -DUSE_SYSTEM_SPIDERMONKEY:BOOL=OFF \
@@ -321,7 +321,7 @@ rm -rf $RPM_BUILD_ROOT
 %{_includedir}/ADM_coreConfig.h
 
 %changelog
-* Sun Jun 05 2011 Richard Shaw <hobbes1069@gmail.com> - 2.5.5-1
+* Sun Jun 05 2011 Richard Shaw <hobbes1069@gmail.com> - 2.5.5-2
 - New release: 2.5.5
 - FFMpeg based AAC encoding is broken (BZ#1825) and
   will be disabled until fixed.
