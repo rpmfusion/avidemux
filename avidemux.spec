@@ -1,8 +1,8 @@
 %define _pkgbuilddir %{_builddir}/%{name}_%{version}
 
 Name:           avidemux
-Version:        2.5.4
-Release:        8%{?dist}
+Version:        2.5.5
+Release:        1%{?dist}
 Summary:        Graphical video editing and transcoding tool
 
 Group:          Applications/Multimedia
@@ -38,18 +38,16 @@ Patch3:         avidemux-2.5.3-tmplinktarget.patch
 Patch4:         avidemux-2.5.3-mpeg2enc.patch
 Patch5:         avidemux-2.5.3-pluginlibs.patch
 # Patch8 obtained from http://lists.rpmfusion.org/pipermail/rpmfusion-developers/2010-October/008645.html
-Patch6:         avidemux_2.5.4-ffmpeg-aac.patch
-Patch7:         avidemux-2.5.4-gcc46_tmp_fix.patch
-Patch8:         avidemux-2.5.4-gtk_menu_crash_fix.patch
+#Patch6:         avidemux_2.5.4-ffmpeg-aac.patch
+Patch6:         avidemux_2.5.5-ffmpeg_aac.patch
+Patch7:         avidemux-2.5.5-gcc46_tmp_fix.patch
 # Patch needed for version of x264 in F15/rawhide.
-Patch9:         avidemux-2.5.4-x264_fix.patch
-Patch10:        avidemux-2.5.4-audio_prefs.patch
-Patch11:        avidemux-2.5.4-ffmpeg_perms.patch
 # Use system libraries
-Patch12:        avidemux-2.5.4-libass.patch
-Patch13:        avidemux-2.5.4-liba52.patch
-Patch14:        avidemux-2.5.4-libmad.patch
-Patch15:        avidemux-2.5.4-libtwolame.patch
+Patch8:         avidemux-2.5.4-libass.patch
+Patch9:         avidemux-2.5.4-liba52.patch
+Patch10:        avidemux-2.5.4-libmad.patch
+Patch11:        avidemux-2.5.4-libtwolame.patch
+Patch12:        avidemux-2.5.5_fix_lav_audio_encoder.patch
 # Uses a header file not found in the standard package
 #Patch16:        avidemux-2.5.4-mpeg2enc.patch
 
@@ -179,7 +177,9 @@ This package contains various plugins for avidemux.
 %setup -q -n avidemux_%{version}
 
 # Remove unneeded external libraries
+%if 0%{?fedora} <= 14
 rm -rf avidemux/ADM_libraries/ADM_smjs
+%endif
 rm -rf plugins/ADM_videoFilters/Ass/ADM_libAss
 rm -rf plugins/ADM_audioEncoders/twolame/ADM_libtwolame
 rm -rf plugins/ADM_audioDecoders/ADM_ad_mad/ADM_libMad
@@ -192,33 +192,39 @@ sed -i.bak 's/startDir="lib";/startDir="lib64";/' avidemux/ADM_core/src/ADM_file
 sed -i.bak 's/startDir="lib";/startDir="lib64";/' avidemux/main.cpp
 %endif
 
+# Fix build with js 1.8.5 introduced in F15.
+#find avidemux/ADM_script -name '*.h' -exec \
+#sed -i -e '/#include "jsapi.h"/ i\
+##undef malloc \
+##undef calloc \
+##undef realloc \
+##undef free' {} \;
+
 %patch0 -p1 -b .parallel
 %patch1 -p1 -b .pulse
 %patch2 -p1 -b .qt4
 %patch3 -p1 -b .tmplinktarget
 %patch4 -p1 -b .mpeg2enc
 %patch5 -p1 -b .pluginlibs
-%patch6 -p1 -b .ffmpegaac
+#%patch6 -p1 -b .ffmpegaac
 %patch7 -p1 -b .gcc46tmpfix
-%patch8 -b .gtk_menu
-%patch9 -p1 -b .x264fix
-%patch10 -p1 -b .audioprefs
-%patch11 -p1 -b .ffmpegperms
-%patch12 -p1 -b .libass
-%patch13 -p1 -b .liba52
-%patch14 -p1 -b .libmad
-%patch15 -p1 -b .libtwolame
-#%patch16 -p1 -b .mpeg2enc
+%patch8 -p1 -b .libass
+%patch9 -p1 -b .liba52
+%patch10 -p1 -b .libmad
+%patch11 -p1 -b .libtwolame
+%patch12 -p1 -b .lavencode
 
 
 %build
 # Cmake requires out of source build
 mkdir -p build && pushd build
-%cmake -DAVIDEMUX_INSTALL_PREFIX=%{_prefix} \
-       -DAVIDEMUX_SOURCE_DIR="%{_pkgbuilddir}" \
-       -DAVIDEMUX_CORECONFIG_DIR="%{_pkgbuilddir}/build/config" \
-       -DUSE_SYSTEM_SPIDERMONKEY:BOOL=ON \
+%if 0%{?fedora} <= 14
+%cmake -DUSE_SYSTEM_SPIDERMONKEY:BOOL=ON \
+%else
+%cmake -DUSE_SYSTEM_SPIDERMONKEY:BOOL=OFF \
+%endif
        ..
+
 make %{?_smp_mflags}
 # Create the temp link directory manually since otherwise it happens too early
 mkdir -p %{_pkgbuilddir}/build/%{_lib}
@@ -315,6 +321,15 @@ rm -rf $RPM_BUILD_ROOT
 %{_includedir}/ADM_coreConfig.h
 
 %changelog
+* Sun Jun 05 2011 Richard Shaw <hobbes1069@gmail.com> - 2.5.5-1
+- New release: 2.5.5
+- FFMpeg based AAC encoding is broken (BZ#1825) and
+  will be disabled until fixed.
+
+* Sat Jun 04 2011 Richard Shaw <hobbes1069@gmail.com> - 2.5.4-9
+- New version of js in Fedora 15 breaks build.
+- Re-enable built-in javascript for Fedora 15.
+
 * Wed May 26 2011 Richard Shaw <hobbes1069@gmail.com> - 2.5.4-8
 - Use system libass (subtitles).
 - Use system liba52 (ac3 decoding).

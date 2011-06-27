@@ -1,6 +1,6 @@
-diff -Naur avidemux_2.5.4.orig/avidemux/ADM_UIs/ADM_QT4/src/T_configMenu.cpp avidemux_2.5.4/avidemux/ADM_UIs/ADM_QT4/src/T_configMenu.cpp
---- avidemux_2.5.4.orig/avidemux/ADM_UIs/ADM_QT4/src/T_configMenu.cpp	2010-06-06 18:04:21.000000000 -0500
-+++ avidemux_2.5.4/avidemux/ADM_UIs/ADM_QT4/src/T_configMenu.cpp	2011-04-19 14:15:09.330729997 -0500
+diff -Naur avidemux_2.5.5.orig/avidemux/ADM_UIs/ADM_QT4/src/T_configMenu.cpp avidemux_2.5.5/avidemux/ADM_UIs/ADM_QT4/src/T_configMenu.cpp
+--- avidemux_2.5.5.orig/avidemux/ADM_UIs/ADM_QT4/src/T_configMenu.cpp	2011-04-23 14:56:47.000000000 -0500
++++ avidemux_2.5.5/avidemux/ADM_UIs/ADM_QT4/src/T_configMenu.cpp	2011-06-06 08:36:43.093745534 -0500
 @@ -138,7 +138,7 @@
  		*configType = (ConfigMenuType)combobox->itemData(combobox->currentIndex()).toInt();
  	}
@@ -10,36 +10,39 @@ diff -Naur avidemux_2.5.4.orig/avidemux/ADM_UIs/ADM_QT4/src/T_configMenu.cpp avi
  	{
  		bool success = false;
  		bool origDisableGenericSlots = disableGenericSlots;
-@@ -210,7 +210,7 @@
+@@ -210,8 +210,7 @@
  				delete [] configData;
  
  				fillConfigurationComboBox();
--				selectConfiguration(&QFileInfo(configFileName).completeBaseName(), CONFIG_MENU_USER);
+-				QString qs=QFileInfo(configFileName).completeBaseName();
+-				selectConfiguration(&qs, CONFIG_MENU_USER);
 +				selectConfiguration(QFileInfo(configFileName).completeBaseName(), CONFIG_MENU_USER);
  			}
  		}
  	}
-@@ -316,7 +316,7 @@
+@@ -316,8 +315,7 @@
+ 	void diaElemConfigMenu::updateMe(void)
  	{
  		ADM_QconfigMenu *configMenu = (ADM_QconfigMenu*)myWidget;
- 
--		configMenu->selectConfiguration(&QString(configName), *configType);
+-		QString qs=QString(configName);
+-		configMenu->selectConfiguration(&qs, *configType);
 +		configMenu->selectConfiguration(QString(configName), *configType);
  	}
  
  	void diaElemConfigMenu::finalize(void)
-@@ -356,7 +356,7 @@
+@@ -356,8 +354,7 @@
+ 				while (parentWidget != NULL);
  			}
  		}
- 
--		configMenu->selectConfiguration(&QString(configName), *configType);
+-		QString qs=QString(configName);
+-		configMenu->selectConfiguration(&(qs), *configType);
 +		configMenu->selectConfiguration(QString(configName), *configType);
  	}
  }
  
-diff -Naur avidemux_2.5.4.orig/avidemux/ADM_UIs/ADM_QT4/src/T_configMenu.h avidemux_2.5.4/avidemux/ADM_UIs/ADM_QT4/src/T_configMenu.h
---- avidemux_2.5.4.orig/avidemux/ADM_UIs/ADM_QT4/src/T_configMenu.h	2009-07-30 13:38:30.000000000 -0500
-+++ avidemux_2.5.4/avidemux/ADM_UIs/ADM_QT4/src/T_configMenu.h	2011-04-19 14:15:38.299090636 -0500
+diff -Naur avidemux_2.5.5.orig/avidemux/ADM_UIs/ADM_QT4/src/T_configMenu.h avidemux_2.5.5/avidemux/ADM_UIs/ADM_QT4/src/T_configMenu.h
+--- avidemux_2.5.5.orig/avidemux/ADM_UIs/ADM_QT4/src/T_configMenu.h	2009-07-30 13:38:30.000000000 -0500
++++ avidemux_2.5.5/avidemux/ADM_UIs/ADM_QT4/src/T_configMenu.h	2011-06-06 08:30:50.336250102 -0500
 @@ -46,7 +46,7 @@
  		~ADM_QconfigMenu();
  
@@ -49,10 +52,10 @@ diff -Naur avidemux_2.5.4.orig/avidemux/ADM_UIs/ADM_QT4/src/T_configMenu.h avide
  	};
  }
  #endif	// T_configMenu_h
-diff -Naur avidemux_2.5.4.orig/plugins/ADM_videoEncoder/ADM_vidEnc_x264/qt4/x264ConfigDialog.cpp avidemux_2.5.4/plugins/ADM_videoEncoder/ADM_vidEnc_x264/qt4/x264ConfigDialog.cpp
---- avidemux_2.5.4.orig/plugins/ADM_videoEncoder/ADM_vidEnc_x264/qt4/x264ConfigDialog.cpp	2010-09-29 15:20:48.000000000 -0500
-+++ avidemux_2.5.4/plugins/ADM_videoEncoder/ADM_vidEnc_x264/qt4/x264ConfigDialog.cpp	2011-04-19 15:03:33.459339339 -0500
-@@ -209,7 +209,7 @@
+diff -Naur avidemux_2.5.5.orig/plugins/ADM_videoEncoder/ADM_vidEnc_x264/qt4/x264ConfigDialog.cpp avidemux_2.5.5/plugins/ADM_videoEncoder/ADM_vidEnc_x264/qt4/x264ConfigDialog.cpp
+--- avidemux_2.5.5.orig/plugins/ADM_videoEncoder/ADM_vidEnc_x264/qt4/x264ConfigDialog.cpp	2011-04-23 14:56:49.000000000 -0500
++++ avidemux_2.5.5/plugins/ADM_videoEncoder/ADM_vidEnc_x264/qt4/x264ConfigDialog.cpp	2011-06-06 08:44:49.739870167 -0500
+@@ -216,7 +216,7 @@
  	disableGenericSlots = origDisableGenericSlots;
  }
  
@@ -61,27 +64,29 @@ diff -Naur avidemux_2.5.4.orig/plugins/ADM_videoEncoder/ADM_vidEnc_x264/qt4/x264
  {
  	bool success = false;
  	bool origDisableGenericSlots = disableGenericSlots;
-@@ -343,7 +343,7 @@
+@@ -350,8 +350,7 @@
  		delete [] xml;
  
  		fillConfigurationComboBox();
--		selectConfiguration(&QFileInfo(configFileName).completeBaseName(), PLUGIN_CONFIG_USER);
+-		QString qs=QFileInfo(configFileName).completeBaseName();
+-		selectConfiguration(&qs, PLUGIN_CONFIG_USER);
 +		selectConfiguration(QFileInfo(configFileName).completeBaseName(), PLUGIN_CONFIG_USER);
  	}
  
  	delete [] configDirectory;
-@@ -580,7 +580,7 @@
+@@ -587,8 +586,7 @@
+ 
  	disableGenericSlots = true;
  	options->getPresetConfiguration(&configurationName, &configurationType);
- 
--	bool foundConfig = selectConfiguration(&QString(configurationName), configurationType);
+-	QString qs=QString(configurationName);
+-	bool foundConfig = selectConfiguration(&qs, configurationType);
 +	bool foundConfig = selectConfiguration(QString(configurationName), configurationType);
  
  	if (!foundConfig)
  		printf("Configuration %s (type %d) could not be found.  Using snapshot.\n", configurationName, configurationType);
-diff -Naur avidemux_2.5.4.orig/plugins/ADM_videoEncoder/ADM_vidEnc_x264/qt4/x264ConfigDialog.h avidemux_2.5.4/plugins/ADM_videoEncoder/ADM_vidEnc_x264/qt4/x264ConfigDialog.h
---- avidemux_2.5.4.orig/plugins/ADM_videoEncoder/ADM_vidEnc_x264/qt4/x264ConfigDialog.h	2010-09-29 15:20:48.000000000 -0500
-+++ avidemux_2.5.4/plugins/ADM_videoEncoder/ADM_vidEnc_x264/qt4/x264ConfigDialog.h	2011-04-19 15:03:52.825582656 -0500
+diff -Naur avidemux_2.5.5.orig/plugins/ADM_videoEncoder/ADM_vidEnc_x264/qt4/x264ConfigDialog.h avidemux_2.5.5/plugins/ADM_videoEncoder/ADM_vidEnc_x264/qt4/x264ConfigDialog.h
+--- avidemux_2.5.5.orig/plugins/ADM_videoEncoder/ADM_vidEnc_x264/qt4/x264ConfigDialog.h	2010-09-29 15:20:48.000000000 -0500
++++ avidemux_2.5.5/plugins/ADM_videoEncoder/ADM_vidEnc_x264/qt4/x264ConfigDialog.h	2011-06-06 08:30:50.339250103 -0500
 @@ -46,7 +46,7 @@
  	uint8_t intra8x8Luma[64], inter8x8Luma[64];
  
@@ -91,9 +96,9 @@ diff -Naur avidemux_2.5.4.orig/plugins/ADM_videoEncoder/ADM_vidEnc_x264/qt4/x264
  	bool loadPresetSettings(vidEncOptions *encodeOptions, x264Options *options);
  	void loadSettings(vidEncOptions *encodeOptions, x264Options *options);
  	int getValueIndexInArray(uint8_t value, const uint8_t valueArray[], int elementCount);
-diff -Naur avidemux_2.5.4.orig/plugins/ADM_videoEncoder/ADM_vidEnc_xvid/qt4/xvidConfigDialog.cpp avidemux_2.5.4/plugins/ADM_videoEncoder/ADM_vidEnc_xvid/qt4/xvidConfigDialog.cpp
---- avidemux_2.5.4.orig/plugins/ADM_videoEncoder/ADM_vidEnc_xvid/qt4/xvidConfigDialog.cpp	2010-06-06 18:07:37.000000000 -0500
-+++ avidemux_2.5.4/plugins/ADM_videoEncoder/ADM_vidEnc_xvid/qt4/xvidConfigDialog.cpp	2011-04-19 14:36:49.467456165 -0500
+diff -Naur avidemux_2.5.5.orig/plugins/ADM_videoEncoder/ADM_vidEnc_xvid/qt4/xvidConfigDialog.cpp avidemux_2.5.5/plugins/ADM_videoEncoder/ADM_vidEnc_xvid/qt4/xvidConfigDialog.cpp
+--- avidemux_2.5.5.orig/plugins/ADM_videoEncoder/ADM_vidEnc_xvid/qt4/xvidConfigDialog.cpp	2011-04-30 07:49:07.000000000 -0500
++++ avidemux_2.5.5/plugins/ADM_videoEncoder/ADM_vidEnc_xvid/qt4/xvidConfigDialog.cpp	2011-06-06 08:41:31.901324879 -0500
 @@ -129,7 +129,7 @@
  	disableGenericSlots = origDisableGenericSlots;
  }
@@ -103,27 +108,29 @@ diff -Naur avidemux_2.5.4.orig/plugins/ADM_videoEncoder/ADM_vidEnc_xvid/qt4/xvid
  {
  	bool success = false;
  	bool origDisableGenericSlots = disableGenericSlots;
-@@ -233,7 +233,7 @@
- 		delete [] xml;
+@@ -234,8 +234,7 @@
  
  		fillConfigurationComboBox();
--		selectConfiguration(&QFileInfo(configFileName).completeBaseName(), PLUGIN_CONFIG_USER);
+ 
+-                QString qs=QFileInfo(configFileName).completeBaseName();
+-		selectConfiguration(&qs, PLUGIN_CONFIG_USER);
 +		selectConfiguration(QFileInfo(configFileName).completeBaseName(), PLUGIN_CONFIG_USER);
  	}
  
  	delete [] configDirectory;
-@@ -373,7 +373,7 @@
+@@ -375,8 +374,7 @@
  	disableGenericSlots = true;
  	options->getPresetConfiguration(&configurationName, &configurationType);		
  
--	bool foundConfig = selectConfiguration(&QString(configurationName), configurationType);
+-        QString qs=QString(configurationName);
+-	bool foundConfig = selectConfiguration(&qs, configurationType);
 +	bool foundConfig = selectConfiguration(QString(configurationName), configurationType);
  
  	if (!foundConfig)
  		printf("Configuration %s (type %d) could not be found.  Using snapshot.\n", configurationName, configurationType);
-diff -Naur avidemux_2.5.4.orig/plugins/ADM_videoEncoder/ADM_vidEnc_xvid/qt4/xvidConfigDialog.h avidemux_2.5.4/plugins/ADM_videoEncoder/ADM_vidEnc_xvid/qt4/xvidConfigDialog.h
---- avidemux_2.5.4.orig/plugins/ADM_videoEncoder/ADM_vidEnc_xvid/qt4/xvidConfigDialog.h	2009-08-03 11:24:09.000000000 -0500
-+++ avidemux_2.5.4/plugins/ADM_videoEncoder/ADM_vidEnc_xvid/qt4/xvidConfigDialog.h	2011-04-19 14:38:00.253653291 -0500
+diff -Naur avidemux_2.5.5.orig/plugins/ADM_videoEncoder/ADM_vidEnc_xvid/qt4/xvidConfigDialog.h avidemux_2.5.5/plugins/ADM_videoEncoder/ADM_vidEnc_xvid/qt4/xvidConfigDialog.h
+--- avidemux_2.5.5.orig/plugins/ADM_videoEncoder/ADM_vidEnc_xvid/qt4/xvidConfigDialog.h	2009-08-03 11:24:09.000000000 -0500
++++ avidemux_2.5.5/plugins/ADM_videoEncoder/ADM_vidEnc_xvid/qt4/xvidConfigDialog.h	2011-06-06 08:30:50.341250092 -0500
 @@ -26,7 +26,7 @@
  	unsigned char intraMatrix[64], interMatrix[64];
  
