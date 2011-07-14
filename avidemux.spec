@@ -2,7 +2,7 @@
 
 Name:           avidemux
 Version:        2.5.5
-Release:        1%{?dist}
+Release:        2%{?dist}
 Summary:        Graphical video editing and transcoding tool
 
 Group:          Applications/Multimedia
@@ -321,6 +321,9 @@ rm -rf $RPM_BUILD_ROOT
 %{_includedir}/ADM_coreConfig.h
 
 %changelog
+* Fri Jul 15 2011 Nicolas Chauvet <kwizart@gmail.com> - 2.5.5-2
+- Rebuilt for x264 ABI 115
+
 * Sun Jun 05 2011 Richard Shaw <hobbes1069@gmail.com> - 2.5.5-1
 - New release: 2.5.5
 - FFMpeg based AAC encoding is broken (BZ#1825) and
