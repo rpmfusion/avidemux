@@ -2,7 +2,7 @@
 
 Name:           avidemux
 Version:        2.5.5
-Release:        2%{?dist}
+Release:        3%{?dist}
 Summary:        Graphical video editing and transcoding tool
 
 Group:          Applications/Multimedia
@@ -48,6 +48,8 @@ Patch9:         avidemux-2.5.4-liba52.patch
 Patch10:        avidemux-2.5.4-libmad.patch
 Patch11:        avidemux-2.5.4-libtwolame.patch
 Patch12:        avidemux-2.5.5_fix_lav_audio_encoder.patch
+# Fix for x264 ABI 115 change.
+Patch13:        avidemux-2.5.5-x264_i_to_b_open_gop.patch 
 # Uses a header file not found in the standard package
 #Patch16:        avidemux-2.5.4-mpeg2enc.patch
 
@@ -213,6 +215,7 @@ sed -i.bak 's/startDir="lib";/startDir="lib64";/' avidemux/main.cpp
 %patch10 -p1 -b .libmad
 %patch11 -p1 -b .libtwolame
 %patch12 -p1 -b .lavencode
+%patch13 -p1 -b .x264plugin
 
 
 %build
@@ -321,6 +324,9 @@ rm -rf $RPM_BUILD_ROOT
 %{_includedir}/ADM_coreConfig.h
 
 %changelog
+* Fri Jul 15 2011 Richard Shaw <hobbes1069@gmail.com> - 2.5.5-3
+- Add patch to fix x264 ABI 115 change (#1848)
+
 * Fri Jul 15 2011 Nicolas Chauvet <kwizart@gmail.com> - 2.5.5-2
 - Rebuilt for x264 ABI 115
 
