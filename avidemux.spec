@@ -2,28 +2,14 @@
 
 Name:           avidemux
 Version:        2.5.5
-Release:        1%{?dist}
+Release:        3%{?dist}
 Summary:        Graphical video editing and transcoding tool
 
 Group:          Applications/Multimedia
 License:        GPLv2+
 URL:            http://www.avidemux.org/
+
 Source0:        http://download.berlios.de/avidemux/avidemux_%{version}.tar.gz
-## This procedure is used to make a SVN checkout
-# svn co svn://svn.berlios.de/avidemux/branches/avidemux_2.5_branch_gruntster
-# svn export avidemux_2.5_branch_gruntster avidemux-2.5.1-20091010svn-r5371
-# pushd avidemux-2.5.1-20091010svn-r5371/avidemux/ADM_libraries
-# rm {ffmpeg,libswscale}*.tar.gz
-##(cmake/admFFmpegBuild.cmake provides the up-to-date SVN revision numbers)
-# svn co svn://svn.ffmpeg.org/ffmpeg/trunk -r 19894 --ignore-externals ffmpeg_r19894
-# svn export ffmpeg{_r19894,} --ignore-externals
-# tar cfz ffmpeg_r19894.tar.gz ffmpeg && rm -rf ffmpeg{,_r19894}
-# svn co svn://svn.ffmpeg.org/mplayer/trunk/libswscale -r 29686 libswscale_r29686
-# svn export libswscale{_r29686,}
-# tar cfz libswscale_r29686.tar.gz libswscale && rm -rf libswscale{,_r29686}
-# popd
-# tar cfj avidemux-2.5.1-20091010svn-r5371.tar.bz2 avidemux-2.5.1-20091010svn-r5371
-#Source0:        avidemux-%{version}-20091010svn-r5371.tar.bz2
 Source1:        %{name}-gtk.desktop
 Source2:        %{name}-qt.desktop
 # Patch0 obtained from avidemux-2.5.0-patches-1.tar.bz2:
@@ -48,19 +34,21 @@ Patch9:         avidemux-2.5.4-liba52.patch
 Patch10:        avidemux-2.5.4-libmad.patch
 Patch11:        avidemux-2.5.4-libtwolame.patch
 Patch12:        avidemux-2.5.5_fix_lav_audio_encoder.patch
+# Patch for ABI change in x264 115.
+Patch13:        avidemux-2.5.5-x264_i_to_b_open_gop.patch
 # Uses a header file not found in the standard package
 #Patch16:        avidemux-2.5.4-mpeg2enc.patch
 
 # Upstream has been informed http://avidemux.org/admForum/viewtopic.php?id=6447
 ExcludeArch: ppc ppc64
 
-Requires:       %{name}-cli  = %{version}-%{release}
+Requires:       %{name}-cli = %{version}-%{release}
 Requires:       %{name}-gui = %{version}
 Requires:       %{name}-plugins = %{version}
 
 # Compiling
 BuildRequires:  cmake
-BuildRequires:  gettext-devel
+BuildRequires:  gettext-devel intltool
 BuildRequires:  libxslt
 
 # Libraries
@@ -107,6 +95,7 @@ BuildRequires:  ffmpeg-devel
 # Finally...
 BuildRequires:  desktop-file-utils
 
+
 %description
 Avidemux is a free video editor designed for simple cutting, filtering and
 encoding tasks. It supports many file types, including AVI, DVD compatible
@@ -120,7 +109,7 @@ you may selectively install one or more of the avidemux-* subpackages.
 %package cli
 Summary:        CLI for %{name}
 Group:          Applications/Multimedia
-Requires:       %{name}-libs = %{version}-%{release}
+Requires:       %{name}-libs%{?_isa} = %{version}-%{release}
 
 %description cli
 This package provides a command-line interface to editing videos with %{name}.
@@ -128,6 +117,9 @@ This package provides a command-line interface to editing videos with %{name}.
 %package libs
 Summary:        Libraries for %{name}
 Group:          System Environment/Libraries
+Requires:       %{name} = %{version}-%{release}
+Obsoletes:      %{name}-plugins
+Provides:       %{name}-plugins = %{version}-%{release}
 
 %description libs
 This package contains the runtime libraries for %{name}.
@@ -140,7 +132,7 @@ BuildRequires:  cairo-devel
 # Slightly higher so it is default, but it can be avoided by installing
 # avidemux-qt directly or it can be removed later once avidemux-qt is installed
 Provides:       %{name}-gui = %{version}-%{release}.1
-Requires:       %{name}-libs = %{version}-%{release}
+Requires:       %{name}-libs%{?_isa} = %{version}-%{release}
 
 %description gtk
 This package provides the GTK graphical interface for %{name}.
@@ -152,7 +144,7 @@ Group:          Applications/Multimedia
 # https://bugzilla.redhat.com/show_bug.cgi?id=491514
 BuildRequires:  qt4-devel >= 4.5.0-9
 Provides:       %{name}-gui = %{version}-%{release}
-Requires:       %{name}-libs = %{version}-%{release}
+Requires:       %{name}-libs%{?_isa} = %{version}-%{release}
 
 %description qt
 This package contains the Qt graphical interface for %{name}.
@@ -165,16 +157,9 @@ Requires:       %{name}-libs = %{version}-%{release}
 %description devel
 This package contains files required to develop with or extend %{name}.
 
-%package plugins
-Summary:        Plugins for the avidemux video editing and transcoding tool
-Group:          Applications/Multimedia
-Requires:       %{name}-libs = %{version}-%{release}
-
-%description plugins
-This package contains various plugins for avidemux.
 
 %prep
-%setup -q -n avidemux_%{version}
+%setup -q -n %{name}_%{version}
 
 # Remove unneeded external libraries
 %if 0%{?fedora} <= 14
@@ -213,17 +198,17 @@ sed -i.bak 's/startDir="lib";/startDir="lib64";/' avidemux/main.cpp
 %patch10 -p1 -b .libmad
 %patch11 -p1 -b .libtwolame
 %patch12 -p1 -b .lavencode
+%patch13 -p1 -b .x264
 
 
 %build
 # Cmake requires out of source build
 mkdir -p build && pushd build
 %if 0%{?fedora} <= 14
-%cmake -DUSE_SYSTEM_SPIDERMONKEY:BOOL=ON \
+%cmake -DUSE_SYSTEM_SPIDERMONKEY:BOOL=ON .. \
 %else
-%cmake -DUSE_SYSTEM_SPIDERMONKEY:BOOL=OFF \
+%cmake -DUSE_SYSTEM_SPIDERMONKEY:BOOL=OFF .. \
 %endif
-       ..
 
 make %{?_smp_mflags}
 # Create the temp link directory manually since otherwise it happens too early
@@ -242,38 +227,38 @@ popd
 
 
 %install
-rm -rf $RPM_BUILD_ROOT
+rm -rf %{buildroot}
 
-make -C build install DESTDIR=$RPM_BUILD_ROOT
-make -C build_plugins install DESTDIR=$RPM_BUILD_ROOT
+make -C build install DESTDIR=%{buildroot}
+make -C build_plugins install DESTDIR=%{buildroot}
 
 # Install the build configuration for devel package
-install -d -m755 $RPM_BUILD_ROOT%{_includedir}
-install -m644 build/config/ADM_coreConfig.h $RPM_BUILD_ROOT%{_includedir}/ADM_coreConfig.h
-install -d -m755 $RPM_BUILD_ROOT%{_datadir}/pixmaps
-install -m644 avidemux/ADM_userInterfaces/ADM_QT4/ADM_gui/pics/avidemux_icon.png $RPM_BUILD_ROOT%{_datadir}/pixmaps/avidemux.png
+install -d -m755 %{buildroot}%{_includedir}
+install -m644 build/config/ADM_coreConfig.h %{buildroot}%{_includedir}/ADM_coreConfig.h
+install -d -m755 %{buildroot}%{_datadir}/pixmaps
+install -m644 avidemux/ADM_userInterfaces/ADM_QT4/ADM_gui/pics/avidemux_icon.png %{buildroot}%{_datadir}/pixmaps/avidemux.png
 
 # Find and remove all la files
-find $RPM_BUILD_ROOT -type f -name "*.la" -exec rm -f {} ';'
+find %{buildroot} -type f -name "*.la" -exec rm -f {} ';'
 
 # Remove Windows-only executables
 # Must check this for new Linux-relevant files upon new avidemux releases
-rm -rf $RPM_BUILD_ROOT%{_datadir}/ADM_addons/avsfilter
-rmdir $RPM_BUILD_ROOT%{_datadir}/ADM_addons/
+rm -rf %{buildroot}%{_datadir}/ADM_addons/avsfilter
+rmdir %{buildroot}%{_datadir}/ADM_addons/
 
 # Install .desktop shortcuts
 desktop-file-install --vendor rpmfusion \
-    --dir $RPM_BUILD_ROOT%{_datadir}/applications \
+    --dir %{buildroot}%{_datadir}/applications \
     %{SOURCE1}
 
 desktop-file-install --vendor rpmfusion \
-    --dir $RPM_BUILD_ROOT%{_datadir}/applications \
+    --dir %{buildroot}%{_datadir}/applications \
     %{SOURCE2}
 
 # Remove duplicated Qt translations
-rm -f $RPM_BUILD_ROOT%{_datadir}/%{name}/i18n/qt_*.qm
+rm -f %{buildroot}%{_datadir}/%{name}/i18n/qt_*.qm
 # find_lang.sh doesn't recognize this one, and there already is avidemux_sr.qm
-rm -f $RPM_BUILD_ROOT%{_datadir}/%{name}/i18n/avidemux_sr@latin.qm
+rm -f %{buildroot}%{_datadir}/%{name}/i18n/avidemux_sr@latin.qm
 
 # Qt-style translations
 %find_lang %{name} --with-qt --without-mo
@@ -282,45 +267,70 @@ mv -f %{name}.lang %{name}-qt.lang
 %find_lang %{name}
 
 %clean
-rm -rf $RPM_BUILD_ROOT
+rm -rf %{buildroot}
+
 
 %post libs -p /sbin/ldconfig
+
 %postun libs -p /sbin/ldconfig
 
+
 %files
-%defattr(-,root,root,-)
-# metapackage, no files
+%doc AUTHORS COPYING README TODO
 
 %files libs
-%doc AUTHORS COPYING README TODO
 %{_datadir}/ADM_scripts/
 %{_datadir}/pixmaps/avidemux.png
 %{_libdir}/libADM*
+%exclude %{_libdir}/libADM_UI*
+%exclude %{_libdir}/libADM_render*
+%{_libdir}/ADM_plugins/
+%exclude %{_libdir}/ADM_plugins/videoEncoder/*/*Gtk.so
+%exclude %{_libdir}/ADM_plugins/videoEncoder/*/*Qt.so
+%exclude %{_libdir}/ADM_plugins/videoFilter/*cli.so
+%exclude %{_libdir}/ADM_plugins/videoFilter/*gtk.so
+%exclude %{_libdir}/ADM_plugins/videoFilter/*qt4.so
+
 
 %files cli
-%defattr(-,root,root,-)
 %{_bindir}/avidemux2_cli
+%{_libdir}/libADM_UICli.so
+%{_libdir}/libADM_render_cli.so
+%{_libdir}/ADM_plugins/videoFilter/*cli.so
+
 
 %files gtk -f %{name}.lang
-%defattr(-,root,root,-)
 %{_bindir}/avidemux2_gtk
+%{_libdir}/libADM_UIGtk.so
+%{_libdir}/libADM_render_gtk.so
+%{_libdir}/ADM_plugins/videoEncoder/x264/libADM_vidEnc_x264_Gtk.so
+%{_libdir}/ADM_plugins/videoEncoder/xvid/libADM_vidEnc_Xvid_Gtk.so
+%{_libdir}/ADM_plugins/videoFilter/*gtk.so
 %{_datadir}/applications/*gtk*.desktop
 
 %files qt -f %{name}-qt.lang
-%defattr(-,root,root,-)
 %{_bindir}/avidemux2_qt4
+%{_libdir}/libADM_UIQT4.so
+%{_libdir}/libADM_render_qt4.so
+%{_libdir}/ADM_plugins/videoEncoder/x264/libADM_vidEnc_x264_Qt.so
+%{_libdir}/ADM_plugins/videoEncoder/xvid/libADM_vidEnc_Xvid_Qt.so
+%{_libdir}/ADM_plugins/videoFilter/*qt4.so
 %{_datadir}/applications/*qt*.desktop
 %dir %{_datadir}/%{name}/i18n
 
-%files plugins
-%defattr(-,root,root,-)
-%{_libdir}/ADM_plugins/
-
 %files devel
-%defattr(-,root,root,-)
 %{_includedir}/ADM_coreConfig.h
 
+
 %changelog
+* Mon Aug 07 2011 Richard Shaw <hobbes1069@gmail.com> - 2.5.5-3
+- Moved UI specific libraries and plugins to their respective sub-package to
+  prevent unneeded dependencies from being installed.
+- Obsoleted plugins sub-package and combined with libs sub-package.
+
+* Fri Jul 15 2011 Richard Shaw <hobbes1069@gmail.com> - 2.5.5-2
+- Patch for x254 ABI 115 change (#1848).
+
 * Sun Jun 05 2011 Richard Shaw <hobbes1069@gmail.com> - 2.5.5-1
 - New release: 2.5.5
 - FFMpeg based AAC encoding is broken (BZ#1825) and
