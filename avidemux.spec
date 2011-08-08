@@ -2,7 +2,7 @@
 
 Name:           avidemux
 Version:        2.5.5
-Release:        3%{?dist}
+Release:        4%{?dist}
 Summary:        Graphical video editing and transcoding tool
 
 Group:          Applications/Multimedia
@@ -323,7 +323,7 @@ rm -rf %{buildroot}
 
 
 %changelog
-* Mon Aug 07 2011 Richard Shaw <hobbes1069@gmail.com> - 2.5.5-3
+* Mon Aug 07 2011 Richard Shaw <hobbes1069@gmail.com> - 2.5.5-4
 - Moved UI specific libraries and plugins to their respective sub-package to
   prevent unneeded dependencies from being installed.
 - Obsoleted plugins sub-package and combined with libs sub-package.
