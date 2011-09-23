@@ -2,7 +2,7 @@
 
 Name:           avidemux
 Version:        2.5.5
-Release:        4%{?dist}
+Release:        6%{?dist}
 Summary:        Graphical video editing and transcoding tool
 
 Group:          Applications/Multimedia
@@ -45,6 +45,7 @@ ExcludeArch: ppc ppc64
 Requires:       %{name}-cli = %{version}-%{release}
 Requires:       %{name}-gui = %{version}
 Requires:       %{name}-plugins = %{version}
+Obsoletes:      %{name}-devel
 
 # Compiling
 BuildRequires:  cmake
@@ -149,14 +150,6 @@ Requires:       %{name}-libs%{?_isa} = %{version}-%{release}
 %description qt
 This package contains the Qt graphical interface for %{name}.
 
-%package devel
-Summary:        Development files for %{name}
-Group:          Development/Libraries
-Requires:       %{name}-libs = %{version}-%{release}
-
-%description devel
-This package contains files required to develop with or extend %{name}.
-
 
 %prep
 %setup -q -n %{name}_%{version}
@@ -227,16 +220,11 @@ popd
 
 
 %install
-rm -rf %{buildroot}
-
 make -C build install DESTDIR=%{buildroot}
 make -C build_plugins install DESTDIR=%{buildroot}
 
-# Install the build configuration for devel package
-install -d -m755 %{buildroot}%{_includedir}
-install -m644 build/config/ADM_coreConfig.h %{buildroot}%{_includedir}/ADM_coreConfig.h
 install -d -m755 %{buildroot}%{_datadir}/pixmaps
-install -m644 avidemux/ADM_userInterfaces/ADM_QT4/ADM_gui/pics/avidemux_icon.png %{buildroot}%{_datadir}/pixmaps/avidemux.png
+install -pm0644 avidemux/ADM_userInterfaces/ADM_QT4/ADM_gui/pics/avidemux_icon.png %{buildroot}%{_datadir}/pixmaps/avidemux.png
 
 # Find and remove all la files
 find %{buildroot} -type f -name "*.la" -exec rm -f {} ';'
@@ -266,9 +254,6 @@ mv -f %{name}.lang %{name}-qt.lang
 # Gettext-style translations
 %find_lang %{name}
 
-%clean
-rm -rf %{buildroot}
-
 
 %post libs -p /sbin/ldconfig
 
@@ -291,13 +276,11 @@ rm -rf %{buildroot}
 %exclude %{_libdir}/ADM_plugins/videoFilter/*gtk.so
 %exclude %{_libdir}/ADM_plugins/videoFilter/*qt4.so
 
-
 %files cli
 %{_bindir}/avidemux2_cli
 %{_libdir}/libADM_UICli.so
 %{_libdir}/libADM_render_cli.so
 %{_libdir}/ADM_plugins/videoFilter/*cli.so
-
 
 %files gtk -f %{name}.lang
 %{_bindir}/avidemux2_gtk
@@ -318,11 +301,11 @@ rm -rf %{buildroot}
 %{_datadir}/applications/*qt*.desktop
 %dir %{_datadir}/%{name}/i18n
 
-%files devel
-%{_includedir}/ADM_coreConfig.h
-
 
 %changelog
+* Fri Sep 23 2011 Richard Shaw <hobbes1069@gmail.com> - 2.5.5-6
+- Obsolete useless devel subpackage which has multilib issues.
+
 * Mon Aug 07 2011 Richard Shaw <hobbes1069@gmail.com> - 2.5.5-4
 - Moved UI specific libraries and plugins to their respective sub-package to
   prevent unneeded dependencies from being installed.
