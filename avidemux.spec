@@ -2,7 +2,7 @@
 
 Name:           avidemux
 Version:        2.5.5
-Release:        5%{?dist}
+Release:        6%{?dist}
 Summary:        Graphical video editing and transcoding tool
 
 Group:          Applications/Multimedia
@@ -45,6 +45,7 @@ ExcludeArch: ppc ppc64
 Requires:       %{name}-cli = %{version}-%{release}
 Requires:       %{name}-gui = %{version}
 Requires:       %{name}-plugins = %{version}
+Obsoletes:      %{name}-devel
 
 # Compiling
 BuildRequires:  cmake
@@ -302,8 +303,8 @@ mv -f %{name}.lang %{name}-qt.lang
 
 
 %changelog
-* Fri Sep 23 2011 Richard Shaw <hobbes1069@gmail.com> - 2.5.5-5
-- Remove useless devel subpackage which has multilib issues.
+* Fri Sep 23 2011 Richard Shaw <hobbes1069@gmail.com> - 2.5.5-6
+- Obsolete useless devel subpackage which has multilib issues.
 
 * Mon Aug 07 2011 Richard Shaw <hobbes1069@gmail.com> - 2.5.5-4
 - Moved UI specific libraries and plugins to their respective sub-package to
