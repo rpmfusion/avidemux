@@ -2,7 +2,7 @@
 
 Name:           avidemux
 Version:        2.5.5
-Release:        6%{?dist}
+Release:        6%{?dist}.1
 Summary:        Graphical video editing and transcoding tool
 
 Group:          Applications/Multimedia
@@ -303,6 +303,9 @@ mv -f %{name}.lang %{name}-qt.lang
 
 
 %changelog
+* Fri Oct 07 2011 Nicolas Chauvet <kwizart@gmail.com> - 2.5.5-6.1
+- Rebuilt for x264 update in F15
+
 * Fri Sep 23 2011 Richard Shaw <hobbes1069@gmail.com> - 2.5.5-6
 - Obsolete useless devel subpackage which has multilib issues.
 
