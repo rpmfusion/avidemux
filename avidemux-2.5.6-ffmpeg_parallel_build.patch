@@ -1,0 +1,12 @@
+diff -Naur avidemux_2.5.6.orig/cmake/admFFmpegBuild.cmake avidemux_2.5.6/cmake/admFFmpegBuild.cmake
+--- avidemux_2.5.6.orig/cmake/admFFmpegBuild.cmake	2011-12-28 08:51:49.000000000 -0600
++++ avidemux_2.5.6/cmake/admFFmpegBuild.cmake	2012-01-26 14:07:41.928167845 -0600
+@@ -167,7 +167,7 @@
+ 
+ # Build FFmpeg
+ add_custom_command(OUTPUT "${FFMPEG_BINARY_DIR}/ffmpeg${CMAKE_EXECUTABLE_SUFFIX}"
+-				   COMMAND ${CMAKE_COMMAND} -DCMAKE_BUILD_TOOL=${CMAKE_BUILD_TOOL} -P "${CMAKE_SOURCE_DIR}/cmake/admFFmpegMake.cmake"
++				   COMMAND ${CMAKE_COMMAND} -DCMAKE_BUILD_TOOL=$(MAKE) -P "${CMAKE_SOURCE_DIR}/cmake/admFFmpegMake.cmake"
+ 				   WORKING_DIRECTORY "${FFMPEG_BINARY_DIR}")
+ 
+ add_custom_target(ffmpeg ALL
