@@ -2,7 +2,7 @@
 
 Name:           avidemux
 Version:        2.5.6
-Release:        2%{?dist}
+Release:        3%{?dist}
 Summary:        Graphical video editing and transcoding tool
 
 Group:          Applications/Multimedia
@@ -12,9 +12,7 @@ URL:            http://www.avidemux.org/
 Source0:        http://download.berlios.de/avidemux/avidemux_%{version}.tar.gz
 Source1:        %{name}-gtk.desktop
 Source2:        %{name}-qt.desktop
-# Patch0 obtained from avidemux-2.5.0-patches-1.tar.bz2:
-# http://mirror.csclub.uwaterloo.ca/gentoo-distfiles/distfiles/avidemux-2.5.0-patches-1.tar.bz2
-#Patch0:         avidemux-2.5.6-parallel_build.patch
+
 Patch1:         avidemux-2.5-pulseaudio-default.patch
 Patch2:         avidemux-2.4-qt4.patch
 # Prevents avidemux from creating the symlinks for .so files, which we do below
@@ -23,11 +21,8 @@ Patch3:         avidemux-2.5.3-tmplinktarget.patch
 # built statically according to upstream... Let's get them installed instead
 Patch4:         avidemux-2.5.3-mpeg2enc.patch
 Patch5:         avidemux-2.5.3-pluginlibs.patch
-# Patch8 obtained from http://lists.rpmfusion.org/pipermail/rpmfusion-developers/2010-October/008645.html
-#Patch6:         avidemux_2.5.4-ffmpeg-aac.patch
 Patch6:         avidemux-2.5.6-ffmpeg_aac.patch
 Patch7:         avidemux-2.5.5-gcc46_tmp_fix.patch
-# Patch needed for version of x264 in F15/rawhide.
 # Use system libraries
 Patch8:         avidemux-2.5.4-libass.patch
 Patch9:         avidemux-2.5.4-liba52.patch
@@ -36,8 +31,6 @@ Patch11:        avidemux-2.5.4-libtwolame.patch
 Patch12:        avidemux-2.5.5_fix_lav_audio_encoder.patch
 # Patch for ABI change in x264 115.
 Patch13:        avidemux-2.5.5-x264_i_to_b_open_gop.patch
-# Uses a header file not found in the standard package
-#Patch16:        avidemux-2.5.4-mpeg2enc.patch
 Patch14:        avidemux-2.5.6-ffmpeg_parallel_build.patch
 
 # Upstream has been informed http://avidemux.org/admForum/viewtopic.php?id=6447
@@ -94,6 +87,7 @@ BuildRequires:  ffmpeg-devel
 
 # Finally...
 BuildRequires:  desktop-file-utils
+Requires:       hicolor-icon-theme
 
 
 %description
@@ -148,14 +142,6 @@ Requires:       %{name}-libs%{?_isa} = %{version}-%{release}
 
 %description qt
 This package contains the Qt graphical interface for %{name}.
-
-%package devel
-Summary:        Development files for %{name}
-Group:          Development/Libraries
-Requires:       %{name}-libs = %{version}-%{release}
-
-%description devel
-This package contains files required to develop with or extend %{name}.
 
 
 %prep
@@ -220,16 +206,17 @@ popd
 
 
 %install
-rm -rf %{buildroot}
-
 make -C build install DESTDIR=%{buildroot}
 make -C build_plugins install DESTDIR=%{buildroot}
 
-# Install the build configuration for devel package
-install -d -m755 %{buildroot}%{_includedir}
-install -m644 build/config/ADM_coreConfig.h %{buildroot}%{_includedir}/ADM_coreConfig.h
-install -d -m755 %{buildroot}%{_datadir}/pixmaps
-install -m644 avidemux/ADM_userInterfaces/ADM_QT4/ADM_gui/pics/avidemux_icon.png %{buildroot}%{_datadir}/pixmaps/avidemux.png
+#install -d -m755 %{buildroot}%{_datadir}/pixmaps
+#install -m644 avidemux/ADM_userInterfaces/ADM_QT4/ADM_gui/pics/avidemux_icon.png %{buildroot}%{_datadir}/pixmaps/avidemux.png
+
+# Install icons
+install -pDm 0644 avidemux/ADM_icons/avidemux_icon_small.png \
+	%{buildroot}%{_datadir}/icons/hicolor/48x48/apps/avidemux.png
+install -pDm 0644 avidemux_icon.png \
+	%{buildroot}%{_datadir}/icons/hicolor/64x64/apps/avidemux.png
 
 # Find and remove all la files
 find %{buildroot} -type f -name "*.la" -exec rm -f {} ';'
@@ -259,13 +246,20 @@ mv -f %{name}.lang %{name}-qt.lang
 # Gettext-style translations
 %find_lang %{name}
 
-%clean
-rm -rf %{buildroot}
 
+%post libs
+/sbin/ldconfig
+/bin/touch --no-create %{_datadir}/icons/hicolor &>/dev/null || :
 
-%post libs -p /sbin/ldconfig
+%postun libs
+/sbin/ldconfig
+if [ $1 -eq 0 ] ; then
+    /bin/touch --no-create %{_datadir}/icons/hicolor &>/dev/null
+    /usr/bin/gtk-update-icon-cache %{_datadir}/icons/hicolor &>/dev/null || :
+fi
 
-%postun libs -p /sbin/ldconfig
+%posttrans
+/usr/bin/gtk-update-icon-cache %{_datadir}/icons/hicolor &>/dev/null || :
 
 
 %files
@@ -273,7 +267,8 @@ rm -rf %{buildroot}
 
 %files libs
 %{_datadir}/ADM_scripts/
-%{_datadir}/pixmaps/avidemux.png
+%{_datadir}/icons/hicolor/48x48/apps/avidemux.png
+%{_datadir}/icons/hicolor/64x64/apps/avidemux.png
 %{_libdir}/libADM*
 %exclude %{_libdir}/libADM_UI*
 %exclude %{_libdir}/libADM_render*
@@ -310,15 +305,11 @@ rm -rf %{buildroot}
 %{_datadir}/applications/*qt*.desktop
 %dir %{_datadir}/%{name}/i18n
 
-%files devel
-%{_includedir}/ADM_coreConfig.h
-
 
 %changelog
-* Fri Jan 27 2012 Richard Shaw <hobbes1069@gmail.com> - 2.5.6-2
+* Sat Jan 28 2012 Richard Shaw <hobbes1069@gmail.com> - 2.5.6-3
+- Install icon files to preferred location.
 - Reenable FFmpeg based AAC encoding.
-
-* Wed Jan 25 2012 Richard Shaw <hobbes1069@gmail.com> - 2.5.6-1
 - Update to latest release.
 
 * Fri Sep 23 2011 Richard Shaw <hobbes1069@gmail.com> - 2.5.5-6
