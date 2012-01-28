@@ -1,8 +1,8 @@
 %define _pkgbuilddir %{_builddir}/%{name}_%{version}
 
 Name:           avidemux
-Version:        2.5.5
-Release:        6%{?dist}
+Version:        2.5.6
+Release:        2%{?dist}
 Summary:        Graphical video editing and transcoding tool
 
 Group:          Applications/Multimedia
@@ -14,18 +14,18 @@ Source1:        %{name}-gtk.desktop
 Source2:        %{name}-qt.desktop
 # Patch0 obtained from avidemux-2.5.0-patches-1.tar.bz2:
 # http://mirror.csclub.uwaterloo.ca/gentoo-distfiles/distfiles/avidemux-2.5.0-patches-1.tar.bz2
-Patch0:         2.5.0-coreImage-parallel-build.patch
+#Patch0:         avidemux-2.5.6-parallel_build.patch
 Patch1:         avidemux-2.5-pulseaudio-default.patch
 Patch2:         avidemux-2.4-qt4.patch
 # Prevents avidemux from creating the symlinks for .so files, which we do below
 Patch3:         avidemux-2.5.3-tmplinktarget.patch
 # libADM_xvidRateCtl.so and libADM_vidEnc_pluginOptions.so are supposed to be
-# build statically according to upstream... Let's get them installed instead
+# built statically according to upstream... Let's get them installed instead
 Patch4:         avidemux-2.5.3-mpeg2enc.patch
 Patch5:         avidemux-2.5.3-pluginlibs.patch
 # Patch8 obtained from http://lists.rpmfusion.org/pipermail/rpmfusion-developers/2010-October/008645.html
 #Patch6:         avidemux_2.5.4-ffmpeg-aac.patch
-Patch6:         avidemux_2.5.5-ffmpeg_aac.patch
+Patch6:         avidemux-2.5.6-ffmpeg_aac.patch
 Patch7:         avidemux-2.5.5-gcc46_tmp_fix.patch
 # Patch needed for version of x264 in F15/rawhide.
 # Use system libraries
@@ -38,6 +38,7 @@ Patch12:        avidemux-2.5.5_fix_lav_audio_encoder.patch
 Patch13:        avidemux-2.5.5-x264_i_to_b_open_gop.patch
 # Uses a header file not found in the standard package
 #Patch16:        avidemux-2.5.4-mpeg2enc.patch
+Patch14:        avidemux-2.5.6-ffmpeg_parallel_build.patch
 
 # Upstream has been informed http://avidemux.org/admForum/viewtopic.php?id=6447
 ExcludeArch: ppc ppc64
@@ -45,7 +46,6 @@ ExcludeArch: ppc ppc64
 Requires:       %{name}-cli = %{version}-%{release}
 Requires:       %{name}-gui = %{version}
 Requires:       %{name}-plugins = %{version}
-Obsoletes:      %{name}-devel
 
 # Compiling
 BuildRequires:  cmake
@@ -81,7 +81,6 @@ BuildRequires:  libogg-devel >= 1.1
 BuildRequires:  libvorbis-devel >= 1.0.1
 BuildRequires:  libdca-devel
 BuildRequires:  opencore-amr-devel
-# VP8 support, decoding only?
 BuildRequires:  libvpx-devel
 BuildRequires:  twolame-devel
 
@@ -150,6 +149,14 @@ Requires:       %{name}-libs%{?_isa} = %{version}-%{release}
 %description qt
 This package contains the Qt graphical interface for %{name}.
 
+%package devel
+Summary:        Development files for %{name}
+Group:          Development/Libraries
+Requires:       %{name}-libs = %{version}-%{release}
+
+%description devel
+This package contains files required to develop with or extend %{name}.
+
 
 %prep
 %setup -q -n %{name}_%{version}
@@ -170,28 +177,21 @@ sed -i.bak 's/startDir="lib";/startDir="lib64";/' avidemux/ADM_core/src/ADM_file
 sed -i.bak 's/startDir="lib";/startDir="lib64";/' avidemux/main.cpp
 %endif
 
-# Fix build with js 1.8.5 introduced in F15.
-#find avidemux/ADM_script -name '*.h' -exec \
-#sed -i -e '/#include "jsapi.h"/ i\
-##undef malloc \
-##undef calloc \
-##undef realloc \
-##undef free' {} \;
-
-%patch0 -p1 -b .parallel
+#patch0 -p1 -b .parallel
 %patch1 -p1 -b .pulse
 %patch2 -p1 -b .qt4
 %patch3 -p1 -b .tmplinktarget
 %patch4 -p1 -b .mpeg2enc
 %patch5 -p1 -b .pluginlibs
-#%patch6 -p1 -b .ffmpegaac
+%patch6 -p1 -b .ffmpegaac
 %patch7 -p1 -b .gcc46tmpfix
 %patch8 -p1 -b .libass
 %patch9 -p1 -b .liba52
 %patch10 -p1 -b .libmad
 %patch11 -p1 -b .libtwolame
-%patch12 -p1 -b .lavencode
-%patch13 -p1 -b .x264
+#patch12 -p1 -b .lavencode
+#patch13 -p1 -b .x264
+%patch14 -p1 -b .ffmpegbuild
 
 
 %build
@@ -220,11 +220,16 @@ popd
 
 
 %install
+rm -rf %{buildroot}
+
 make -C build install DESTDIR=%{buildroot}
 make -C build_plugins install DESTDIR=%{buildroot}
 
+# Install the build configuration for devel package
+install -d -m755 %{buildroot}%{_includedir}
+install -m644 build/config/ADM_coreConfig.h %{buildroot}%{_includedir}/ADM_coreConfig.h
 install -d -m755 %{buildroot}%{_datadir}/pixmaps
-install -pm0644 avidemux/ADM_userInterfaces/ADM_QT4/ADM_gui/pics/avidemux_icon.png %{buildroot}%{_datadir}/pixmaps/avidemux.png
+install -m644 avidemux/ADM_userInterfaces/ADM_QT4/ADM_gui/pics/avidemux_icon.png %{buildroot}%{_datadir}/pixmaps/avidemux.png
 
 # Find and remove all la files
 find %{buildroot} -type f -name "*.la" -exec rm -f {} ';'
@@ -254,6 +259,9 @@ mv -f %{name}.lang %{name}-qt.lang
 # Gettext-style translations
 %find_lang %{name}
 
+%clean
+rm -rf %{buildroot}
+
 
 %post libs -p /sbin/ldconfig
 
@@ -282,6 +290,7 @@ mv -f %{name}.lang %{name}-qt.lang
 %{_libdir}/libADM_render_cli.so
 %{_libdir}/ADM_plugins/videoFilter/*cli.so
 
+
 %files gtk -f %{name}.lang
 %{_bindir}/avidemux2_gtk
 %{_libdir}/libADM_UIGtk.so
@@ -301,14 +310,23 @@ mv -f %{name}.lang %{name}-qt.lang
 %{_datadir}/applications/*qt*.desktop
 %dir %{_datadir}/%{name}/i18n
 
+%files devel
+%{_includedir}/ADM_coreConfig.h
+
 
 %changelog
+* Fri Jan 27 2012 Richard Shaw <hobbes1069@gmail.com> - 2.5.6-2
+- Reenable FFmpeg based AAC encoding.
+
+* Wed Jan 25 2012 Richard Shaw <hobbes1069@gmail.com> - 2.5.6-1
+- Update to latest release.
+
 * Fri Sep 23 2011 Richard Shaw <hobbes1069@gmail.com> - 2.5.5-6
 - Obsolete useless devel subpackage which has multilib issues.
 
 * Mon Aug 07 2011 Richard Shaw <hobbes1069@gmail.com> - 2.5.5-4
-- Moved UI specific libraries and plugins to their respective sub-package to
-  prevent unneeded dependencies from being installed.
+- Moved UI specific libraries and plugins to their respective sub-package to prevent
+  unneeded dependencies from being installed.
 - Obsoleted plugins sub-package and combined with libs sub-package.
 
 * Fri Jul 15 2011 Richard Shaw <hobbes1069@gmail.com> - 2.5.5-2
