@@ -14,7 +14,7 @@ Source1:        %{name}-gtk.desktop
 Source2:        %{name}-qt.desktop
 # Patch0 obtained from avidemux-2.5.0-patches-1.tar.bz2:
 # http://mirror.csclub.uwaterloo.ca/gentoo-distfiles/distfiles/avidemux-2.5.0-patches-1.tar.bz2
-Patch0:         avidemux-2.5.6-parallel_build.patch
+#Patch0:         avidemux-2.5.6-parallel_build.patch
 Patch1:         avidemux-2.5-pulseaudio-default.patch
 Patch2:         avidemux-2.4-qt4.patch
 # Prevents avidemux from creating the symlinks for .so files, which we do below
@@ -316,7 +316,7 @@ rm -rf %{buildroot}
 
 %changelog
 * Fri Jan 27 2012 Richard Shaw <hobbes1069@gmail.com> - 2.5.6-2
-- Attempt to fix FFmpeg based AAC encoding.
+- Reenable FFmpeg based AAC encoding.
 
 * Wed Jan 25 2012 Richard Shaw <hobbes1069@gmail.com> - 2.5.6-1
 - Update to latest release.
