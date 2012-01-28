@@ -2,7 +2,7 @@
 
 Name:           avidemux
 Version:        2.5.6
-Release:        1%{?dist}
+Release:        2%{?dist}
 Summary:        Graphical video editing and transcoding tool
 
 Group:          Applications/Multimedia
@@ -14,7 +14,7 @@ Source1:        %{name}-gtk.desktop
 Source2:        %{name}-qt.desktop
 # Patch0 obtained from avidemux-2.5.0-patches-1.tar.bz2:
 # http://mirror.csclub.uwaterloo.ca/gentoo-distfiles/distfiles/avidemux-2.5.0-patches-1.tar.bz2
-#Patch0:         avidemux-2.5.6-parallel_build.patch
+Patch0:         avidemux-2.5.6-parallel_build.patch
 Patch1:         avidemux-2.5-pulseaudio-default.patch
 Patch2:         avidemux-2.4-qt4.patch
 # Prevents avidemux from creating the symlinks for .so files, which we do below
@@ -25,7 +25,7 @@ Patch4:         avidemux-2.5.3-mpeg2enc.patch
 Patch5:         avidemux-2.5.3-pluginlibs.patch
 # Patch8 obtained from http://lists.rpmfusion.org/pipermail/rpmfusion-developers/2010-October/008645.html
 #Patch6:         avidemux_2.5.4-ffmpeg-aac.patch
-Patch6:         avidemux_2.5.5-ffmpeg_aac.patch
+Patch6:         avidemux-2.5.6-ffmpeg_aac.patch
 Patch7:         avidemux-2.5.5-gcc46_tmp_fix.patch
 # Patch needed for version of x264 in F15/rawhide.
 # Use system libraries
@@ -183,7 +183,7 @@ sed -i.bak 's/startDir="lib";/startDir="lib64";/' avidemux/main.cpp
 %patch3 -p1 -b .tmplinktarget
 %patch4 -p1 -b .mpeg2enc
 %patch5 -p1 -b .pluginlibs
-#patch6 -p1 -b .ffmpegaac
+%patch6 -p1 -b .ffmpegaac
 %patch7 -p1 -b .gcc46tmpfix
 %patch8 -p1 -b .libass
 %patch9 -p1 -b .liba52
@@ -315,6 +315,9 @@ rm -rf %{buildroot}
 
 
 %changelog
+* Fri Jan 27 2012 Richard Shaw <hobbes1069@gmail.com> - 2.5.6-2
+- Attempt to fix FFmpeg based AAC encoding.
+
 * Wed Jan 25 2012 Richard Shaw <hobbes1069@gmail.com> - 2.5.6-1
 - Update to latest release.
 
