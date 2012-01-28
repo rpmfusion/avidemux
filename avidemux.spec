@@ -14,7 +14,7 @@ Source1:        %{name}-gtk.desktop
 Source2:        %{name}-qt.desktop
 # Patch0 obtained from avidemux-2.5.0-patches-1.tar.bz2:
 # http://mirror.csclub.uwaterloo.ca/gentoo-distfiles/distfiles/avidemux-2.5.0-patches-1.tar.bz2
-#Patch0:         avidemux-2.5.6-parallel_build.patch
+Patch0:         avidemux-2.5.6-parallel_build.patch
 Patch1:         avidemux-2.5-pulseaudio-default.patch
 Patch2:         avidemux-2.4-qt4.patch
 # Prevents avidemux from creating the symlinks for .so files, which we do below
