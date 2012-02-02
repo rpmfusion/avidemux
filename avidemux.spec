@@ -2,7 +2,7 @@
 
 Name:           avidemux
 Version:        2.5.6
-Release:        3%{?dist}
+Release:        4%{?dist}
 Summary:        Graphical video editing and transcoding tool
 
 Group:          Applications/Multimedia
@@ -307,6 +307,9 @@ fi
 
 
 %changelog
+* Wed Feb 01 2012 Richard Shaw <hobbes1069@gmail.com> - 2.5.6-4
+- Rebuild for libvpx soname bump.
+
 * Sat Jan 28 2012 Richard Shaw <hobbes1069@gmail.com> - 2.5.6-3
 - Install icon files to preferred location.
 - Reenable FFmpeg based AAC encoding.
