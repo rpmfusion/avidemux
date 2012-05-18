@@ -2,7 +2,7 @@
 
 Name:           avidemux
 Version:        2.5.6
-Release:        7%{?dist}
+Release:        8%{?dist}
 Summary:        Graphical video editing and transcoding tool
 
 Group:          Applications/Multimedia
@@ -307,6 +307,9 @@ fi
 
 
 %changelog
+* Mon May 14 2012 Nicolas Chauvet <kwizart@gmail.com> - 2.5.6-8
+- Rebuilt for opencore-arm
+
 * Fri May 04 2012 Richard Shaw <hobbes1069@gmail.com> - 2.5.6-7
 - Rebuild for FTBFS for F-17.
 
