@@ -2,7 +2,7 @@
 
 Name:           avidemux
 Version:        2.5.6
-Release:        8%{?dist}
+Release:        9%{?dist}
 Summary:        Graphical video editing and transcoding tool
 
 Group:          Applications/Multimedia
@@ -307,6 +307,9 @@ fi
 
 
 %changelog
+* Wed Sep 05 2012 Nicolas Chauvet <kwizart@gmail.com> - 2.5.6-9
+- Rebuilt for x264 ABI 125
+
 * Mon May 14 2012 Nicolas Chauvet <kwizart@gmail.com> - 2.5.6-8
 - Rebuilt for opencore-arm
 
