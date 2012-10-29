@@ -12,7 +12,7 @@ Source0:        http://downloads.sourceforge.net/%{realname}/%{realname}_%{versi
 Source1:        avidemux-qt.desktop
 Source2:        avidemux-gtk.desktop
 
-Patch0:         avidemux-2.5.6-ffmpeg_parallel_build.patch
+#Patch0:         avidemux-2.5.6-ffmpeg_parallel_build.patch
 Patch1:         avidemux-2.6-bundled_libs.patch
 Patch2:         avidemux3-libass.patch
 Patch3:         avidemux3-bundled_libs.patch
