@@ -1,49 +1,29 @@
-%define _pkgbuilddir %{_builddir}/%{name}_%{version}
+%global realname avidemux
+%global _pkgbuilddir %{_builddir}/%{name}_%{version}
 
 Name:           avidemux
-Version:        2.5.6
-Release:        9%{?dist}
+Version:        2.6.0
+Release:        1%{?dist}
 Summary:        Graphical video editing and transcoding tool
 
-Group:          Applications/Multimedia
 License:        GPLv2+
-URL:            http://www.avidemux.org/
+URL:            http://www.avidemux.org
+Source0:        http://downloads.sourceforge.net/%{realname}/%{realname}_%{version}.tar.gz
+Source1:        avidemux-qt.desktop
+Source2:        avidemux-gtk.desktop
 
-Source0:        http://download.berlios.de/avidemux/avidemux_%{version}.tar.gz
-Source1:        %{name}-gtk.desktop
-Source2:        %{name}-qt.desktop
+#Patch0:         avidemux-2.5.6-ffmpeg_parallel_build.patch
+Patch1:         avidemux-2.6-bundled_libs.patch
+Patch2:         avidemux3-libass.patch
+Patch3:         avidemux3-bundled_libs.patch
 
-Patch1:         avidemux-2.5-pulseaudio-default.patch
-Patch2:         avidemux-2.4-qt4.patch
-# Prevents avidemux from creating the symlinks for .so files, which we do below
-Patch3:         avidemux-2.5.3-tmplinktarget.patch
-# libADM_xvidRateCtl.so and libADM_vidEnc_pluginOptions.so are supposed to be
-# built statically according to upstream... Let's get them installed instead
-Patch4:         avidemux-2.5.3-mpeg2enc.patch
-Patch5:         avidemux-2.5.3-pluginlibs.patch
-Patch6:         avidemux-2.5.6-ffmpeg_aac.patch
-Patch7:         avidemux-2.5.5-gcc46_tmp_fix.patch
-# Use system libraries
-Patch8:         avidemux-2.5.4-libass.patch
-Patch9:         avidemux-2.5.4-liba52.patch
-Patch10:        avidemux-2.5.4-libmad.patch
-Patch11:        avidemux-2.5.4-libtwolame.patch
-Patch12:        avidemux-2.5.5_fix_lav_audio_encoder.patch
-# Patch for ABI change in x264 115.
-Patch13:        avidemux-2.5.5-x264_i_to_b_open_gop.patch
-Patch14:        avidemux-2.5.6-ffmpeg_parallel_build.patch
-
-# Upstream has been informed http://avidemux.org/admForum/viewtopic.php?id=6447
-ExcludeArch: ppc ppc64
-
-Requires:       %{name}-cli = %{version}-%{release}
-Requires:       %{name}-gui = %{version}
-Requires:       %{name}-plugins = %{version}
-
-# Compiling
+# Utilities
 BuildRequires:  cmake
-BuildRequires:  gettext-devel intltool
+BuildRequires:  gettext intltool
 BuildRequires:  libxslt
+BuildRequires:  desktop-file-utils
+BuildRequires:  pkgconfig
+BuildRequires:  sqlite-devel
 
 # Libraries
 BuildRequires:  yasm-devel
@@ -61,8 +41,10 @@ BuildRequires:  libass-devel
 BuildRequires:  alsa-lib-devel >= 1.0.3
 BuildRequires:  pulseaudio-libs-devel
 
-# Video out 
+# Video out
 BuildRequires:  SDL-devel >= 1.2.7
+BuildRequires:  mesa-libGL-devel mesa-libGLU-devel
+BuildRequires:  libvdpau-devel
 
 # Audio Codecs
 BuildRequires:  a52dec-devel >= 0.7.4
@@ -81,13 +63,12 @@ BuildRequires:  twolame-devel
 BuildRequires:  xvidcore-devel >= 1.0.2
 BuildRequires:  x264-devel
 BuildRequires:  ffmpeg-devel
-#BuildRequires:  mjpegtools-devel
 
-# FIXME: aften not packaged, add BR when it is
+Conflicts:      avidemux < 2.6.0
+Provides:       avidemux = %{version}-%{release}
 
-# Finally...
-BuildRequires:  desktop-file-utils
-Requires:       hicolor-icon-theme
+# Main package is a metapackage, bring in something useful.
+Requires:       avidemux-gui = %{version}-%{release}
 
 
 %description
@@ -96,9 +77,6 @@ encoding tasks. It supports many file types, including AVI, DVD compatible
 MPEG files, MP4 and ASF, using a variety of codecs. Tasks can be automated
 using projects, job queue and powerful scripting capabilities.
 
-For compatibility reasons, avidemux is a meta-package which installs the
-graphical, command line and plugin packages. If you want a smaller setup,
-you may selectively install one or more of the avidemux-* subpackages.
 
 %package cli
 Summary:        CLI for %{name}
@@ -111,9 +89,7 @@ This package provides a command-line interface to editing videos with %{name}.
 %package libs
 Summary:        Libraries for %{name}
 Group:          System Environment/Libraries
-Requires:       %{name} = %{version}-%{release}
-Obsoletes:      %{name}-plugins
-Provides:       %{name}-plugins = %{version}-%{release}
+Requires:       %{name}%{?_isa} = %{version}-%{release}
 
 %description libs
 This package contains the runtime libraries for %{name}.
@@ -121,12 +97,13 @@ This package contains the runtime libraries for %{name}.
 %package gtk
 Summary:        GTK interface for %{name}
 Group:          Applications/Multimedia
-BuildRequires:  gtk2-devel >= 2.8.0
+BuildRequires:  gtk3-devel
 BuildRequires:  cairo-devel
 # Slightly higher so it is default, but it can be avoided by installing
 # avidemux-qt directly or it can be removed later once avidemux-qt is installed
 Provides:       %{name}-gui = %{version}-%{release}.1
 Requires:       %{name}-libs%{?_isa} = %{version}-%{release}
+Requires:       %{name}-help = %{version}-%{release}
 
 %description gtk
 This package provides the GTK graphical interface for %{name}.
@@ -139,94 +116,106 @@ Group:          Applications/Multimedia
 BuildRequires:  qt4-devel >= 4.5.0-9
 Provides:       %{name}-gui = %{version}-%{release}
 Requires:       %{name}-libs%{?_isa} = %{version}-%{release}
+Requires:       %{name}-help = %{version}-%{release}
 
 %description qt
 This package contains the Qt graphical interface for %{name}.
 
+%package help
+Summary:        Help files for %{name}
+Requires:       %{name}-gui = %{version}-%{release}
+BuildArch:      noarch
+
+%description help
+This package contains the help files for %{name}.
+
+%package devel
+Summary:        Development files for %{name}
+Group:          Development/Libraries
+Requires:       %{name}-libs%{?_isa} = %{version}-%{release}
+
+%description devel
+This package contains files required to develop with or extend %{name}.
+
 
 %prep
-%setup -q -n %{name}_%{version}
+%setup -q -n %{realname}_%{version}
+#patch0 -p1 -b .ffmpeg_build
+%patch1 -p1 -b .bund_libs
+%patch2 -p1 -b .libass
+%patch3 -p1 -b .bund_libs2
 
-# Remove unneeded external libraries
-%if 0%{?fedora} <= 14
-rm -rf avidemux/ADM_libraries/ADM_smjs
-%endif
-rm -rf plugins/ADM_videoFilters/Ass/ADM_libAss
-rm -rf plugins/ADM_audioEncoders/twolame/ADM_libtwolame
-rm -rf plugins/ADM_audioDecoders/ADM_ad_mad/ADM_libMad
-rm -rf plugins/ADM_audioDecoders/ADM_ad_ac3/ADM_liba52
-#rm -rf plugins/ADM_videoEncoder/ADM_vidEnc_mpeg2enc/mpeg2enc
-
-# change hardcoded libdir paths
-%ifarch x86_64 ppc64
-sed -i.bak 's/startDir="lib";/startDir="lib64";/' avidemux/ADM_core/src/ADM_fileio.cpp
-sed -i.bak 's/startDir="lib";/startDir="lib64";/' avidemux/main.cpp
-%endif
-
-#patch0 -p1 -b .parallel
-%patch1 -p1 -b .pulse
-%patch2 -p1 -b .qt4
-%patch3 -p1 -b .tmplinktarget
-%patch4 -p1 -b .mpeg2enc
-%patch5 -p1 -b .pluginlibs
-%patch6 -p1 -b .ffmpegaac
-%patch7 -p1 -b .gcc46tmpfix
-%patch8 -p1 -b .libass
-%patch9 -p1 -b .liba52
-%patch10 -p1 -b .libmad
-%patch11 -p1 -b .libtwolame
-#patch12 -p1 -b .lavencode
-#patch13 -p1 -b .x264
-%patch14 -p1 -b .ffmpegbuild
+# Remove sources of bundled libraries.
+rm -rf avidemux_plugins/ADM_audioDecoders/ADM_ad_ac3/ADM_liba52 \
+       avidemux_plugins/ADM_audioDecoders/ADM_ad_mad/ADM_libMad \
+       avidemux_plugins/ADM_audioEncoders/twolame/ADM_libtwolame \
+       avidemux_plugins/ADM_videoFilters6/ass/ADM_libass
 
 
 %build
-# Cmake requires out of source build
-mkdir -p build && pushd build
-%if 0%{?fedora} <= 14
-%cmake -DUSE_SYSTEM_SPIDERMONKEY:BOOL=ON .. \
-%else
-%cmake -DUSE_SYSTEM_SPIDERMONKEY:BOOL=OFF .. \
-%endif
+# Build avidemux_core
+LDFLAGS="-Wl,--as-needed";export LDFLAGS
+rm -rf build_core && mkdir build_core && pushd build_core
+%cmake -DCMAKE_BUILD_TYPE=RelWithDebInfo \
+       ../avidemux_core
+make 
+#%{?_smp_mflags}
 
-make %{?_smp_mflags}
-# Create the temp link directory manually since otherwise it happens too early
-mkdir -p %{_pkgbuilddir}/build/%{_lib}
-find %{_pkgbuilddir}/build/avidemux -name '*.so*' | \
-     xargs ln -sft %{_pkgbuilddir}/build/%{_lib}
+# We have to do a fake install so header files are avaialble for the other
+# packages.
+make install DESTDIR=%{_pkgbuilddir}/fakeRoot
 popd
 
-mkdir -p build_plugins && pushd build_plugins
-%cmake -DAVIDEMUX_INSTALL_PREFIX="%{_pkgbuilddir}/build/" \
-       -DAVIDEMUX_SOURCE_DIR="%{_pkgbuilddir}" \
-       -DAVIDEMUX_CORECONFIG_DIR="%{_pkgbuilddir}/build/config" \
-       ../plugins
+# Build cli interface
+rm -rf build_cli && mkdir build_cli && pushd build_cli
+%cmake -DCMAKE_BUILD_TYPE=RelWithDebInfo \
+       -DFAKEROOT=%{_pkgbuilddir}/fakeRoot \
+       ../avidemux/cli
+make %{?_smp_mflags}
+popd
+
+# Build QT4 gui
+rm -rf build_qt4 && mkdir build_qt4 && pushd build_qt4
+%cmake -DCMAKE_BUILD_TYPE=RelWithDebInfo \
+       -DFAKEROOT=%{_pkgbuilddir}/fakeRoot \
+       ../avidemux/qt4
+make %{?_smp_mflags}
+popd
+
+# Build GTK gui
+rm -rf build_gtk && mkdir build_gtk && pushd build_gtk
+%cmake -DCMAKE_BUILD_TYPE=RelWithDebInfo \
+       -DFAKEROOT=%{_pkgbuilddir}/fakeRoot \
+       ../avidemux/gtk
+make %{?_smp_mflags}
+popd
+
+# Build avidemux_plugins
+rm -rf build_plugins && mkdir build_plugins && pushd build_plugins
+%cmake -DCMAKE_BUILD_TYPE=RelWithDebInfo \
+       -DFAKEROOT=%{_pkgbuilddir}/fakeRoot \
+       -DAVIDEMUX_SOURCE_DIR=%{_builddir}/%{realname}_%{version} \
+       -DPLUGIN_UI=COMMON \
+       -DUSE_EXTERNAL_LIBASS=TRUE \
+       -DUSE_EXTERNAL_LIBMAD=TRUE \
+       -DUSE_EXTERNAL_LIBA52=TRUE \
+       -DUSE_EXTERNAL_TWOLAME=TRUE \
+       ../avidemux_plugins
 make %{?_smp_mflags}
 popd
 
 
 %install
-make -C build install DESTDIR=%{buildroot}
+make -C build_core install DESTDIR=%{buildroot}
+make -C build_cli install DESTDIR=%{buildroot}
+make -C build_qt4 install DESTDIR=%{buildroot}
+make -C build_gtk install DESTDIR=%{buildroot}
 make -C build_plugins install DESTDIR=%{buildroot}
 
-#install -d -m755 %{buildroot}%{_datadir}/pixmaps
-#install -m644 avidemux/ADM_userInterfaces/ADM_QT4/ADM_gui/pics/avidemux_icon.png %{buildroot}%{_datadir}/pixmaps/avidemux.png
+# FFMpeg libraries are not being installed as executable.
+chmod +x %{buildroot}%{_libdir}/libADM6*.so.*
 
-# Install icons
-install -pDm 0644 avidemux/ADM_icons/avidemux_icon_small.png \
-	%{buildroot}%{_datadir}/icons/hicolor/48x48/apps/avidemux.png
-install -pDm 0644 avidemux_icon.png \
-	%{buildroot}%{_datadir}/icons/hicolor/64x64/apps/avidemux.png
-
-# Find and remove all la files
-find %{buildroot} -type f -name "*.la" -exec rm -f {} ';'
-
-# Remove Windows-only executables
-# Must check this for new Linux-relevant files upon new avidemux releases
-rm -rf %{buildroot}%{_datadir}/ADM_addons/avsfilter
-rmdir %{buildroot}%{_datadir}/ADM_addons/
-
-# Install .desktop shortcuts
+# Install desktop files
 desktop-file-install --vendor rpmfusion \
     --dir %{buildroot}%{_datadir}/applications \
     %{SOURCE1}
@@ -235,363 +224,82 @@ desktop-file-install --vendor rpmfusion \
     --dir %{buildroot}%{_datadir}/applications \
     %{SOURCE2}
 
-# Remove duplicated Qt translations
-rm -f %{buildroot}%{_datadir}/%{name}/i18n/qt_*.qm
-# find_lang.sh doesn't recognize this one, and there already is avidemux_sr.qm
-rm -f %{buildroot}%{_datadir}/%{name}/i18n/avidemux_sr@latin.qm
-
-# Qt-style translations
-%find_lang %{name} --with-qt --without-mo
-mv -f %{name}.lang %{name}-qt.lang
-# Gettext-style translations
-%find_lang %{name}
+# Install icons
+install -pDm 0644 avidemux/gtk/ADM_userInterfaces/glade/main/avidemux_icon_small.png \
+        %{buildroot}%{_datadir}/icons/hicolor/48x48/apps/avidemux.png
+install -pDm 0644 avidemux_icon.png \
+	%{buildroot}%{_datadir}/icons/hicolor/64x64/apps/avidemux.png
 
 
-%post libs
-/sbin/ldconfig
+%post libs -p /sbin/ldconfig
+
+%postun libs -p /sbin/ldconfig
+
+%post gtk
 /bin/touch --no-create %{_datadir}/icons/hicolor &>/dev/null || :
+/usr/bin/update-desktop-database &> /dev/null || :
 
-%postun libs
-/sbin/ldconfig
+%post qt
+/bin/touch --no-create %{_datadir}/icons/hicolor &>/dev/null || :
+/usr/bin/update-desktop-database &> /dev/null || :
+
+
+%postun gtk
 if [ $1 -eq 0 ] ; then
     /bin/touch --no-create %{_datadir}/icons/hicolor &>/dev/null
     /usr/bin/gtk-update-icon-cache %{_datadir}/icons/hicolor &>/dev/null || :
 fi
+/usr/bin/update-desktop-database &> /dev/null || :
 
-%posttrans
+%postun qt
+if [ $1 -eq 0 ] ; then
+    /bin/touch --no-create %{_datadir}/icons/hicolor &>/dev/null
+    /usr/bin/gtk-update-icon-cache %{_datadir}/icons/hicolor &>/dev/null || :
+fi
+/usr/bin/update-desktop-database &> /dev/null || :
+
+%posttrans gtk
+/usr/bin/gtk-update-icon-cache %{_datadir}/icons/hicolor &>/dev/null || :
+
+%posttrans qt
 /usr/bin/gtk-update-icon-cache %{_datadir}/icons/hicolor &>/dev/null || :
 
 
 %files
-%doc AUTHORS COPYING README TODO
+%doc AUTHORS COPYING README
 
 %files libs
-%{_datadir}/ADM_scripts/
-%{_datadir}/icons/hicolor/48x48/apps/avidemux.png
-%{_datadir}/icons/hicolor/64x64/apps/avidemux.png
+%{_datadir}/icons/hicolor/*/apps/avidemux.png
 %{_libdir}/libADM*
 %exclude %{_libdir}/libADM_UI*
 %exclude %{_libdir}/libADM_render*
-%{_libdir}/ADM_plugins/
-%exclude %{_libdir}/ADM_plugins/videoEncoder/*/*Gtk.so
-%exclude %{_libdir}/ADM_plugins/videoEncoder/*/*Qt.so
-%exclude %{_libdir}/ADM_plugins/videoFilter/*cli.so
-%exclude %{_libdir}/ADM_plugins/videoFilter/*gtk.so
-%exclude %{_libdir}/ADM_plugins/videoFilter/*qt4.so
+%{_libdir}/ADM_plugins6/
 
 %files cli
-%{_bindir}/avidemux2_cli
-%{_libdir}/libADM_UICli.so
-%{_libdir}/libADM_render_cli.so
-%{_libdir}/ADM_plugins/videoFilter/*cli.so
+%{_bindir}/avidemux3_cli
+%{_libdir}/libADM_UI_Cli6.so
+%{_libdir}/libADM_render6_cli.so
 
+%files gtk 
+%{_bindir}/avidemux3_gtk
+%{_libdir}/libADM_UIGtk6.so
+%{_libdir}/libADM_render6_gtk.so
+%{_libdir}/ADM_glade/
+%{_datadir}/applications/rpmfusion-avidemux-gtk.desktop
 
-%files gtk -f %{name}.lang
-%{_bindir}/avidemux2_gtk
-%{_libdir}/libADM_UIGtk.so
-%{_libdir}/libADM_render_gtk.so
-%{_libdir}/ADM_plugins/videoEncoder/x264/libADM_vidEnc_x264_Gtk.so
-%{_libdir}/ADM_plugins/videoEncoder/xvid/libADM_vidEnc_Xvid_Gtk.so
-%{_libdir}/ADM_plugins/videoFilter/*gtk.so
-%{_datadir}/applications/*gtk*.desktop
+%files qt 
+%{_bindir}/avidemux3_qt4
+%{_bindir}/avidemux3_jobs
+%{_libdir}/libADM_UIQT46.so
+%{_libdir}/libADM_render6_qt4.so
+%{_datadir}/applications/rpmfusion-avidemux-qt.desktop
 
-%files qt -f %{name}-qt.lang
-%{_bindir}/avidemux2_qt4
-%{_libdir}/libADM_UIQT4.so
-%{_libdir}/libADM_render_qt4.so
-%{_libdir}/ADM_plugins/videoEncoder/x264/libADM_vidEnc_x264_Qt.so
-%{_libdir}/ADM_plugins/videoEncoder/xvid/libADM_vidEnc_Xvid_Qt.so
-%{_libdir}/ADM_plugins/videoFilter/*qt4.so
-%{_datadir}/applications/*qt*.desktop
-%dir %{_datadir}/%{name}/i18n
+%files help
+%{_datadir}/avidemux6/help/
 
+%files devel
+%{_includedir}/avidemux/
 
 %changelog
-* Wed Sep 05 2012 Nicolas Chauvet <kwizart@gmail.com> - 2.5.6-9
-- Rebuilt for x264 ABI 125
-
-* Mon May 14 2012 Nicolas Chauvet <kwizart@gmail.com> - 2.5.6-8
-- Rebuilt for opencore-arm
-
-* Fri May 04 2012 Richard Shaw <hobbes1069@gmail.com> - 2.5.6-7
-- Rebuild for FTBFS for F-17.
-
-* Tue Mar 13 2012 Nicolas Chauvet <kwizart@gmail.com> - 2.5.6-6
-- Rebuilt for x264 ABI 0.120
-
-* Fri Mar 09 2012 Nicolas Chauvet <kwizart@gmail.com> - 2.5.6-5
-- Rebuilt
-
-* Wed Feb 01 2012 Richard Shaw <hobbes1069@gmail.com> - 2.5.6-4
-- Rebuild for libvpx soname bump.
-
-* Sat Jan 28 2012 Richard Shaw <hobbes1069@gmail.com> - 2.5.6-3
-- Install icon files to preferred location.
-- Reenable FFmpeg based AAC encoding.
-- Update to latest release.
-
-* Fri Sep 23 2011 Richard Shaw <hobbes1069@gmail.com> - 2.5.5-6
-- Obsolete useless devel subpackage which has multilib issues.
-
-* Mon Aug 07 2011 Richard Shaw <hobbes1069@gmail.com> - 2.5.5-4
-- Moved UI specific libraries and plugins to their respective sub-package to prevent
-  unneeded dependencies from being installed.
-- Obsoleted plugins sub-package and combined with libs sub-package.
-
-* Fri Jul 15 2011 Richard Shaw <hobbes1069@gmail.com> - 2.5.5-2
-- Patch for x254 ABI 115 change (#1848).
-
-* Sun Jun 05 2011 Richard Shaw <hobbes1069@gmail.com> - 2.5.5-1
-- New release: 2.5.5
-- FFMpeg based AAC encoding is broken (BZ#1825) and
-  will be disabled until fixed.
-
-* Sat Jun 04 2011 Richard Shaw <hobbes1069@gmail.com> - 2.5.4-9
-- New version of js in Fedora 15 breaks build.
-- Re-enable built-in javascript for Fedora 15.
-
-* Wed May 26 2011 Richard Shaw <hobbes1069@gmail.com> - 2.5.4-8
-- Use system libass (subtitles).
-- Use system liba52 (ac3 decoding).
-- Use system libmad.
-- Use system libtwolame.
-
-* Sun Apr 24 2011 Richard Shaw <hobbes1069@gmail.com> - 2.5.4-6
-- Really fix AAC this time.
-- Really fix x264 this time.
-
-* Sun Apr 24 2011 Richard Shaw <hobbes1069@gmail.com> - 2.5.4-5
-- AAC encoding now working. (Kevin Kofler)
-- Fedora 15 build dependecy fixed. (Kevin Kofler)
-- Audio device peferences now remembered.
-
-* Wed Apr 20 2011 Richard Shaw <hobbes1069@gmail.com> - 2.5.4-4
-- Disabled non-working patch for experimental aac encoding with ffmpeg.
-- Removed dependency on bundled javascript library. Now uses system library.
-- Added optional opencore-amr decoding support.
-
-* Tue Apr 19 2011 Richard Shaw <hobbes1069@gmail.com> - 2.5.4-3
-- Fixes gcc 4.6 errors that used to be warnings.
-- Fixes compile issues with x264 being too new.
-- Fixes potential crash betwen gtk and opengl.
-
-* Sat Apr 16 2011 Richard Shaw <hobbes1069@gmail.com> - 2.5.4-2
-- Upload missing patch to CVS.
-
-* Sat Apr 16 2011 Richard Shaw <hobbes1069@gmail.com> - 2.5.4-1
-- Updated to version 2.5.4.
-
-* Sun Mar 27 2011 Nicolas Chauvet <kwizart@gmail.com> - 2.5.3-5
-- Rebuild for x264
-
-* Tue Jul 20 2010 Stewart Adam <s.adam at diffingo.com> - 2.5.3-4
-- Rebuild for new x264
-
-* Sun May 30 2010 Stewart Adam <s.adam at diffingo.com> - 2.5.3-3
-- Add /usr/bin/xsltproc BR for qt4 subpackage
-
-* Wed May 26 2010 Stewart Adam <s.adam at diffingo.com> - 2.5.3-2
-- Bump for F-13 --> devel EVR
-
-* Wed May 26 2010 Stewart Adam <s.adam at diffingo.com> - 2.5.3-1
-- Update to 2.5.3 release
-- Use avidemux.png as icon in the desktop shorcuts to fix problem on KDE
-- Make ldconfig run in post/postun of libs package
-- Fix typo in %%description
-
-* Wed Jan 27 2010 Stewart Adam <s.adam at diffingo.com> - 2.5.2-4
-- Remove the i18n folder from %%files, as it seems it does not get created nor
-  populated with any files on rawhide.
-
-* Tue Jan 26 2010 Stewart Adam <s.adam at diffingo.com> - 2.5.2-3
-- Fix stupid mistake in mkdir command (add -p for subdir creation)
-
-* Mon Jan 25 2010 Stewart Adam <s.adam at diffingo.com> - 2.5.2-2
-- Temporary workaround for build failure on rawhide
-
-* Mon Jan 18 2010 Stewart Adam <s.adam at diffingo.com> - 2.5.2-1
-- Update to 2.5.2 release
-
-* Thu Nov  5 2009 Nicolas Chauvet <kwizart@fedoraproject.org> - 2.5.1-6.20091010svn
-- Update bugfix to 20091105
-
-* Sat Oct 24 2009 Stewart Adam <s.adam at diffingo.com> - 2.5.1-5.20091010svn
-- Temporarily disable FAAC as per discussion on RF-dev ML
-- Create temporary linking dir before running find | xargs
-
-* Fri Oct 23 2009 Orcan Ogetbil <oged[DOT]fedora[AT]gmail[DOT]com> - 2.5.1-4.20091010svn
-- Update desktop file according to F-12 FedoraStudio feature
-
-* Sat Oct 10 2009 Stewart Adam <s.adam at diffingo.com> - 2.5.1-3.20091010svn
-- Fix AVIDEMUX_INSTALL_PREFIX define so plugins can link correctly
-
-* Sat Oct 10 2009 Stewart Adam <s.adam at diffingo.com> - 2.5.1-2.20091010svn
-- Update to 2.5.1 subversion r5371
-
-* Fri Jun 19 2009 Stewart Adam <s.adam at diffingo.com> - 2.4.4-9
-- Add patch to fix build with CMake 2.6.4
-- Update gcc44 patch to match Gentoo upstream
-- Update PulseAudio patch to work as expected with avidemux 2.4.4
-
-* Sun May 03 2009 Rex Dieter <rdieter@fedoraproject.org> - 2.4.4-8
-- skip %%_smp_mflags in po/
-
-* Sat Apr 25 2009 Stewart Adam <s.adam at diffingo.com> - 2.4.4-7
-- Test build with ppc* enabled
-
-* Sat Apr 25 2009 Stewart Adam <s.adam at diffingo.com> - 2.4.4-6
-- Rebuild, disable ppc* for now
-
-* Sun Mar 29 2009 Thorsten Leemhuis <fedora [AT] leemhuis [DOT] info> - 2.4.4-5
-- rebuild for new F11 features
-
-* Wed Mar 25 2009 Dominik Mierzejewski <rpm at greysector.net> - 2.4.4-4
-- Fix gcc 4.4 patch
-- Improve dca patch
-
-* Sun Mar 22 2009 Stewart Adam <s.adam at diffingo.com> - 2.4.4-3
-- Apply the patch
-
-* Sun Mar 22 2009 Stewart Adam <s.adam at diffingo.com> - 2.4.4-2
-- Fix build errors when compiling with gcc 4.4 (#386) (thanks to Rathann)
-
-* Wed Feb 18 2009 Stewart Adam <s.adam at diffingo.com> - 2.4.4-1
-- Update to 2.4.4 final, update patches accordingly
-- Move Qt translation files to qt subpackage
-
-* Sun Dec 14 2008 Dominik Mierzejewski <rpm at greysector.net> - 2.4.3-8
-- Fix build with current x264
-
-* Fri Dec 5 2008 Stewart Adam <s.adam at diffingo.com> - 2.4.3-7.1
-- Rebuild for 20081202 ffmpeg snapshot
-
-* Tue Nov 25 2008 Stewart Adam <s.adam at diffingo.com> - 2.4.3-7
-- Don't uselessly provide avidemux-cli
-- Make GUI and CLI subpackages require the main package (fixes bz#178)
-
-* Tue Nov 25 2008 Stewart Adam <s.adam at diffingo.com> - 2.4.3-6
-- Bump release to fix EVR
-
-* Sat Sep 27 2008 Stewart Adam <s.adam at diffingo.com> - 2.4.3-5
-- Add CMake patch for PPC64
-- Update patches for 2.4.3
-- Remove outdated libmad patch (Nov. 2007)
-
-* Thu Sep 18 2008 Stewart Adam <s.adam at diffingo.com> - 2.4.3-4
-- Add another patch to fix ppc64 build (pointer type), first
-  patch was for libmad
-
-* Fri Aug 22 2008 Stewart Adam <s.adam at diffingo.com> - 2.4.3-3
-- Add patch to fix ppc64 build
-
-* Sat Aug 16 2008 Stewart Adam <s.adam at diffingo.com> - 2.4.3-2
-- retag
-
-* Sat Aug 16 2008 Stewart Adam <s.adam at diffingo.com> - 2.4.3-1
-- Update to 2.4.3
-
-* Tue Aug 12 2008 Stewart Adam <s.adam at diffingo.com> - 2.4.2-3
-- ppc64 uint_32 fun
-
-* Sun Aug 03 2008 Thorsten Leemhuis <fedora [AT] leemhuis [DOT] info - 2.4.2-2
-- rebuild
-
-* Sat Jul 19 2008 Thorsten Leemhuis <s.adam at diffingo.com> - 2.4.2-1
-- Update to 2.4.2
-
-* Wed May 21 2008 Stewart Adam <s.adam AT diffingo DOT com> - 2.4.1-3.20080521svn
-- Disable --new-faad
-- 20080521 subversion snapshot
-
-* Sat Mar 15 2008 Stewart Adam <s.adam AT diffingo DOT com> - 2.4.1-2
-- Disable %%{?_smp_mflags}
-
-* Sat Mar 15 2008 Stewart Adam <s.adam AT diffingo DOT com> - 2.4.1-1
-- Update to 2.4.1
-- Don't list the bin files twice, revisited
-- Default to GTK frontend
-
-* Wed Feb 20 2008 Stewart Adam <s.adam AT diffingo DOT com> - 2.4-6.20080126svn
-- Make pulseaudio default for sound out
-- Don't list the bin files twice
-- Don't build with arts support
-
-* Fri Feb 15 2008 Stewart Adam <s.adam AT diffingo DOT com> - 2.4-5.20080126svn
-- Don't list the .desktop files twice (bz#1870)
-- Oops, we should have %%{svndate}svn in release tag!
-
-* Sat Feb 2 2008 Stewart Adam <s.adam AT diffingo DOT com> - 2.4-4
-- F-8/F-7 x86_64 does seem to need --with-newfaad
-
-* Fri Feb 1 2008 Stewart Adam <s.adam AT diffingo DOT com> - 2.4-3
-- Update to version 2.4 (20080126svn) and include fixes from devel branch
-
-* Mon Jan 14 2008 Stewart Adam <s.adam AT diffingo DOT com> - 2.4-2
-- Fix many copy/paste errors and desktop file's Exec field
-
-* Sun Jan 13 2008 Stewart Adam <s.adam AT diffingo DOT com> - 2.4-1
-- Update to 2.4 final
-- Split up desktop files and make them pass desktop-file-validate
-- Add structure to split into gtk and qt pacakges
-- Disable qt4 for now, doesn't compile
-
-* Sun Oct 7 2007 Thorsten Leemhuis <fedora[AT]leemhuis[DOT]info>3- 2.3.0-4.3
-- move js-include to a place where it is honored
-
-* Sun Oct 7 2007 Stewart Adam <s.adam AT diffingo DOT com> - 2.3.0-4.2
-- Fix macro problem
-- Fix changelog date
-- Rebuild with faad, but don't pass --newfaad
-
-* Sun Oct 7 2007 Stewart Adam <s.adam AT diffingo DOT com> - 2.3.0-4.1
-- Rebuild with no faad
-
-* Sat Oct 6 2007 Stewart Adam <s.adam AT diffingo DOT com> - 2.3.0-4
-- Rebuild for ffmpeg dependency problems
-- Update License: tag per Fedora guidelines
-
-* Sat Jan 13 2007 Thorsten Leemhuis <fedora[AT]leemhuis[DOT]info> - 2.3.0-3
-- more features with new BR's: x264-devel libXv-devel
-- make a note regarding the libdca-devel problem
-- remove the "0:" from the versioned BR's
-
-* Thu Jan 04 2007 Thorsten Leemhuis <fedora[AT]leemhuis[DOT]info> - 2.3.0-2
-- don't use smp_mflags during make for now
-
-* Sat Dec 23 2006 kwizart < kwizart at gmail.com > - 2.3.0-1
-- Update to 2.3.0 Final
-- Use find_lang
-
-* Mon Apr 03 2006 Thorsten Leemhuis <fedora[AT]leemhuis[DOT]info> - 2.1.2-1
-- Update to 2.1.2
-
-* Thu Mar 09 2006 Andreas Bierfert <andreas.bierfert[AT]lowlatency.de>
-- switch to new release field
-
-* Tue Feb 28 2006 Andreas Bierfert <andreas.bierfert[AT]lowlatency.de>
-- add dist
-
-* Wed Jan 04 2006 Thorsten Leemhuis <fedora[AT]leemhuis[DOT]info> - 0:2.1.0-0.lvn.1
-- Update to 2.1.0
-- Drop epoch
-- gtk 2.6 now, so drop FC3 support
-
-* Sat Aug 27 2005 Thorsten Leemhuis <fedora[AT]leemhuis[DOT]info> - 0:2.0.42-0.lvn.3
-- Remove bogus BR ffmpeg-devel (#555)
-
-* Thu Jul 09 2005 Thorsten Leemhuis <fedora[AT]leemhuis[DOT]info> - 0:2.0.42-0.lvn.2
-- Add missing BR desktop-file-utils (thanks to ixs)
-
-* Thu Jul 07 2005 Thorsten Leemhuis <fedora[AT]leemhuis[DOT]info> - 0:2.0.42-0.lvn.1
-- Update to 2.0.42
-
-* Sat Jan 22 2005 Thorsten Leemhuis <fedora[AT]leemhuis[DOT]info> - 0:2.0.36-0.lvn.1
-- Update to 2.0.34
-- Rename package to avidemux -- no need for avidemux2 afaics
-
-* Sun Nov 21 2004 Thorsten Leemhuis <fedora[AT]leemhuis[DOT]info> - 0:2.0.34-0.lvn.1.test1
-- Update to 2.0.34-test1
-- BR gettext, libtool
-
-* Tue Oct 18 2004 Thorsten Leemhuis <fedora[AT]leemhuis[DOT]info> - 0:2.0.30-0.lvn.1
-- Initial RPM release.
+* Sun Oct 14 2012 Richard Shaw <hobbes1069@gmail.com> - 2.6.0-1
+- Update to new upstream release.
