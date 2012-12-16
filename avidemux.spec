@@ -1,14 +1,13 @@
-%global realname avidemux
 %global _pkgbuilddir %{_builddir}/%{name}_%{version}
 
 Name:           avidemux
 Version:        2.6.0
-Release:        2%{?dist}
+Release:        3%{?dist}
 Summary:        Graphical video editing and transcoding tool
 
 License:        GPLv2+
 URL:            http://www.avidemux.org
-Source0:        http://downloads.sourceforge.net/%{realname}/%{realname}_%{version}.tar.gz
+Source0:        http://downloads.sourceforge.net/%{name}/%{name}_%{version}.tar.gz
 Source1:        avidemux-qt.desktop
 Source2:        avidemux-gtk.desktop
 
@@ -16,6 +15,9 @@ Source2:        avidemux-gtk.desktop
 Patch1:         avidemux-2.6-bundled_libs.patch
 Patch2:         avidemux3-libass.patch
 Patch3:         avidemux3-bundled_libs.patch
+
+# Don't try to build on arm
+ExcludeArch: %{arm}
 
 # Utilities
 BuildRequires:  cmake
@@ -64,9 +66,6 @@ BuildRequires:  xvidcore-devel >= 1.0.2
 BuildRequires:  x264-devel
 BuildRequires:  ffmpeg-devel
 
-Conflicts:      avidemux < 2.6.0
-Provides:       avidemux = %{version}-%{release}
-
 # Main package is a metapackage, bring in something useful.
 Requires:       avidemux-gui = %{version}-%{release}
 
@@ -76,6 +75,8 @@ Avidemux is a free video editor designed for simple cutting, filtering and
 encoding tasks. It supports many file types, including AVI, DVD compatible
 MPEG files, MP4 and ASF, using a variety of codecs. Tasks can be automated
 using projects, job queue and powerful scripting capabilities.
+
+This is a meta package that brings in all interfaces: GTK, QT, and CLI.
 
 
 %package cli
@@ -99,9 +100,7 @@ Summary:        GTK interface for %{name}
 Group:          Applications/Multimedia
 BuildRequires:  gtk3-devel
 BuildRequires:  cairo-devel
-# Slightly higher so it is default, but it can be avoided by installing
-# avidemux-qt directly or it can be removed later once avidemux-qt is installed
-Provides:       %{name}-gui = %{version}-%{release}.1
+Provides:       %{name}-gui = %{version}-%{release}
 Requires:       %{name}-libs%{?_isa} = %{version}-%{release}
 Requires:       %{name}-help = %{version}-%{release}
 
@@ -139,7 +138,7 @@ This package contains files required to develop with or extend %{name}.
 
 
 %prep
-%setup -q -n %{realname}_%{version}
+%setup -q -n %{name}_%{version}
 #patch0 -p1 -b .ffmpeg_build
 %patch1 -p1 -b .bund_libs
 %patch2 -p1 -b .libass
@@ -172,6 +171,7 @@ rm -rf build_cli && mkdir build_cli && pushd build_cli
        -DFAKEROOT=%{_pkgbuilddir}/fakeRoot \
        ../avidemux/cli
 make %{?_smp_mflags}
+make install DESTDIR=%{_pkgbuilddir}/fakeRoot
 popd
 
 # Build QT4 gui
@@ -180,6 +180,7 @@ rm -rf build_qt4 && mkdir build_qt4 && pushd build_qt4
        -DFAKEROOT=%{_pkgbuilddir}/fakeRoot \
        ../avidemux/qt4
 make %{?_smp_mflags}
+make install DESTDIR=%{_pkgbuilddir}/fakeRoot
 popd
 
 # Build GTK gui
@@ -188,13 +189,14 @@ rm -rf build_gtk && mkdir build_gtk && pushd build_gtk
        -DFAKEROOT=%{_pkgbuilddir}/fakeRoot \
        ../avidemux/gtk
 make %{?_smp_mflags}
+make install DESTDIR=%{_pkgbuilddir}/fakeRoot
 popd
 
-# Build avidemux_plugins
-rm -rf build_plugins && mkdir build_plugins && pushd build_plugins
+# Build avidemux_plugins_common
+rm -rf build_plugins_common && mkdir build_plugins_common && pushd build_plugins_common
 %cmake -DCMAKE_BUILD_TYPE=RelWithDebInfo \
        -DFAKEROOT=%{_pkgbuilddir}/fakeRoot \
-       -DAVIDEMUX_SOURCE_DIR=%{_builddir}/%{realname}_%{version} \
+       -DAVIDEMUX_SOURCE_DIR=%{_builddir}/%{name}_%{version} \
        -DPLUGIN_UI=COMMON \
        -DUSE_EXTERNAL_LIBASS=TRUE \
        -DUSE_EXTERNAL_LIBMAD=TRUE \
@@ -202,6 +204,52 @@ rm -rf build_plugins && mkdir build_plugins && pushd build_plugins
        -DUSE_EXTERNAL_TWOLAME=TRUE \
        ../avidemux_plugins
 make %{?_smp_mflags}
+make install DESTDIR=%{_pkgbuilddir}/fakeRoot
+popd
+
+# Build avidemux_plugins_cli
+rm -rf build_plugins_cli && mkdir build_plugins_cli && pushd build_plugins_cli
+%cmake -DCMAKE_BUILD_TYPE=RelWithDebInfo \
+       -DFAKEROOT=%{_pkgbuilddir}/fakeRoot \
+       -DAVIDEMUX_SOURCE_DIR=%{_builddir}/%{name}_%{version} \
+       -DPLUGIN_UI=CLI \
+       -DUSE_EXTERNAL_LIBASS=TRUE \
+       -DUSE_EXTERNAL_LIBMAD=TRUE \
+       -DUSE_EXTERNAL_LIBA52=TRUE \
+       -DUSE_EXTERNAL_TWOLAME=TRUE \
+       ../avidemux_plugins
+make %{?_smp_mflags}
+make install DESTDIR=%{_pkgbuilddir}/fakeRoot
+popd
+
+# Build avidemux_plugins_qt4
+rm -rf build_plugins_qt4 && mkdir build_plugins_qt4 && pushd build_plugins_qt4
+%cmake -DCMAKE_BUILD_TYPE=RelWithDebInfo \
+       -DFAKEROOT=%{_pkgbuilddir}/fakeRoot \
+       -DAVIDEMUX_SOURCE_DIR=%{_builddir}/%{name}_%{version} \
+       -DPLUGIN_UI=QT4 \
+       -DUSE_EXTERNAL_LIBASS=TRUE \
+       -DUSE_EXTERNAL_LIBMAD=TRUE \
+       -DUSE_EXTERNAL_LIBA52=TRUE \
+       -DUSE_EXTERNAL_TWOLAME=TRUE \
+       ../avidemux_plugins
+make %{?_smp_mflags}
+make install DESTDIR=%{_pkgbuilddir}/fakeRoot
+popd
+
+# Build avidemux_plugins_gtk
+rm -rf build_plugins_gtk && mkdir build_plugins_gtk && pushd build_plugins_gtk
+%cmake -DCMAKE_BUILD_TYPE=RelWithDebInfo \
+       -DFAKEROOT=%{_pkgbuilddir}/fakeRoot \
+       -DAVIDEMUX_SOURCE_DIR=%{_builddir}/%{name}_%{version} \
+       -DPLUGIN_UI=GTK \
+       -DUSE_EXTERNAL_LIBASS=TRUE \
+       -DUSE_EXTERNAL_LIBMAD=TRUE \
+       -DUSE_EXTERNAL_LIBA52=TRUE \
+       -DUSE_EXTERNAL_TWOLAME=TRUE \
+       ../avidemux_plugins
+make %{?_smp_mflags}
+make install DESTDIR=%{_pkgbuilddir}/fakeRoot
 popd
 
 
@@ -210,7 +258,10 @@ make -C build_core install DESTDIR=%{buildroot}
 make -C build_cli install DESTDIR=%{buildroot}
 make -C build_qt4 install DESTDIR=%{buildroot}
 make -C build_gtk install DESTDIR=%{buildroot}
-make -C build_plugins install DESTDIR=%{buildroot}
+make -C build_plugins_common install DESTDIR=%{buildroot}
+make -C build_plugins_cli install DESTDIR=%{buildroot}
+make -C build_plugins_qt4 install DESTDIR=%{buildroot}
+make -C build_plugins_gtk install DESTDIR=%{buildroot}
 
 # FFMpeg libraries are not being installed as executable.
 chmod +x %{buildroot}%{_libdir}/libADM6*.so.*
@@ -268,26 +319,26 @@ fi
 %files
 %doc AUTHORS COPYING README
 
-%files libs
+%files libs -f build_plugins_common/install_manifest.txt
 %{_datadir}/icons/hicolor/*/apps/avidemux.png
 %{_libdir}/libADM*
 %exclude %{_libdir}/libADM_UI*
 %exclude %{_libdir}/libADM_render*
 %{_libdir}/ADM_plugins6/
 
-%files cli
+%files cli -f build_plugins_cli/install_manifest.txt
 %{_bindir}/avidemux3_cli
 %{_libdir}/libADM_UI_Cli6.so
 %{_libdir}/libADM_render6_cli.so
 
-%files gtk 
+%files gtk -f build_plugins_gtk/install_manifest.txt
 %{_bindir}/avidemux3_gtk
 %{_libdir}/libADM_UIGtk6.so
 %{_libdir}/libADM_render6_gtk.so
 %{_libdir}/ADM_glade/
 %{_datadir}/applications/rpmfusion-avidemux-gtk.desktop
 
-%files qt 
+%files qt -f build_plugins_qt4/install_manifest.txt
 %{_bindir}/avidemux3_qt4
 %{_bindir}/avidemux3_jobs
 %{_libdir}/libADM_UIQT46.so
@@ -301,6 +352,11 @@ fi
 %{_includedir}/avidemux/
 
 %changelog
+* Sun Dec 16 2012 Richard Shaw <hobbes1069@gmail.com> - 2.6.0-3
+- Make sure we're building all availabel plugins. (#2575)
+- Don't install the gtk interface when all you want is the qt one. (#2574)
+- Exclude arm as a build target. (#2466)
+
 * Fri Nov 23 2012 Nicolas Chauvet <kwizart@gmail.com> - 2.6.0-2
 - Rebuilt for x264
 
