@@ -2,7 +2,7 @@
 
 Name:           avidemux
 Version:        2.6.0
-Release:        3%{?dist}
+Release:        4%{?dist}
 Summary:        Graphical video editing and transcoding tool
 
 License:        GPLv2+
@@ -322,18 +322,19 @@ fi
 %files libs -f build_plugins_common/install_manifest.txt
 %{_datadir}/icons/hicolor/*/apps/avidemux.png
 %{_libdir}/libADM*
-%exclude %{_libdir}/libADM_UI*
 %exclude %{_libdir}/libADM_render*
-%{_libdir}/ADM_plugins6/
+# Catch the stuff missed using install_manifest.txt
+%{_libdir}/ADM_plugins6/autoScripts/*.pyc
+%{_libdir}/ADM_plugins6/autoScripts/*.pyo
+%{_libdir}/ADM_plugins6/autoScripts/lib/*.pyc
+%{_libdir}/ADM_plugins6/autoScripts/lib/*.pyo
 
 %files cli -f build_plugins_cli/install_manifest.txt
 %{_bindir}/avidemux3_cli
-%{_libdir}/libADM_UI_Cli6.so
 %{_libdir}/libADM_render6_cli.so
 
 %files gtk -f build_plugins_gtk/install_manifest.txt
 %{_bindir}/avidemux3_gtk
-%{_libdir}/libADM_UIGtk6.so
 %{_libdir}/libADM_render6_gtk.so
 %{_libdir}/ADM_glade/
 %{_datadir}/applications/rpmfusion-avidemux-gtk.desktop
@@ -341,7 +342,6 @@ fi
 %files qt -f build_plugins_qt4/install_manifest.txt
 %{_bindir}/avidemux3_qt4
 %{_bindir}/avidemux3_jobs
-%{_libdir}/libADM_UIQT46.so
 %{_libdir}/libADM_render6_qt4.so
 %{_datadir}/applications/rpmfusion-avidemux-qt.desktop
 
@@ -352,7 +352,7 @@ fi
 %{_includedir}/avidemux/
 
 %changelog
-* Sun Dec 16 2012 Richard Shaw <hobbes1069@gmail.com> - 2.6.0-3
+* Sun Dec 16 2012 Richard Shaw <hobbes1069@gmail.com> - 2.6.0-4
 - Make sure we're building all availabel plugins. (#2575)
 - Don't install the gtk interface when all you want is the qt one. (#2574)
 - Exclude arm as a build target. (#2466)
