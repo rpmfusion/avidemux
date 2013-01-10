@@ -1,8 +1,8 @@
 %global _pkgbuilddir %{_builddir}/%{name}_%{version}
 
 Name:           avidemux
-Version:        2.6.0
-Release:        4%{?dist}
+Version:        2.6.1
+Release:        1%{?dist}
 Summary:        Graphical video editing and transcoding tool
 
 License:        GPLv2+
@@ -90,7 +90,7 @@ This package provides a command-line interface to editing videos with %{name}.
 %package libs
 Summary:        Libraries for %{name}
 Group:          System Environment/Libraries
-Requires:       %{name}%{?_isa} = %{version}-%{release}
+#Requires:       %{name}%{?_isa} = %{version}-%{release}
 
 %description libs
 This package contains the runtime libraries for %{name}.
@@ -323,6 +323,7 @@ fi
 %{_datadir}/icons/hicolor/*/apps/avidemux.png
 %{_libdir}/libADM*
 %exclude %{_libdir}/libADM_render*
+%exclude %{_datadir}/avidemux6
 # Catch the stuff missed using install_manifest.txt
 %{_libdir}/ADM_plugins6/autoScripts/*.pyc
 %{_libdir}/ADM_plugins6/autoScripts/*.pyo
@@ -352,6 +353,9 @@ fi
 %{_includedir}/avidemux/
 
 %changelog
+* Sat Dec 22 2012 Richard Shaw <hobbes1069@gmail.com> - 2.6.1-1
+- Update to latest upstream release.
+
 * Sun Dec 16 2012 Richard Shaw <hobbes1069@gmail.com> - 2.6.0-4
 - Make sure we're building all availabel plugins. (#2575)
 - Don't install the gtk interface when all you want is the qt one. (#2574)
