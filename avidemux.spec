@@ -1,7 +1,7 @@
 %global _pkgbuilddir %{_builddir}/%{name}_%{version}
 
 Name:           avidemux
-Version:        2.6.1
+Version:        2.6.3
 Release:        1%{?dist}
 Summary:        Graphical video editing and transcoding tool
 
@@ -353,6 +353,12 @@ fi
 %{_includedir}/avidemux/
 
 %changelog
+* Wed Mar 20 2013 Richard Shaw <hobbes1069@gmail.com> - 2.6.3-1
+- Update to latest bugfix release.
+
+* Sun Jan 20 2013 Nicolas Chauvet <kwizart@gmail.com> - 2.6.1-2
+- Rebuilt for ffmpeg/x264
+
 * Sat Dec 22 2012 Richard Shaw <hobbes1069@gmail.com> - 2.6.1-1
 - Update to latest upstream release.
 
