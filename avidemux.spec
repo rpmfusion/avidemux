@@ -1,8 +1,8 @@
 %global _pkgbuilddir %{_builddir}/%{name}_%{version}
 
 Name:           avidemux
-Version:        2.6.3
-Release:        2%{?dist}
+Version:        2.6.4
+Release:        1%{?dist}
 Summary:        Graphical video editing and transcoding tool
 
 License:        GPLv2+
@@ -15,6 +15,7 @@ Source2:        avidemux-gtk.desktop
 Patch1:         avidemux-2.6-bundled_libs.patch
 Patch2:         avidemux3-libass.patch
 Patch3:         avidemux3-bundled_libs.patch
+Patch4:         avidemux-2.6.4-gtk_fix.patch
 
 # Don't try to build on arm
 ExcludeArch: %{arm}
@@ -143,6 +144,7 @@ This package contains files required to develop with or extend %{name}.
 %patch1 -p1 -b .bund_libs
 %patch2 -p1 -b .libass
 %patch3 -p1 -b .bund_libs2
+%patch4 -p1 -b .gtk_fix
 
 # Remove sources of bundled libraries.
 rm -rf avidemux_plugins/ADM_audioDecoders/ADM_ad_ac3/ADM_liba52 \
@@ -353,6 +355,9 @@ fi
 %{_includedir}/avidemux/
 
 %changelog
+* Wed May 15 2013 Richard Shaw <hobbes1069@gmail.com> - 2.6.4-1
+- Update to latest upstream release.
+
 * Sun May 05 2013 Richard Shaw <hobbes1069@gmail.com> - 2.6.3-2
 - Rebuild for updated x264.
 
