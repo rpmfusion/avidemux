@@ -2,7 +2,7 @@
 
 Name:           avidemux
 Version:        2.6.4
-Release:        1%{?dist}
+Release:        2%{?dist}
 Summary:        Graphical video editing and transcoding tool
 
 License:        GPLv2+
@@ -346,6 +346,7 @@ fi
 %{_bindir}/avidemux3_qt4
 %{_bindir}/avidemux3_jobs
 %{_libdir}/libADM_render6_qt4.so
+%{_datadir}/avidemux6/i18n/
 %{_datadir}/applications/rpmfusion-avidemux-qt.desktop
 
 %files help
@@ -354,7 +355,11 @@ fi
 %files devel
 %{_includedir}/avidemux/
 
+
 %changelog
+* Mon Jun  3 2013 Richard Shaw <hobbes1069@gmail.com> - 2.6.4-2
+- Fix packaging of translations (qt package only).
+
 * Wed May 15 2013 Richard Shaw <hobbes1069@gmail.com> - 2.6.4-1
 - Update to latest upstream release.
 
@@ -371,7 +376,7 @@ fi
 - Update to latest upstream release.
 
 * Sun Dec 16 2012 Richard Shaw <hobbes1069@gmail.com> - 2.6.0-4
-- Make sure we're building all availabel plugins. (#2575)
+- Make sure we're building all available plugins. (#2575)
 - Don't install the gtk interface when all you want is the qt one. (#2574)
 - Exclude arm as a build target. (#2466)
 
