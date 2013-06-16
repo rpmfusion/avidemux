@@ -2,7 +2,7 @@
 
 Name:           avidemux
 Version:        2.6.4
-Release:        2%{?dist}
+Release:        3%{?dist}
 Summary:        Graphical video editing and transcoding tool
 
 License:        GPLv2+
@@ -123,7 +123,8 @@ This package contains the Qt graphical interface for %{name}.
 
 %package help
 Summary:        Help files for %{name}
-Requires:       %{name}-gui = %{version}-%{release}
+Requires:       %{name}%{?_isa} = %{version}-%{release}
+Requires:       %{name}-gui     = %{version}-%{release}
 BuildArch:      noarch
 
 %description help
@@ -136,6 +137,15 @@ Requires:       %{name}-libs%{?_isa} = %{version}-%{release}
 
 %description devel
 This package contains files required to develop with or extend %{name}.
+
+%package i18n
+Summary:        Translations for %{name}
+Requires:       %{name}%{?_isa} = %{version}-%{release}
+Requires:       %{name}-qt      = %{version}-%{release}
+BuildArch:      noarch
+
+%description i18n
+This package contains translation files for %{name}.
 
 
 %prep
@@ -320,6 +330,7 @@ fi
 
 %files
 %doc AUTHORS COPYING README
+%dir %{_datadir}/avidemux6
 
 %files libs -f build_plugins_common/install_manifest.txt
 %{_datadir}/icons/hicolor/*/apps/avidemux.png
@@ -346,7 +357,6 @@ fi
 %{_bindir}/avidemux3_qt4
 %{_bindir}/avidemux3_jobs
 %{_libdir}/libADM_render6_qt4.so
-%{_datadir}/avidemux6/i18n/
 %{_datadir}/applications/rpmfusion-avidemux-qt.desktop
 
 %files help
@@ -355,8 +365,14 @@ fi
 %files devel
 %{_includedir}/avidemux/
 
+%files i18n
+%{_datadir}/avidemux6/i18n/
+
 
 %changelog
+* Sun Jun 16 2013 Richard Shaw <hobbes1069@gmail.com> - 2.6.4-3
+- Move translations to their own subpackage to make use optional, fixes BZ#2825.
+
 * Mon Jun  3 2013 Richard Shaw <hobbes1069@gmail.com> - 2.6.4-2
 - Fix packaging of translations (qt package only).
 
