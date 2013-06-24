@@ -2,7 +2,7 @@
 
 Name:           avidemux
 Version:        2.6.4
-Release:        3.1%{?dist}
+Release:        4%{?dist}
 Summary:        Graphical video editing and transcoding tool
 
 License:        GPLv2+
@@ -123,8 +123,8 @@ This package contains the Qt graphical interface for %{name}.
 
 %package help
 Summary:        Help files for %{name}
-Requires:       %{name}%{?_isa} = %{version}-%{release}
-Requires:       %{name}-gui     = %{version}-%{release}
+Requires:       %{name}     = %{version}-%{release}
+Requires:       %{name}-gui = %{version}-%{release}
 BuildArch:      noarch
 
 %description help
@@ -370,6 +370,9 @@ fi
 
 
 %changelog
+* Mon Jun 24 2013 Richard Shaw <hobbes1069@gmail.com> - 2.6.4-4
+- Can't have arch requirement on noarch package, fixes BZ#2840.
+
 * Sun Jun 16 2013 Richard Shaw <hobbes1069@gmail.com> - 2.6.4-3.1
 - Move translations to their own subpackage to make use optional, fixes BZ#2825.
 
