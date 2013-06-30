@@ -2,7 +2,7 @@
 
 Name:           avidemux
 Version:        2.6.4
-Release:        4%{?dist}
+Release:        5%{?dist}
 Summary:        Graphical video editing and transcoding tool
 
 License:        GPLv2+
@@ -140,8 +140,8 @@ This package contains files required to develop with or extend %{name}.
 
 %package i18n
 Summary:        Translations for %{name}
-Requires:       %{name}%{?_isa} = %{version}-%{release}
-Requires:       %{name}-qt      = %{version}-%{release}
+Requires:       %{name}    = %{version}-%{release}
+Requires:       %{name}-qt = %{version}-%{release}
 BuildArch:      noarch
 
 %description i18n
@@ -370,7 +370,7 @@ fi
 
 
 %changelog
-* Mon Jun 24 2013 Richard Shaw <hobbes1069@gmail.com> - 2.6.4-4
+* Mon Jun 24 2013 Richard Shaw <hobbes1069@gmail.com> - 2.6.4-5
 - Can't have arch requirement on noarch package, fixes BZ#2840.
 
 * Sun Jun 16 2013 Richard Shaw <hobbes1069@gmail.com> - 2.6.4-3.1
