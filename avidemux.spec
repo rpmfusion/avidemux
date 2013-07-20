@@ -2,7 +2,7 @@
 
 Name:           avidemux
 Version:        2.6.4
-Release:        5%{?dist}
+Release:        6%{?dist}
 Summary:        Graphical video editing and transcoding tool
 
 License:        GPLv2+
@@ -370,6 +370,9 @@ fi
 
 
 %changelog
+* Sat Jul 20 2013 Nicolas Chauvet <kwizart@gmail.com> - 2.6.4-6
+- Rebuilt for x264
+
 * Mon Jun 24 2013 Richard Shaw <hobbes1069@gmail.com> - 2.6.4-5
 - Can't have arch requirement on noarch package, fixes BZ#2840.
 
