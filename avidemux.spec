@@ -2,7 +2,7 @@
 
 Name:           avidemux
 Version:        2.6.4
-Release:        6%{?dist}
+Release:        7%{?dist}
 Summary:        Graphical video editing and transcoding tool
 
 License:        GPLv2+
@@ -370,6 +370,9 @@ fi
 
 
 %changelog
+* Tue Oct 22 2013 Nicolas Chauvet <kwizart@gmail.com> - 2.6.4-7
+- Rebuilt for x264
+
 * Sat Jul 20 2013 Nicolas Chauvet <kwizart@gmail.com> - 2.6.4-6
 - Rebuilt for x264
 
