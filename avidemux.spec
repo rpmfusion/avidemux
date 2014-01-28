@@ -15,6 +15,7 @@ Source2:        avidemux-gtk.desktop
 Patch1:         avidemux-2.6-bundled_libs.patch
 Patch2:         avidemux3-libass.patch
 Patch3:         avidemux3-bundled_libs.patch
+Patch4:         avidemux-2.6.7-libva.patch
 
 # Don't try to build on arm
 ExcludeArch: %{arm}
@@ -92,6 +93,7 @@ This package provides a command-line interface to editing videos with %{name}.
 Summary:        Libraries for %{name}
 Group:          System Environment/Libraries
 #Requires:       %{name}%{?_isa} = %{version}-%{release}
+Obsoletes:      avidemux-devel < 2.6.4-9
 
 %description libs
 This package contains the runtime libraries for %{name}.
@@ -145,6 +147,7 @@ This package contains translation files for %{name}.
 %patch1 -p1 -b .bund_libs
 %patch2 -p1 -b .libass
 %patch3 -p1 -b .bund_libs2
+%patch4 -p1 -b .libva
 
 # Remove sources of bundled libraries.
 rm -rf avidemux_plugins/ADM_audioDecoders/ADM_ad_ac3/ADM_liba52 \
@@ -364,7 +367,7 @@ fi
 %changelog
 * Mon Jan 27 2014 Richard Shaw <hobbes1069@gmail.com> - 2.6.7-1
 - Update to latest upstream release.
-- Drop unneeded devel subpackage.
+- Obsolete unneeded devel subpackage.
 
 * Tue Nov 05 2013 Nicolas Chauvet <kwizart@gmail.com> - 2.6.4-8
 - Rebuilt for x264/FFmpeg
