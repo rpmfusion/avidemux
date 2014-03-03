@@ -15,7 +15,6 @@ Source2:        avidemux-gtk.desktop
 Patch1:         avidemux-2.6-bundled_libs.patch
 Patch2:         avidemux3-libass.patch
 Patch3:         avidemux3-bundled_libs.patch
-Patch4:         avidemux-2.6.7-libva.patch
 
 # Don't try to build on arm
 ExcludeArch: %{arm}
@@ -147,7 +146,6 @@ This package contains translation files for %{name}.
 %patch1 -p1 -b .bund_libs
 %patch2 -p1 -b .libass
 %patch3 -p1 -b .bund_libs2
-%patch4 -p1 -b .libva
 
 # Remove sources of bundled libraries.
 rm -rf avidemux_plugins/ADM_audioDecoders/ADM_ad_ac3/ADM_liba52 \
@@ -158,7 +156,7 @@ rm -rf avidemux_plugins/ADM_audioDecoders/ADM_ad_ac3/ADM_liba52 \
 
 %build
 # Build avidemux_core
-LDFLAGS="-Wl,--as-needed";export LDFLAGS
+LDFLAGS="-lm -Wl,--as-needed";export LDFLAGS
 rm -rf build_core && mkdir build_core && pushd build_core
 %cmake -DCMAKE_BUILD_TYPE=RelWithDebInfo \
        ../avidemux_core
