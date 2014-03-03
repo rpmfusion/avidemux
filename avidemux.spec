@@ -156,7 +156,7 @@ rm -rf avidemux_plugins/ADM_audioDecoders/ADM_ad_ac3/ADM_liba52 \
 
 %build
 # Build avidemux_core
-LDFLAGS="-lm -Wl,--as-needed";export LDFLAGS
+LDFLAGS="-lc -Wl,--as-needed";export LDFLAGS
 rm -rf build_core && mkdir build_core && pushd build_core
 %cmake -DCMAKE_BUILD_TYPE=RelWithDebInfo \
        ../avidemux_core
