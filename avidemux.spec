@@ -1,8 +1,8 @@
 %global _pkgbuilddir %{_builddir}/%{name}_%{version}
 
 Name:           avidemux
-Version:        2.6.4
-Release:        8%{?dist}
+Version:        2.6.7
+Release:        1%{?dist}
 Summary:        Graphical video editing and transcoding tool
 
 License:        GPLv2+
@@ -15,7 +15,6 @@ Source2:        avidemux-gtk.desktop
 Patch1:         avidemux-2.6-bundled_libs.patch
 Patch2:         avidemux3-libass.patch
 Patch3:         avidemux3-bundled_libs.patch
-Patch4:         avidemux-2.6.4-gtk_fix.patch
 
 # Don't try to build on arm
 ExcludeArch: %{arm}
@@ -68,7 +67,8 @@ BuildRequires:  x264-devel
 BuildRequires:  ffmpeg-devel
 
 # Main package is a metapackage, bring in something useful.
-Requires:       avidemux-gui = %{version}-%{release}
+Requires:       %{name}-gui = %{version}-%{release}
+Requires:       %{name}-help = %{version}-%{release}
 
 
 %description
@@ -92,6 +92,7 @@ This package provides a command-line interface to editing videos with %{name}.
 Summary:        Libraries for %{name}
 Group:          System Environment/Libraries
 #Requires:       %{name}%{?_isa} = %{version}-%{release}
+Obsoletes:      avidemux-devel < 2.6.4-9
 
 %description libs
 This package contains the runtime libraries for %{name}.
@@ -103,7 +104,6 @@ BuildRequires:  gtk3-devel
 BuildRequires:  cairo-devel
 Provides:       %{name}-gui = %{version}-%{release}
 Requires:       %{name}-libs%{?_isa} = %{version}-%{release}
-Requires:       %{name}-help = %{version}-%{release}
 
 %description gtk
 This package provides the GTK graphical interface for %{name}.
@@ -116,7 +116,6 @@ Group:          Applications/Multimedia
 BuildRequires:  qt4-devel >= 4.5.0-9
 Provides:       %{name}-gui = %{version}-%{release}
 Requires:       %{name}-libs%{?_isa} = %{version}-%{release}
-Requires:       %{name}-help = %{version}-%{release}
 
 %description qt
 This package contains the Qt graphical interface for %{name}.
@@ -130,13 +129,6 @@ BuildArch:      noarch
 %description help
 This package contains the help files for %{name}.
 
-%package devel
-Summary:        Development files for %{name}
-Group:          Development/Libraries
-Requires:       %{name}-libs%{?_isa} = %{version}-%{release}
-
-%description devel
-This package contains files required to develop with or extend %{name}.
 
 %package i18n
 Summary:        Translations for %{name}
@@ -154,7 +146,6 @@ This package contains translation files for %{name}.
 %patch1 -p1 -b .bund_libs
 %patch2 -p1 -b .libass
 %patch3 -p1 -b .bund_libs2
-%patch4 -p1 -b .gtk_fix
 
 # Remove sources of bundled libraries.
 rm -rf avidemux_plugins/ADM_audioDecoders/ADM_ad_ac3/ADM_liba52 \
@@ -165,7 +156,7 @@ rm -rf avidemux_plugins/ADM_audioDecoders/ADM_ad_ac3/ADM_liba52 \
 
 %build
 # Build avidemux_core
-LDFLAGS="-Wl,--as-needed";export LDFLAGS
+LDFLAGS="-lc -Wl,--as-needed";export LDFLAGS
 rm -rf build_core && mkdir build_core && pushd build_core
 %cmake -DCMAKE_BUILD_TYPE=RelWithDebInfo \
        ../avidemux_core
@@ -275,6 +266,9 @@ make -C build_plugins_cli install DESTDIR=%{buildroot}
 make -C build_plugins_qt4 install DESTDIR=%{buildroot}
 make -C build_plugins_gtk install DESTDIR=%{buildroot}
 
+# Remove useless devel files
+rm -rf %{buildroot}%{_includedir}/%{name}
+
 # FFMpeg libraries are not being installed as executable.
 chmod +x %{buildroot}%{_libdir}/libADM6*.so.*
 
@@ -306,7 +300,6 @@ install -pDm 0644 avidemux_icon.png \
 /bin/touch --no-create %{_datadir}/icons/hicolor &>/dev/null || :
 /usr/bin/update-desktop-database &> /dev/null || :
 
-
 %postun gtk
 if [ $1 -eq 0 ] ; then
     /bin/touch --no-create %{_datadir}/icons/hicolor &>/dev/null
@@ -330,13 +323,13 @@ fi
 
 %files
 %doc AUTHORS COPYING README
-%dir %{_datadir}/avidemux6
 
 %files libs -f build_plugins_common/install_manifest.txt
+%dir %{_datadir}/avidemux6
 %{_datadir}/icons/hicolor/*/apps/avidemux.png
 %{_libdir}/libADM*
 %exclude %{_libdir}/libADM_render*
-%exclude %{_datadir}/avidemux6
+%exclude %{_libdir}/libADM_UI*
 # Catch the stuff missed using install_manifest.txt
 %{_libdir}/ADM_plugins6/autoScripts/*.pyc
 %{_libdir}/ADM_plugins6/autoScripts/*.pyo
@@ -345,10 +338,12 @@ fi
 
 %files cli -f build_plugins_cli/install_manifest.txt
 %{_bindir}/avidemux3_cli
+%{_libdir}/libADM_UI_Cli*.so
 %{_libdir}/libADM_render6_cli.so
 
 %files gtk -f build_plugins_gtk/install_manifest.txt
 %{_bindir}/avidemux3_gtk
+%{_libdir}/libADM_UIGtk*.so
 %{_libdir}/libADM_render6_gtk.so
 %{_libdir}/ADM_glade/
 %{_datadir}/applications/rpmfusion-avidemux-gtk.desktop
@@ -356,20 +351,22 @@ fi
 %files qt -f build_plugins_qt4/install_manifest.txt
 %{_bindir}/avidemux3_qt4
 %{_bindir}/avidemux3_jobs
+%{_libdir}/libADM_UIQT*.so
 %{_libdir}/libADM_render6_qt4.so
 %{_datadir}/applications/rpmfusion-avidemux-qt.desktop
 
 %files help
 %{_datadir}/avidemux6/help/
 
-%files devel
-%{_includedir}/avidemux/
-
 %files i18n
 %{_datadir}/avidemux6/i18n/
 
 
 %changelog
+* Mon Jan 27 2014 Richard Shaw <hobbes1069@gmail.com> - 2.6.7-1
+- Update to latest upstream release.
+- Obsolete unneeded devel subpackage.
+
 * Tue Nov 05 2013 Nicolas Chauvet <kwizart@gmail.com> - 2.6.4-8
 - Rebuilt for x264/FFmpeg
 
@@ -382,7 +379,7 @@ fi
 * Mon Jun 24 2013 Richard Shaw <hobbes1069@gmail.com> - 2.6.4-5
 - Can't have arch requirement on noarch package, fixes BZ#2840.
 
-* Sun Jun 16 2013 Richard Shaw <hobbes1069@gmail.com> - 2.6.4-3.1
+* Sun Jun 16 2013 Richard Shaw <hobbes1069@gmail.com> - 2.6.4-3
 - Move translations to their own subpackage to make use optional, fixes BZ#2825.
 
 * Mon Jun  3 2013 Richard Shaw <hobbes1069@gmail.com> - 2.6.4-2
