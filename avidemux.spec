@@ -1,7 +1,7 @@
 %global _pkgbuilddir %{_builddir}/%{name}_%{version}
 
 Name:           avidemux
-Version:        2.6.7
+Version:        2.6.8
 Release:        1%{?dist}
 Summary:        Graphical video editing and transcoding tool
 
@@ -11,9 +11,10 @@ Source0:        http://downloads.sourceforge.net/%{name}/%{name}_%{version}.tar.
 Source1:        avidemux-qt.desktop
 Source2:        avidemux-gtk.desktop
 
-Patch0:         avidemux-2.6-bundled_libs.patch
-Patch1:         avidemux3-libass.patch
-Patch2:         avidemux3-bundled_libs.patch
+#Patch0:         avidemux-2.5.6-ffmpeg_parallel_build.patch
+Patch1:         avidemux-2.6-bundled_libs.patch
+Patch2:         avidemux3-libass.patch
+Patch3:         avidemux3-bundled_libs.patch
 
 # Don't try to build on arm
 ExcludeArch: %{arm}
@@ -141,9 +142,10 @@ This package contains translation files for %{name}.
 
 %prep
 %setup -q -n %{name}_%{version}
-%patch0 -p1 -b .bund_libs
-%patch1 -p1 -b .libass
-%patch2 -p1 -b .bund_libs2
+#patch0 -p1 -b .ffmpeg_build
+%patch1 -p1 -b .bund_libs
+%patch2 -p1 -b .libass
+%patch3 -p1 -b .bund_libs2
 
 # Remove sources of bundled libraries.
 rm -rf avidemux_plugins/ADM_audioDecoders/ADM_ad_ac3/ADM_liba52 \
@@ -361,6 +363,18 @@ fi
 
 
 %changelog
+* Sun May 11 2014 Richard Shaw <hobbes1069@gmail.com> - 2.6.8-1
+- Update to latest upstream release.
+
+* Sat Mar 22 2014 Sérgio Basto <sergio@serjux.com> - 2.6.7-4
+- Rebuilt for x264
+
+* Thu Mar 06 2014 Nicolas Chauvet <kwizart@gmail.com> - 2.6.7-3
+- Rebuilt for x264
+
+* Thu Mar 06 2014 Nicolas Chauvet <kwizart@gmail.com> - 2.6.7-2
+- Rebuilt
+
 * Mon Jan 27 2014 Richard Shaw <hobbes1069@gmail.com> - 2.6.7-1
 - Update to latest upstream release.
 - Obsolete unneeded devel subpackage.

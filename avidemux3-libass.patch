@@ -1,5 +1,6 @@
---- avidemux3/avidemux_plugins/ADM_videoFilters6/ass/CMakeLists.txt.bund_libs	2012-06-17 21:01:09.000000000 -0500
-+++ avidemux3/avidemux_plugins/ADM_videoFilters6/ass/CMakeLists.txt	2012-06-18 14:52:06.836495759 -0500
+diff -Naur avidemux_2.6.8.orig/avidemux_plugins/ADM_videoFilters6/ass/CMakeLists.txt avidemux_2.6.8/avidemux_plugins/ADM_videoFilters6/ass/CMakeLists.txt
+--- avidemux_2.6.8.orig/avidemux_plugins/ADM_videoFilters6/ass/CMakeLists.txt	2014-03-12 01:15:23.000000000 -0500
++++ avidemux_2.6.8/avidemux_plugins/ADM_videoFilters6/ass/CMakeLists.txt	2014-03-14 08:07:05.851887562 -0500
 @@ -4,7 +4,6 @@
  checkFridibi("0.19")
  
@@ -8,18 +9,19 @@
  
  	INCLUDE(vf_plugin)
  	SET(ADM_vf_ssa_SRCS ADM_vidASS.cpp)
-@@ -12,7 +11,14 @@
+@@ -12,7 +11,15 @@
  	ADD_VIDEO_FILTER(ADM_vf_ssa ${ADM_vf_ssa_SRCS})
  
  	IF(DO_COMMON)
--		TARGET_LINK_LIBRARIES(ADM_vf_ssa ADM_libass ${FREETYPE2_LDFLAGS} ${FRIDIBI_LDFLAGS})
+-		TARGET_LINK_LIBRARIES(ADM_vf_ssa ADM_libass ${FREETYPE2_LDFLAGS} ${FRIDIBI_LDFLAGS} ADM_coreSubtitle)
++#		TARGET_LINK_LIBRARIES(ADM_vf_ssa ADM_libass ${FREETYPE2_LDFLAGS} ${FRIDIBI_LDFLAGS} ADM_coreSubtitle)
 +               IF(USE_EXTERNAL_LIBASS)
 +                       TARGET_LINK_LIBRARIES(ADM_vf_ssa ${LIBASS_LIBRARIES}
-+                               ${FREETYPE2_LDFLAGS})
++                               ${FREETYPE2_LDFLAGS} ADM_coreSubtitle)
 +               ELSE(USE_EXTERNAL_LIBASS)
 +                       ADD_SUBDIRECTORY(ADM_libass)
 +                       TARGET_LINK_LIBRARIES(ADM_vf_ssa ADM_libass
-+                               ${FREETYPE2_LDFLAGS})
++                               ${FREETYPE2_LDFLAGS} ADM_coreSubtitle)
 +               ENDIF(USE_EXTERNAL_LIBASS)
                  # We force the use of fontconfig
                  ADD_DEFINITIONS("-DUSE_FONTCONFIG")
