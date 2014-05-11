@@ -1,8 +1,8 @@
 %global _pkgbuilddir %{_builddir}/%{name}_%{version}
 
 Name:           avidemux
-Version:        2.6.7
-Release:        4%{?dist}
+Version:        2.6.8
+Release:        1%{?dist}
 Summary:        Graphical video editing and transcoding tool
 
 License:        GPLv2+
@@ -363,6 +363,9 @@ fi
 
 
 %changelog
+* Sun May 11 2014 Richard Shaw <hobbes1069@gmail.com> - 2.6.8-1
+- Update to latest upstream release.
+
 * Sat Mar 22 2014 Sérgio Basto <sergio@serjux.com> - 2.6.7-4
 - Rebuilt for x264
 
