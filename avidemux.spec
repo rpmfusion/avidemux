@@ -2,7 +2,7 @@
 
 Name:           avidemux
 Version:        2.6.8
-Release:        1%{?dist}
+Release:        2%{?dist}
 Summary:        Graphical video editing and transcoding tool
 
 License:        GPLv2+
@@ -363,6 +363,9 @@ fi
 
 
 %changelog
+* Mon Sep 01 2014 Sérgio Basto <sergio@serjux.com> - 2.6.8-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_21_22_Mass_Rebuild
+
 * Sun May 11 2014 Richard Shaw <hobbes1069@gmail.com> - 2.6.8-1
 - Update to latest upstream release.
 
