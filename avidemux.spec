@@ -2,7 +2,7 @@
 
 Name:           avidemux
 Version:        2.6.8
-Release:        2%{?dist}
+Release:        3%{?dist}
 Summary:        Graphical video editing and transcoding tool
 
 License:        GPLv2+
@@ -331,6 +331,7 @@ fi
 %exclude %{_libdir}/libADM_render*
 %exclude %{_libdir}/libADM_UI*
 # Catch the stuff missed using install_manifest.txt
+%dir %{_libdir}/ADM_plugins6
 %{_libdir}/ADM_plugins6/autoScripts/*.pyc
 %{_libdir}/ADM_plugins6/autoScripts/*.pyo
 %{_libdir}/ADM_plugins6/autoScripts/lib/*.pyc
@@ -363,6 +364,9 @@ fi
 
 
 %changelog
+* Wed Jan 21 2015 Richard Shaw <hobbes1069@gmail.com> - 2.6.8-3
+- Fix directory ownership.
+
 * Mon Sep 01 2014 Sérgio Basto <sergio@serjux.com> - 2.6.8-2
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_21_22_Mass_Rebuild
 
