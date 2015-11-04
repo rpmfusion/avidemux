@@ -1,8 +1,8 @@
 %global _pkgbuilddir %{_builddir}/%{name}_%{version}
 
 Name:           avidemux
-Version:        2.6.8
-Release:        3%{?dist}
+Version:        2.6.10
+Release:        1%{?dist}
 Summary:        Graphical video editing and transcoding tool
 
 License:        GPLv2+
@@ -11,10 +11,7 @@ Source0:        http://downloads.sourceforge.net/%{name}/%{name}_%{version}.tar.
 Source1:        avidemux-qt.desktop
 Source2:        avidemux-gtk.desktop
 
-#Patch0:         avidemux-2.5.6-ffmpeg_parallel_build.patch
-Patch1:         avidemux-2.6-bundled_libs.patch
-Patch2:         avidemux3-libass.patch
-Patch3:         avidemux3-bundled_libs.patch
+Patch1:         avidemux-2.6.10-bundled_libs.patch
 
 # Don't try to build on arm
 ExcludeArch: %{arm}
@@ -64,6 +61,7 @@ BuildRequires:  twolame-devel
 # Video Codecs
 BuildRequires:  xvidcore-devel >= 1.0.2
 BuildRequires:  x264-devel
+BuildRequires:  x265-devel
 BuildRequires:  ffmpeg-devel
 
 # Main package is a metapackage, bring in something useful.
@@ -77,12 +75,12 @@ encoding tasks. It supports many file types, including AVI, DVD compatible
 MPEG files, MP4 and ASF, using a variety of codecs. Tasks can be automated
 using projects, job queue and powerful scripting capabilities.
 
-This is a meta package that brings in all interfaces: GTK, QT, and CLI.
+This is a meta package that brings in all interfaces: QT and CLI.
+#This is a meta package that brings in all interfaces: GTK, QT, and CLI.
 
 
 %package cli
 Summary:        CLI for %{name}
-Group:          Applications/Multimedia
 Requires:       %{name}-libs%{?_isa} = %{version}-%{release}
 
 %description cli
@@ -90,32 +88,27 @@ This package provides a command-line interface to editing videos with %{name}.
 
 %package libs
 Summary:        Libraries for %{name}
-Group:          System Environment/Libraries
-#Requires:       %{name}%{?_isa} = %{version}-%{release}
-Obsoletes:      avidemux-devel < 2.6.4-9
 
 %description libs
 This package contains the runtime libraries for %{name}.
 
-%package gtk
-Summary:        GTK interface for %{name}
-Group:          Applications/Multimedia
-BuildRequires:  gtk3-devel
-BuildRequires:  cairo-devel
-Provides:       %{name}-gui = %{version}-%{release}
-Requires:       %{name}-libs%{?_isa} = %{version}-%{release}
+#%package gtk
+#Summary:        GTK interface for %{name}
+#BuildRequires:  gtk3-devel
+#BuildRequires:  cairo-devel
+#Provides:       %{name}-gui = %{version}-%{release}
+#Requires:       %{name}-libs%{?_isa} = %{version}-%{release}
 
-%description gtk
-This package provides the GTK graphical interface for %{name}.
+#%description gtk
+#This package provides the GTK graphical interface for %{name}.
 
 %package qt
 Summary:        Qt interface for %{name}
-Group:          Applications/Multimedia
-# 4.5.0-9 fixes a failure when there are duplicate translated strings
-# https://bugzilla.redhat.com/show_bug.cgi?id=491514
-BuildRequires:  qt4-devel >= 4.5.0-9
+#BuildRequires:  qt4-devel >= 4.5.0-9
+BuildRequires:  qt5-qtbase-devel qt5-qttools-devel libxslt
 Provides:       %{name}-gui = %{version}-%{release}
 Requires:       %{name}-libs%{?_isa} = %{version}-%{release}
+Obsoletes:      %{name}-gtk < 2.6.10
 
 %description qt
 This package contains the Qt graphical interface for %{name}.
@@ -142,10 +135,7 @@ This package contains translation files for %{name}.
 
 %prep
 %setup -q -n %{name}_%{version}
-#patch0 -p1 -b .ffmpeg_build
 %patch1 -p1 -b .bund_libs
-%patch2 -p1 -b .libass
-%patch3 -p1 -b .bund_libs2
 
 # Remove sources of bundled libraries.
 rm -rf avidemux_plugins/ADM_audioDecoders/ADM_ad_ac3/ADM_liba52 \
@@ -156,12 +146,11 @@ rm -rf avidemux_plugins/ADM_audioDecoders/ADM_ad_ac3/ADM_liba52 \
 
 %build
 # Build avidemux_core
-LDFLAGS="-lc -Wl,--as-needed";export LDFLAGS
+export LDFLAGS="-lc -Wl,--as-needed"
 rm -rf build_core && mkdir build_core && pushd build_core
 %cmake -DCMAKE_BUILD_TYPE=RelWithDebInfo \
        ../avidemux_core
 make 
-#%{?_smp_mflags}
 
 # We have to do a fake install so header files are avaialble for the other
 # packages.
@@ -181,25 +170,27 @@ popd
 rm -rf build_qt4 && mkdir build_qt4 && pushd build_qt4
 %cmake -DCMAKE_BUILD_TYPE=RelWithDebInfo \
        -DFAKEROOT=%{_pkgbuilddir}/fakeRoot \
+       -DENABLE_QT5=TRUE \
        ../avidemux/qt4
 make %{?_smp_mflags}
 make install DESTDIR=%{_pkgbuilddir}/fakeRoot
 popd
 
 # Build GTK gui
-rm -rf build_gtk && mkdir build_gtk && pushd build_gtk
-%cmake -DCMAKE_BUILD_TYPE=RelWithDebInfo \
-       -DFAKEROOT=%{_pkgbuilddir}/fakeRoot \
-       ../avidemux/gtk
-make %{?_smp_mflags}
-make install DESTDIR=%{_pkgbuilddir}/fakeRoot
-popd
+#rm -rf build_gtk && mkdir build_gtk && pushd build_gtk
+#cmake -DCMAKE_BUILD_TYPE=RelWithDebInfo \
+#       -DFAKEROOT=%{_pkgbuilddir}/fakeRoot \
+#       ../avidemux/gtk
+#make %{?_smp_mflags}
+#make install DESTDIR=%{_pkgbuilddir}/fakeRoot
+#popd
 
 # Build avidemux_plugins_common
 rm -rf build_plugins_common && mkdir build_plugins_common && pushd build_plugins_common
 %cmake -DCMAKE_BUILD_TYPE=RelWithDebInfo \
        -DFAKEROOT=%{_pkgbuilddir}/fakeRoot \
        -DAVIDEMUX_SOURCE_DIR=%{_builddir}/%{name}_%{version} \
+       -DENABLE_QT5=TRUE \
        -DPLUGIN_UI=COMMON \
        -DUSE_EXTERNAL_LIBASS=TRUE \
        -DUSE_EXTERNAL_LIBMAD=TRUE \
@@ -215,6 +206,7 @@ rm -rf build_plugins_cli && mkdir build_plugins_cli && pushd build_plugins_cli
 %cmake -DCMAKE_BUILD_TYPE=RelWithDebInfo \
        -DFAKEROOT=%{_pkgbuilddir}/fakeRoot \
        -DAVIDEMUX_SOURCE_DIR=%{_builddir}/%{name}_%{version} \
+       -DENABLE_QT5=TRUE \
        -DPLUGIN_UI=CLI \
        -DUSE_EXTERNAL_LIBASS=TRUE \
        -DUSE_EXTERNAL_LIBMAD=TRUE \
@@ -230,6 +222,7 @@ rm -rf build_plugins_qt4 && mkdir build_plugins_qt4 && pushd build_plugins_qt4
 %cmake -DCMAKE_BUILD_TYPE=RelWithDebInfo \
        -DFAKEROOT=%{_pkgbuilddir}/fakeRoot \
        -DAVIDEMUX_SOURCE_DIR=%{_builddir}/%{name}_%{version} \
+       -DENABLE_QT5=TRUE \
        -DPLUGIN_UI=QT4 \
        -DUSE_EXTERNAL_LIBASS=TRUE \
        -DUSE_EXTERNAL_LIBMAD=TRUE \
@@ -241,30 +234,30 @@ make install DESTDIR=%{_pkgbuilddir}/fakeRoot
 popd
 
 # Build avidemux_plugins_gtk
-rm -rf build_plugins_gtk && mkdir build_plugins_gtk && pushd build_plugins_gtk
-%cmake -DCMAKE_BUILD_TYPE=RelWithDebInfo \
-       -DFAKEROOT=%{_pkgbuilddir}/fakeRoot \
-       -DAVIDEMUX_SOURCE_DIR=%{_builddir}/%{name}_%{version} \
-       -DPLUGIN_UI=GTK \
-       -DUSE_EXTERNAL_LIBASS=TRUE \
-       -DUSE_EXTERNAL_LIBMAD=TRUE \
-       -DUSE_EXTERNAL_LIBA52=TRUE \
-       -DUSE_EXTERNAL_TWOLAME=TRUE \
-       ../avidemux_plugins
-make %{?_smp_mflags}
-make install DESTDIR=%{_pkgbuilddir}/fakeRoot
-popd
+#rm -rf build_plugins_gtk && mkdir build_plugins_gtk && pushd build_plugins_gtk
+#cmake -DCMAKE_BUILD_TYPE=RelWithDebInfo \
+#       -DFAKEROOT=%{_pkgbuilddir}/fakeRoot \
+#       -DAVIDEMUX_SOURCE_DIR=%{_builddir}/%{name}_%{version} \
+#       -DPLUGIN_UI=GTK \
+#       -DUSE_EXTERNAL_LIBASS=TRUE \
+#       -DUSE_EXTERNAL_LIBMAD=TRUE \
+#       -DUSE_EXTERNAL_LIBA52=TRUE \
+#       -DUSE_EXTERNAL_TWOLAME=TRUE \
+#       ../avidemux_plugins
+#make %{?_smp_mflags}
+#make install DESTDIR=%{_pkgbuilddir}/fakeRoot
+#popd
 
 
 %install
 make -C build_core install DESTDIR=%{buildroot}
 make -C build_cli install DESTDIR=%{buildroot}
 make -C build_qt4 install DESTDIR=%{buildroot}
-make -C build_gtk install DESTDIR=%{buildroot}
+#make -C build_gtk install DESTDIR=%{buildroot}
 make -C build_plugins_common install DESTDIR=%{buildroot}
 make -C build_plugins_cli install DESTDIR=%{buildroot}
 make -C build_plugins_qt4 install DESTDIR=%{buildroot}
-make -C build_plugins_gtk install DESTDIR=%{buildroot}
+#make -C build_plugins_gtk install DESTDIR=%{buildroot}
 
 # Remove useless devel files
 rm -rf %{buildroot}%{_includedir}/%{name}
@@ -277,9 +270,9 @@ desktop-file-install --vendor rpmfusion \
     --dir %{buildroot}%{_datadir}/applications \
     %{SOURCE1}
 
-desktop-file-install --vendor rpmfusion \
-    --dir %{buildroot}%{_datadir}/applications \
-    %{SOURCE2}
+#desktop-file-install --vendor rpmfusion \
+#    --dir %{buildroot}%{_datadir}/applications \
+#    %{SOURCE2}
 
 # Install icons
 install -pDm 0644 avidemux/gtk/ADM_userInterfaces/glade/main/avidemux_icon_small.png \
@@ -292,20 +285,20 @@ install -pDm 0644 avidemux_icon.png \
 
 %postun libs -p /sbin/ldconfig
 
-%post gtk
-/bin/touch --no-create %{_datadir}/icons/hicolor &>/dev/null || :
-/usr/bin/update-desktop-database &> /dev/null || :
+#%post gtk
+#/bin/touch --no-create %{_datadir}/icons/hicolor &>/dev/null || :
+#/usr/bin/update-desktop-database &> /dev/null || :
 
 %post qt
 /bin/touch --no-create %{_datadir}/icons/hicolor &>/dev/null || :
 /usr/bin/update-desktop-database &> /dev/null || :
 
-%postun gtk
-if [ $1 -eq 0 ] ; then
-    /bin/touch --no-create %{_datadir}/icons/hicolor &>/dev/null
-    /usr/bin/gtk-update-icon-cache %{_datadir}/icons/hicolor &>/dev/null || :
-fi
-/usr/bin/update-desktop-database &> /dev/null || :
+#%postun gtk
+#if [ $1 -eq 0 ] ; then
+#    /bin/touch --no-create %{_datadir}/icons/hicolor &>/dev/null
+#    /usr/bin/gtk-update-icon-cache %{_datadir}/icons/hicolor &>/dev/null || :
+#fi
+#/usr/bin/update-desktop-database &> /dev/null || :
 
 %postun qt
 if [ $1 -eq 0 ] ; then
@@ -314,8 +307,8 @@ if [ $1 -eq 0 ] ; then
 fi
 /usr/bin/update-desktop-database &> /dev/null || :
 
-%posttrans gtk
-/usr/bin/gtk-update-icon-cache %{_datadir}/icons/hicolor &>/dev/null || :
+#%posttrans gtk
+#/usr/bin/gtk-update-icon-cache %{_datadir}/icons/hicolor &>/dev/null || :
 
 %posttrans qt
 /usr/bin/gtk-update-icon-cache %{_datadir}/icons/hicolor &>/dev/null || :
@@ -342,28 +335,32 @@ fi
 %{_libdir}/libADM_UI_Cli*.so
 %{_libdir}/libADM_render6_cli.so
 
-%files gtk -f build_plugins_gtk/install_manifest.txt
-%{_bindir}/avidemux3_gtk
-%{_libdir}/libADM_UIGtk*.so
-%{_libdir}/libADM_render6_gtk.so
-%{_libdir}/ADM_glade/
-%{_datadir}/applications/rpmfusion-avidemux-gtk.desktop
+#%files gtk -f build_plugins_gtk/install_manifest.txt
+#%{_bindir}/avidemux3_gtk
+#%{_libdir}/libADM_UIGtk*.so
+#%{_libdir}/libADM_render6_gtk.so
+#%{_libdir}/ADM_glade/
+#%{_datadir}/applications/rpmfusion-avidemux-gtk.desktop
 
 %files qt -f build_plugins_qt4/install_manifest.txt
-%{_bindir}/avidemux3_qt4
-%{_bindir}/avidemux3_jobs
+%{_bindir}/avidemux3_qt5
+%{_bindir}/avidemux3_jobs_qt5
 %{_libdir}/libADM_UIQT*.so
-%{_libdir}/libADM_render6_qt4.so
+#%{_libdir}/libADM_render6_qt4.so
 %{_datadir}/applications/rpmfusion-avidemux-qt.desktop
 
 %files help
 %{_datadir}/avidemux6/help/
 
 %files i18n
-%{_datadir}/avidemux6/i18n/
+%{_datadir}/avidemux6/qt5/i18n/
 
 
 %changelog
+* Tue Jun 16 2015 Richard Shaw <hobbes1069@gmail.com> - 2.6.10-1
+- Update to latest upstream release.
+- Disable GTK interface as it is unmaintained and does not build.
+
 * Wed Jan 21 2015 Richard Shaw <hobbes1069@gmail.com> - 2.6.8-3
 - Fix directory ownership.
 
