@@ -9,9 +9,10 @@ License:        GPLv2+
 URL:            http://www.avidemux.org
 Source0:        http://downloads.sourceforge.net/%{name}/%{name}_%{version}.tar.gz
 Source1:        avidemux-qt.desktop
-Source2:        avidemux-gtk.desktop
+#Source2:        avidemux-gtk.desktop
 
-Patch1:         avidemux-2.6.10-bundled_libs.patch
+Patch0:         avidemux-2.6.10-bundled_libs.patch
+Patch1:         avidemux-2.6.10-qt5_lrelease.patch
 
 # Don't try to build on arm
 ExcludeArch: %{arm}
@@ -105,7 +106,8 @@ This package contains the runtime libraries for %{name}.
 %package qt
 Summary:        Qt interface for %{name}
 #BuildRequires:  qt4-devel >= 4.5.0-9
-BuildRequires:  qt5-qtbase-devel qt5-qttools-devel libxslt
+BuildRequires:  qt5-qtbase-devel qt5-qttools-devel qt5-qtscript-devel
+BuildRequires:  libxslt
 Provides:       %{name}-gui = %{version}-%{release}
 Requires:       %{name}-libs%{?_isa} = %{version}-%{release}
 Obsoletes:      %{name}-gtk < 2.6.10
@@ -135,6 +137,7 @@ This package contains translation files for %{name}.
 
 %prep
 %setup -q -n %{name}_%{version}
+%patch0 -p1
 %patch1 -p1 -b .bund_libs
 
 # Remove sources of bundled libraries.
