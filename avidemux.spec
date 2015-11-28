@@ -2,7 +2,7 @@
 
 Name:           avidemux
 Version:        2.6.10
-Release:        1%{?dist}
+Release:        3%{?dist}
 Summary:        Graphical video editing and transcoding tool
 
 License:        GPLv2+
@@ -105,8 +105,8 @@ This package contains the runtime libraries for %{name}.
 
 %package qt
 Summary:        Qt interface for %{name}
-#BuildRequires:  qt4-devel >= 4.5.0-9
-BuildRequires:  qt5-qtbase-devel qt5-qttools-devel qt5-qtscript-devel
+BuildRequires:  qt4-devel >= 4.5.0-9
+#BuildRequires:  qt5-qtbase-devel qt5-qttools-devel qt5-qtscript-devel
 BuildRequires:  libxslt
 Provides:       %{name}-gui = %{version}-%{release}
 Requires:       %{name}-libs%{?_isa} = %{version}-%{release}
@@ -173,7 +173,6 @@ popd
 rm -rf build_qt4 && mkdir build_qt4 && pushd build_qt4
 %cmake -DCMAKE_BUILD_TYPE=RelWithDebInfo \
        -DFAKEROOT=%{_pkgbuilddir}/fakeRoot \
-       -DENABLE_QT5=TRUE \
        ../avidemux/qt4
 make %{?_smp_mflags}
 make install DESTDIR=%{_pkgbuilddir}/fakeRoot
@@ -209,7 +208,6 @@ rm -rf build_plugins_cli && mkdir build_plugins_cli && pushd build_plugins_cli
 %cmake -DCMAKE_BUILD_TYPE=RelWithDebInfo \
        -DFAKEROOT=%{_pkgbuilddir}/fakeRoot \
        -DAVIDEMUX_SOURCE_DIR=%{_builddir}/%{name}_%{version} \
-       -DENABLE_QT5=TRUE \
        -DPLUGIN_UI=CLI \
        -DUSE_EXTERNAL_LIBASS=TRUE \
        -DUSE_EXTERNAL_LIBMAD=TRUE \
@@ -225,7 +223,6 @@ rm -rf build_plugins_qt4 && mkdir build_plugins_qt4 && pushd build_plugins_qt4
 %cmake -DCMAKE_BUILD_TYPE=RelWithDebInfo \
        -DFAKEROOT=%{_pkgbuilddir}/fakeRoot \
        -DAVIDEMUX_SOURCE_DIR=%{_builddir}/%{name}_%{version} \
-       -DENABLE_QT5=TRUE \
        -DPLUGIN_UI=QT4 \
        -DUSE_EXTERNAL_LIBASS=TRUE \
        -DUSE_EXTERNAL_LIBMAD=TRUE \
@@ -318,7 +315,9 @@ fi
 
 
 %files
-%doc AUTHORS COPYING README
+%{!?_licensedir:%global license %doc}
+%license COPYING
+%doc AUTHORS README
 
 %files libs -f build_plugins_common/install_manifest.txt
 %dir %{_datadir}/avidemux6
@@ -328,6 +327,7 @@ fi
 %exclude %{_libdir}/libADM_UI*
 # Catch the stuff missed using install_manifest.txt
 %dir %{_libdir}/ADM_plugins6
+%dir %{_libdir}/ADM_plugins6/*
 %{_libdir}/ADM_plugins6/autoScripts/*.pyc
 %{_libdir}/ADM_plugins6/autoScripts/*.pyo
 %{_libdir}/ADM_plugins6/autoScripts/lib/*.pyc
@@ -345,21 +345,31 @@ fi
 #%{_libdir}/ADM_glade/
 #%{_datadir}/applications/rpmfusion-avidemux-gtk.desktop
 
-%files qt -f build_plugins_qt4/install_manifest.txt
-%{_bindir}/avidemux3_qt5
-%{_bindir}/avidemux3_jobs_qt5
+%files qt 
+%{_bindir}/avidemux3_qt4
+%{_bindir}/avidemux3_jobs_qt4
 %{_libdir}/libADM_UIQT*.so
-#%{_libdir}/libADM_render6_qt4.so
+%{_libdir}/libADM_render6_QT4.so
 %{_datadir}/applications/rpmfusion-avidemux-qt.desktop
+# QT plugins
+%{_libdir}/ADM_plugins6/videoEncoders/qt4/
+%{_libdir}/ADM_plugins6/videoFilters/qt4/
+%{_libdir}/ADM_plugins6/scriptEngines/qt4/
 
 %files help
 %{_datadir}/avidemux6/help/
 
 %files i18n
-%{_datadir}/avidemux6/qt5/i18n/
+%{_datadir}/avidemux6/qt4/i18n/
 
 
 %changelog
+* Sat Nov 28 2015 Richard Shaw <hobbes1069@gmail.com> - 2.6.10-3
+- Revert back to QT4.
+
+* Mon Nov  9 2015 Richard Shaw <hobbes1069@gmail.com> - 2.6.10-2
+- Fix bug introduced while debugging FTBFS problem. Fixes RFBZ#3830.
+
 * Tue Jun 16 2015 Richard Shaw <hobbes1069@gmail.com> - 2.6.10-1
 - Update to latest upstream release.
 - Disable GTK interface as it is unmaintained and does not build.
