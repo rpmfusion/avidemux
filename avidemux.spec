@@ -1,8 +1,8 @@
 %global _pkgbuilddir %{_builddir}/%{name}_%{version}
 
 Name:           avidemux
-Version:        2.6.10
-Release:        3%{?dist}
+Version:        2.6.12
+Release:        5%{?dist}
 Summary:        Graphical video editing and transcoding tool
 
 License:        GPLv2+
@@ -280,12 +280,15 @@ install -pDm 0644 avidemux/gtk/ADM_userInterfaces/glade/main/avidemux_icon_small
 install -pDm 0644 avidemux_icon.png \
 	%{buildroot}%{_datadir}/icons/hicolor/64x64/apps/avidemux.png
 
+# Fix library permissions
+find %{buildroot}%{_libdir} -type f -name "*.so.*" -exec chmod 0755 {} \;
+
 
 %post libs -p /sbin/ldconfig
 
 %postun libs -p /sbin/ldconfig
 
-#%post gtk
+#post gtk
 #/bin/touch --no-create %{_datadir}/icons/hicolor &>/dev/null || :
 #/usr/bin/update-desktop-database &> /dev/null || :
 
@@ -330,6 +333,7 @@ fi
 %dir %{_libdir}/ADM_plugins6/*
 %{_libdir}/ADM_plugins6/autoScripts/*.pyc
 %{_libdir}/ADM_plugins6/autoScripts/*.pyo
+%dir %{_libdir}/ADM_plugins6/autoScripts/lib
 %{_libdir}/ADM_plugins6/autoScripts/lib/*.pyc
 %{_libdir}/ADM_plugins6/autoScripts/lib/*.pyo
 
@@ -364,6 +368,13 @@ fi
 
 
 %changelog
+* Mon Apr  4 2016 Richard Shaw <hobbes1069@gmail.com> - 2.6.10-5
+- Fix library file permissions, BZ#3923.
+
+* Mon Nov 30 2015 Richard Shaw <hobbes1069@gmail.com> - 2.6.10-4
+- Fix un-owned dir, BZ#3881.
+- Fix broken scriptlet, BZ#3880.
+
 * Sat Nov 28 2015 Richard Shaw <hobbes1069@gmail.com> - 2.6.10-3
 - Revert back to QT4.
 
