@@ -106,7 +106,6 @@ This package contains the runtime libraries for %{name}.
 %package qt
 Summary:        Qt interface for %{name}
 BuildRequires:  qt4-devel >= 4.5.0-9
-#BuildRequires:  qt5-qtbase-devel qt5-qttools-devel qt5-qtscript-devel
 BuildRequires:  libxslt
 Provides:       %{name}-gui = %{version}-%{release}
 Requires:       %{name}-libs%{?_isa} = %{version}-%{release}
@@ -318,11 +317,10 @@ fi
 
 
 %files
-%{!?_licensedir:%global license %doc}
-%license COPYING
 %doc AUTHORS README
 
 %files libs -f build_plugins_common/install_manifest.txt
+%license COPYING
 %dir %{_datadir}/avidemux6
 %{_datadir}/icons/hicolor/*/apps/avidemux.png
 %{_libdir}/libADM*
