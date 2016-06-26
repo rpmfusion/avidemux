@@ -2,7 +2,7 @@
 
 Name:           avidemux
 Version:        2.6.12
-Release:        1%{?dist}
+Release:        2%{?dist}
 Summary:        Graphical video editing and transcoding tool
 
 License:        GPLv2+
@@ -366,6 +366,9 @@ fi
 
 
 %changelog
+* Sat Jun 25 2016 Richard Shaw <hobbes1069@gmail.com> - 2.6.12-2
+- Bump for rebuild in new infra.
+
 * Mon Apr  4 2016 Richard Shaw <hobbes1069@gmail.com> - 2.6.12-1
 - Fix library file permissions, BZ#3923.
 
