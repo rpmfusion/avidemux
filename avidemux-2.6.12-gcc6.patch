@@ -1,5 +1,14 @@
 --- a/avidemux_core/ADM_coreVideoCodec/include/ADM_ffmp43.h
 +++ b/avidemux_core/ADM_coreVideoCodec/include/ADM_ffmp43.h
+@@ -182,7 +182,7 @@ ADM_COREVIDEOCODEC6_EXPORT void ADM_lavD
+ #define WRAP_Open_Template(funcz,argz,display,codecid,extra) \
+ {\
+ AVCodec *codec=funcz(argz);\
+-if(!codec) {GUI_Error_HIG("Codec",QT_TR_NOOP("Internal error finding codec"display));ADM_assert(0);} \
++if(!codec) {GUI_Error_HIG("Codec",QT_TR_NOOP("Internal error finding codec" display));ADM_assert(0);} \
+   codecId=codecid; \
+   _context = avcodec_alloc_context3 (codec);\
+   ADM_assert (_context);\
 @@ -213,7 +213,7 @@ if(!codec) {GUI_Error_HIG("Codec",QT_TR_
    if (avcodec_open2(_context, codec, NULL) < 0)  \
                        { \
