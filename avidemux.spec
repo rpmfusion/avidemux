@@ -14,6 +14,7 @@ Source1:        avidemux-qt.desktop
 Patch0:         avidemux-2.6.10-bundled_libs.patch
 Patch1:         avidemux-2.6.10-qt5_lrelease.patch
 Patch2:         avidemux-2.6.12-narrowing.patch
+Patch3:         avidemux-2.6.12-gcc6.patch
 
 # Don't try to build on arm
 ExcludeArch: %{arm}
@@ -140,6 +141,7 @@ This package contains translation files for %{name}.
 %patch0 -p1
 %patch1 -p1 -b .bund_libs
 %patch2 -p1
+%patch3 -p1
 
 # Remove sources of bundled libraries.
 rm -rf avidemux_plugins/ADM_audioDecoders/ADM_ad_ac3/ADM_liba52 \
@@ -370,7 +372,7 @@ fi
 %changelog
 * Sat Jun 25 2016 Richard Shaw <hobbes1069@gmail.com> - 2.6.12-2
 - Bump for rebuild in new infra.
-- Add patch for GCC 6 narrowing conversion error.
+- Add patch for GCC 6 narrowing conversion and other GCC 6 errors.
 
 * Mon Apr  4 2016 Richard Shaw <hobbes1069@gmail.com> - 2.6.12-1
 - Fix library file permissions, BZ#3923.

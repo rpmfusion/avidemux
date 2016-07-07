@@ -1,0 +1,11 @@
+--- a/avidemux_core/ADM_coreVideoCodec/include/ADM_ffmp43.h
++++ b/avidemux_core/ADM_coreVideoCodec/include/ADM_ffmp43.h
+@@ -213,7 +213,7 @@ if(!codec) {GUI_Error_HIG("Codec",QT_TR_
+   if (avcodec_open2(_context, codec, NULL) < 0)  \
+                       { \
+                                         printf("[lavc] Decoder init: "display" video decoder failed!\n"); \
+-                                        GUI_Error_HIG("Codec","Internal error opening "display); \
++                                        GUI_Error_HIG("Codec","Internal error opening " display); \
+                                         ADM_assert(0); \
+                                 } \
+                                 else \
