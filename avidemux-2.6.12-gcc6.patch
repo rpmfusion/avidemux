@@ -45,3 +45,14 @@
              default:
                  break;
          }
+--- a/avidemux_plugins/ADM_demuxers/MpegTS/dmxTSPacket.cpp
++++ b/avidemux_plugins/ADM_demuxers/MpegTS/dmxTSPacket.cpp
+@@ -433,7 +433,7 @@ nextPack3:
+ /**
+     \fn decodePesHeader
+ */
+-#define fail(x) {printf("[Ts Demuxer]*********"x"*******\n");return false;}
++#define fail(x) {printf("[Ts Demuxer]*********" x "*******\n");return false;}
+ bool tsPacket::decodePesHeader(TS_PESpacket *pes)
+ {
+     uint8_t  *start=pes->payload+6;
