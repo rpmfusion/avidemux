@@ -2,7 +2,7 @@
 
 Name:           avidemux
 Version:        2.6.12
-Release:        2%{?dist}
+Release:        3%{?dist}
 Summary:        Graphical video editing and transcoding tool
 
 License:        GPLv2+
@@ -370,6 +370,9 @@ fi
 
 
 %changelog
+* Mon Jul 11 2016 Hans de Goede <j.w.r.degoede@gmail.com> - 2.6.12-3
+- Really fix building with GCC6, patch provided by Dan Horák <dan@danny.cz>
+
 * Sat Jun 25 2016 Richard Shaw <hobbes1069@gmail.com> - 2.6.12-2
 - Bump for rebuild in new infra.
 - Add patch for GCC 6 narrowing conversion and other GCC 6 errors.
