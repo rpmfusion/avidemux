@@ -2,7 +2,7 @@
 
 Name:           avidemux
 Version:        2.6.12
-Release:        3%{?dist}
+Release:        4%{?dist}
 Summary:        Graphical video editing and transcoding tool
 
 License:        GPLv2+
@@ -15,6 +15,7 @@ Patch0:         avidemux-2.6.10-bundled_libs.patch
 Patch1:         avidemux-2.6.10-qt5_lrelease.patch
 Patch2:         avidemux-2.6.12-narrowing.patch
 Patch3:         avidemux-2.6.12-gcc6.patch
+Patch4:         avidemux-2.6.12-qt.patch
 
 # Don't try to build on arm
 ExcludeArch: %{arm}
@@ -142,6 +143,7 @@ This package contains translation files for %{name}.
 %patch1 -p1 -b .bund_libs
 %patch2 -p1
 %patch3 -p1
+%patch4 -p1
 
 # Remove sources of bundled libraries.
 rm -rf avidemux_plugins/ADM_audioDecoders/ADM_ad_ac3/ADM_liba52 \
@@ -299,7 +301,7 @@ find %{buildroot}%{_libdir} -type f -name "*.so.*" -exec chmod 0755 {} \;
 /bin/touch --no-create %{_datadir}/icons/hicolor &>/dev/null || :
 /usr/bin/update-desktop-database &> /dev/null || :
 
-#%postun gtk
+#postun gtk
 #if [ $1 -eq 0 ] ; then
 #    /bin/touch --no-create %{_datadir}/icons/hicolor &>/dev/null
 #    /usr/bin/gtk-update-icon-cache %{_datadir}/icons/hicolor &>/dev/null || :
@@ -313,7 +315,7 @@ if [ $1 -eq 0 ] ; then
 fi
 /usr/bin/update-desktop-database &> /dev/null || :
 
-#%posttrans gtk
+#posttrans gtk
 #/usr/bin/gtk-update-icon-cache %{_datadir}/icons/hicolor &>/dev/null || :
 
 %posttrans qt
@@ -370,6 +372,9 @@ fi
 
 
 %changelog
+* Mon Jul 25 2016 Richard Shaw <hobbes1069@gmail.com> - 2.6.12-4
+- Add patch to fix qt gui issues, fixes BZ#4035.
+
 * Mon Jul 11 2016 Hans de Goede <j.w.r.degoede@gmail.com> - 2.6.12-3
 - Really fix building with GCC6, patch provided by Dan Horák <dan@danny.cz>
 
