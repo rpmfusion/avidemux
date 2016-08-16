@@ -2,7 +2,7 @@
 
 Name:           avidemux
 Version:        2.6.12
-Release:        4%{?dist}
+Release:        5%{?dist}
 Summary:        Graphical video editing and transcoding tool
 
 License:        GPLv2+
@@ -154,7 +154,7 @@ rm -rf avidemux_plugins/ADM_audioDecoders/ADM_ad_ac3/ADM_liba52 \
 
 %build
 # Build avidemux_core
-export LDFLAGS="-lc -Wl,--as-needed"
+export LDFLAGS="${RPM_LD_FLAGS} -lc -Wl,--as-needed"
 rm -rf build_core && mkdir build_core && pushd build_core
 %cmake -DCMAKE_BUILD_TYPE=RelWithDebInfo \
        ../avidemux_core
@@ -372,6 +372,9 @@ fi
 
 
 %changelog
+* Tue Aug 16 2016 Leigh Scott <leigh123linux@googlemail.com> - 2.6.12-5
+- Add hardening to LDFLAGS
+
 * Mon Jul 25 2016 Richard Shaw <hobbes1069@gmail.com> - 2.6.12-4
 - Add patch to fix qt gui issues, fixes BZ#4035.
 
