@@ -2,14 +2,13 @@
 
 Name:           avidemux
 Version:        2.6.12
-Release:        5%{?dist}
+Release:        6%{?dist}
 Summary:        Graphical video editing and transcoding tool
 
 License:        GPLv2+
 URL:            http://www.avidemux.org
 Source0:        http://downloads.sourceforge.net/%{name}/%{name}_%{version}.tar.gz
 Source1:        avidemux-qt.desktop
-#Source2:        avidemux-gtk.desktop
 
 Patch0:         avidemux-2.6.10-bundled_libs.patch
 Patch1:         avidemux-2.6.10-qt5_lrelease.patch
@@ -80,7 +79,6 @@ MPEG files, MP4 and ASF, using a variety of codecs. Tasks can be automated
 using projects, job queue and powerful scripting capabilities.
 
 This is a meta package that brings in all interfaces: QT and CLI.
-#This is a meta package that brings in all interfaces: GTK, QT, and CLI.
 
 
 %package cli
@@ -95,16 +93,6 @@ Summary:        Libraries for %{name}
 
 %description libs
 This package contains the runtime libraries for %{name}.
-
-#%package gtk
-#Summary:        GTK interface for %{name}
-#BuildRequires:  gtk3-devel
-#BuildRequires:  cairo-devel
-#Provides:       %{name}-gui = %{version}-%{release}
-#Requires:       %{name}-libs%{?_isa} = %{version}-%{release}
-
-#%description gtk
-#This package provides the GTK graphical interface for %{name}.
 
 %package qt
 Summary:        Qt interface for %{name}
@@ -154,7 +142,7 @@ rm -rf avidemux_plugins/ADM_audioDecoders/ADM_ad_ac3/ADM_liba52 \
 
 %build
 # Build avidemux_core
-export LDFLAGS="${RPM_LD_FLAGS} -lc -Wl,--as-needed"
+export LDFLAGS="-lc -Wl,--as-needed"
 rm -rf build_core && mkdir build_core && pushd build_core
 %cmake -DCMAKE_BUILD_TYPE=RelWithDebInfo \
        ../avidemux_core
@@ -182,15 +170,6 @@ rm -rf build_qt4 && mkdir build_qt4 && pushd build_qt4
 make %{?_smp_mflags}
 make install DESTDIR=%{_pkgbuilddir}/fakeRoot
 popd
-
-# Build GTK gui
-#rm -rf build_gtk && mkdir build_gtk && pushd build_gtk
-#cmake -DCMAKE_BUILD_TYPE=RelWithDebInfo \
-#       -DFAKEROOT=%{_pkgbuilddir}/fakeRoot \
-#       ../avidemux/gtk
-#make %{?_smp_mflags}
-#make install DESTDIR=%{_pkgbuilddir}/fakeRoot
-#popd
 
 # Build avidemux_plugins_common
 rm -rf build_plugins_common && mkdir build_plugins_common && pushd build_plugins_common
@@ -238,31 +217,14 @@ make %{?_smp_mflags}
 make install DESTDIR=%{_pkgbuilddir}/fakeRoot
 popd
 
-# Build avidemux_plugins_gtk
-#rm -rf build_plugins_gtk && mkdir build_plugins_gtk && pushd build_plugins_gtk
-#cmake -DCMAKE_BUILD_TYPE=RelWithDebInfo \
-#       -DFAKEROOT=%{_pkgbuilddir}/fakeRoot \
-#       -DAVIDEMUX_SOURCE_DIR=%{_builddir}/%{name}_%{version} \
-#       -DPLUGIN_UI=GTK \
-#       -DUSE_EXTERNAL_LIBASS=TRUE \
-#       -DUSE_EXTERNAL_LIBMAD=TRUE \
-#       -DUSE_EXTERNAL_LIBA52=TRUE \
-#       -DUSE_EXTERNAL_TWOLAME=TRUE \
-#       ../avidemux_plugins
-#make %{?_smp_mflags}
-#make install DESTDIR=%{_pkgbuilddir}/fakeRoot
-#popd
-
 
 %install
 make -C build_core install DESTDIR=%{buildroot}
 make -C build_cli install DESTDIR=%{buildroot}
 make -C build_qt4 install DESTDIR=%{buildroot}
-#make -C build_gtk install DESTDIR=%{buildroot}
 make -C build_plugins_common install DESTDIR=%{buildroot}
 make -C build_plugins_cli install DESTDIR=%{buildroot}
 make -C build_plugins_qt4 install DESTDIR=%{buildroot}
-#make -C build_plugins_gtk install DESTDIR=%{buildroot}
 
 # Remove useless devel files
 rm -rf %{buildroot}%{_includedir}/%{name}
@@ -274,10 +236,6 @@ chmod +x %{buildroot}%{_libdir}/libADM6*.so.*
 desktop-file-install --vendor rpmfusion \
     --dir %{buildroot}%{_datadir}/applications \
     %{SOURCE1}
-
-#desktop-file-install --vendor rpmfusion \
-#    --dir %{buildroot}%{_datadir}/applications \
-#    %{SOURCE2}
 
 # Install icons
 install -pDm 0644 avidemux/gtk/ADM_userInterfaces/glade/main/avidemux_icon_small.png \
@@ -293,20 +251,9 @@ find %{buildroot}%{_libdir} -type f -name "*.so.*" -exec chmod 0755 {} \;
 
 %postun libs -p /sbin/ldconfig
 
-#post gtk
-#/bin/touch --no-create %{_datadir}/icons/hicolor &>/dev/null || :
-#/usr/bin/update-desktop-database &> /dev/null || :
-
 %post qt
 /bin/touch --no-create %{_datadir}/icons/hicolor &>/dev/null || :
 /usr/bin/update-desktop-database &> /dev/null || :
-
-#postun gtk
-#if [ $1 -eq 0 ] ; then
-#    /bin/touch --no-create %{_datadir}/icons/hicolor &>/dev/null
-#    /usr/bin/gtk-update-icon-cache %{_datadir}/icons/hicolor &>/dev/null || :
-#fi
-#/usr/bin/update-desktop-database &> /dev/null || :
 
 %postun qt
 if [ $1 -eq 0 ] ; then
@@ -314,9 +261,6 @@ if [ $1 -eq 0 ] ; then
     /usr/bin/gtk-update-icon-cache %{_datadir}/icons/hicolor &>/dev/null || :
 fi
 /usr/bin/update-desktop-database &> /dev/null || :
-
-#posttrans gtk
-#/usr/bin/gtk-update-icon-cache %{_datadir}/icons/hicolor &>/dev/null || :
 
 %posttrans qt
 /usr/bin/gtk-update-icon-cache %{_datadir}/icons/hicolor &>/dev/null || :
@@ -372,6 +316,10 @@ fi
 
 
 %changelog
+* Wed Oct 19 2016 Richard Shaw <hobbes1069@gmail.com> - 2.6.12-6
+- Remove all old GTK packages and references, also fixes scriptlet issue,
+  BZ#4217.
+
 * Tue Aug 16 2016 Leigh Scott <leigh123linux@googlemail.com> - 2.6.12-5
 - Add hardening to LDFLAGS
 
