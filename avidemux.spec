@@ -2,7 +2,7 @@
 
 Name:           avidemux
 Version:        2.6.12
-Release:        6%{?dist}
+Release:        7%{?dist}
 Summary:        Graphical video editing and transcoding tool
 
 License:        GPLv2+
@@ -316,6 +316,9 @@ fi
 
 
 %changelog
+* Tue Nov 08 2016 Sérgio Basto <sergio@serjux.com> - 2.6.12-7
+- Rebuild for x265-2.1
+
 * Wed Oct 19 2016 Richard Shaw <hobbes1069@gmail.com> - 2.6.12-6
 - Remove all old GTK packages and references, also fixes scriptlet issue,
   BZ#4217.
