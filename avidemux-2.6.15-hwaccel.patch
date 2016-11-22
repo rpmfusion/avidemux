@@ -1,0 +1,19 @@
+diff --git a/avidemux/common/gui_main.cpp b/avidemux/common/gui_main.cpp
+index c27f279..536178b 100644
+--- a/avidemux/common/gui_main.cpp
++++ b/avidemux/common/gui_main.cpp
+@@ -1578,12 +1578,14 @@ ADM_RENDER_TYPE UI_getPreferredRender(void)
+         {
+                 return RENDER_GTK;
+         }
++#if 0
+         if(strcmp(displ,":0") && strcmp(displ,":0.0"))
+         {
+                 printf("Looks like remote display, no Xv :%s\n",displ);
+                 return RENDER_GTK;
+         }
+ #endif
++#endif
+ 
+         if(prefs->get(VIDEODEVICE,&renderI)!=RC_OK)
+         {

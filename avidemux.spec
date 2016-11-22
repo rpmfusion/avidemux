@@ -1,8 +1,8 @@
 %global _pkgbuilddir %{_builddir}/%{name}_%{version}
 
 Name:           avidemux
-Version:        2.6.12
-Release:        7%{?dist}
+Version:        2.6.15
+Release:        1%{?dist}
 Summary:        Graphical video editing and transcoding tool
 
 License:        GPLv2+
@@ -11,10 +11,8 @@ Source0:        http://downloads.sourceforge.net/%{name}/%{name}_%{version}.tar.
 Source1:        avidemux-qt.desktop
 
 Patch0:         avidemux-2.6.10-bundled_libs.patch
-Patch1:         avidemux-2.6.10-qt5_lrelease.patch
-Patch2:         avidemux-2.6.12-narrowing.patch
-Patch3:         avidemux-2.6.12-gcc6.patch
-Patch4:         avidemux-2.6.12-qt.patch
+Patch1:         avidemux-2.6.15-hwaccel.patch
+Patch2:         avidemux-2.6.15-disable-vpx-decoder-plugin.patch
 
 # Don't try to build on arm
 ExcludeArch: %{arm}
@@ -26,6 +24,7 @@ BuildRequires:  libxslt
 BuildRequires:  desktop-file-utils
 BuildRequires:  pkgconfig
 BuildRequires:  sqlite-devel
+BuildRequires:  bzip2
 
 # Libraries
 BuildRequires:  yasm-devel
@@ -44,9 +43,9 @@ BuildRequires:  alsa-lib-devel >= 1.0.3
 BuildRequires:  pulseaudio-libs-devel
 
 # Video out
-BuildRequires:  SDL-devel >= 1.2.7
 BuildRequires:  mesa-libGL-devel mesa-libGLU-devel
 BuildRequires:  libvdpau-devel
+BuildRequires:  libva-devel
 
 # Audio Codecs
 BuildRequires:  a52dec-devel >= 0.7.4
@@ -69,7 +68,6 @@ BuildRequires:  ffmpeg-devel
 
 # Main package is a metapackage, bring in something useful.
 Requires:       %{name}-gui = %{version}-%{release}
-Requires:       %{name}-help = %{version}-%{release}
 
 
 %description
@@ -96,24 +94,16 @@ This package contains the runtime libraries for %{name}.
 
 %package qt
 Summary:        Qt interface for %{name}
-BuildRequires:  qt4-devel >= 4.5.0-9
+BuildRequires:  qt5-qtbase-devel
+BuildRequires:  qt5-linguist
 BuildRequires:  libxslt
 Provides:       %{name}-gui = %{version}-%{release}
 Requires:       %{name}-libs%{?_isa} = %{version}-%{release}
 Obsoletes:      %{name}-gtk < 2.6.10
+Obsoletes:      %{name}-help
 
 %description qt
 This package contains the Qt graphical interface for %{name}.
-
-%package help
-Summary:        Help files for %{name}
-Requires:       %{name}     = %{version}-%{release}
-Requires:       %{name}-gui = %{version}-%{release}
-BuildArch:      noarch
-
-%description help
-This package contains the help files for %{name}.
-
 
 %package i18n
 Summary:        Translations for %{name}
@@ -128,17 +118,14 @@ This package contains translation files for %{name}.
 %prep
 %setup -q -n %{name}_%{version}
 %patch0 -p1
-%patch1 -p1 -b .bund_libs
+%patch1 -p1
 %patch2 -p1
-%patch3 -p1
-%patch4 -p1
 
 # Remove sources of bundled libraries.
 rm -rf avidemux_plugins/ADM_audioDecoders/ADM_ad_ac3/ADM_liba52 \
        avidemux_plugins/ADM_audioDecoders/ADM_ad_mad/ADM_libMad \
        avidemux_plugins/ADM_audioEncoders/twolame/ADM_libtwolame \
        avidemux_plugins/ADM_videoFilters6/ass/ADM_libass
-
 
 %build
 # Build avidemux_core
@@ -162,10 +149,11 @@ make %{?_smp_mflags}
 make install DESTDIR=%{_pkgbuilddir}/fakeRoot
 popd
 
-# Build QT4 gui
-rm -rf build_qt4 && mkdir build_qt4 && pushd build_qt4
+# Build QT5 gui
+rm -rf build_qt5 && mkdir build_qt5 && pushd build_qt5
 %cmake -DCMAKE_BUILD_TYPE=RelWithDebInfo \
        -DFAKEROOT=%{_pkgbuilddir}/fakeRoot \
+       -DENABLE_QT5=TRUE \
        ../avidemux/qt4
 make %{?_smp_mflags}
 make install DESTDIR=%{_pkgbuilddir}/fakeRoot
@@ -192,6 +180,7 @@ rm -rf build_plugins_cli && mkdir build_plugins_cli && pushd build_plugins_cli
 %cmake -DCMAKE_BUILD_TYPE=RelWithDebInfo \
        -DFAKEROOT=%{_pkgbuilddir}/fakeRoot \
        -DAVIDEMUX_SOURCE_DIR=%{_builddir}/%{name}_%{version} \
+       -DENABLE_QT5=TRUE \
        -DPLUGIN_UI=CLI \
        -DUSE_EXTERNAL_LIBASS=TRUE \
        -DUSE_EXTERNAL_LIBMAD=TRUE \
@@ -202,11 +191,12 @@ make %{?_smp_mflags}
 make install DESTDIR=%{_pkgbuilddir}/fakeRoot
 popd
 
-# Build avidemux_plugins_qt4
-rm -rf build_plugins_qt4 && mkdir build_plugins_qt4 && pushd build_plugins_qt4
+# Build avidemux_plugins_qt5
+rm -rf build_plugins_qt5 && mkdir build_plugins_qt5 && pushd build_plugins_qt5
 %cmake -DCMAKE_BUILD_TYPE=RelWithDebInfo \
        -DFAKEROOT=%{_pkgbuilddir}/fakeRoot \
        -DAVIDEMUX_SOURCE_DIR=%{_builddir}/%{name}_%{version} \
+       -DENABLE_QT5=TRUE \
        -DPLUGIN_UI=QT4 \
        -DUSE_EXTERNAL_LIBASS=TRUE \
        -DUSE_EXTERNAL_LIBMAD=TRUE \
@@ -221,10 +211,10 @@ popd
 %install
 make -C build_core install DESTDIR=%{buildroot}
 make -C build_cli install DESTDIR=%{buildroot}
-make -C build_qt4 install DESTDIR=%{buildroot}
+make -C build_qt5 install DESTDIR=%{buildroot}
 make -C build_plugins_common install DESTDIR=%{buildroot}
 make -C build_plugins_cli install DESTDIR=%{buildroot}
-make -C build_plugins_qt4 install DESTDIR=%{buildroot}
+make -C build_plugins_qt5 install DESTDIR=%{buildroot}
 
 # Remove useless devel files
 rm -rf %{buildroot}%{_includedir}/%{name}
@@ -298,24 +288,25 @@ fi
 #%{_datadir}/applications/rpmfusion-avidemux-gtk.desktop
 
 %files qt 
-%{_bindir}/avidemux3_qt4
-%{_bindir}/avidemux3_jobs_qt4
+%{_bindir}/avidemux3_qt5
+%{_bindir}/avidemux3_jobs_qt5
+%{_libdir}/libADM_openGLQT*.so
 %{_libdir}/libADM_UIQT*.so
-%{_libdir}/libADM_render6_QT4.so
+%{_libdir}/libADM_render6_QT5.so
 %{_datadir}/applications/rpmfusion-avidemux-qt.desktop
 # QT plugins
-%{_libdir}/ADM_plugins6/videoEncoders/qt4/
-%{_libdir}/ADM_plugins6/videoFilters/qt4/
-%{_libdir}/ADM_plugins6/scriptEngines/qt4/
-
-%files help
-%{_datadir}/avidemux6/help/
+%{_libdir}/ADM_plugins6/videoEncoders/qt5/
+%{_libdir}/ADM_plugins6/videoFilters/qt5/
+%{_libdir}/ADM_plugins6/shaderDemo/
 
 %files i18n
-%{_datadir}/avidemux6/qt4/i18n/
+%{_datadir}/avidemux6/qt5/i18n/
 
 
 %changelog
+* Tue Nov 22 2016 Sérgio Basto <sergio@serjux.com> - 2.6.15-1
+- Update to the 2.6.15 release, rfbz#4344
+
 * Tue Nov 08 2016 Sérgio Basto <sergio@serjux.com> - 2.6.12-7
 - Rebuild for x265-2.1
 
