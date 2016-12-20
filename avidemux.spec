@@ -10,9 +10,11 @@ URL:            http://www.avidemux.org
 Source0:        http://downloads.sourceforge.net/%{name}/%{name}_%{version}.tar.gz
 Source1:        avidemux-qt.desktop
 Source2:        ffmpeg-3.0.5.tar.bz2
+Source3:        ffmpeg-3.0.5-do-not-require-nonfree-for-nvenc.diff
 
 Patch0:         avidemux-2.6.15-drop-after-2.6.16.patch
 Patch1:         avidemux-2.6.15-disable-vpx-decoder-plugin.patch
+Patch2:         avidemux-2.6.15-cmake-nvenc.patch
 
 # Don't try to build on arm
 ExcludeArch: %{arm}
@@ -120,6 +122,7 @@ This package contains translation files for %{name}.
 %setup -q -n %{name}_%{version}
 %patch0 -p1
 %patch1 -p1
+%patch2 -p1
 
 # Remove sources of bundled libraries.
 rm -rf avidemux_plugins/ADM_audioDecoders/ADM_ad_ac3/ADM_liba52 \
@@ -128,8 +131,9 @@ rm -rf avidemux_plugins/ADM_audioDecoders/ADM_ad_ac3/ADM_liba52 \
        avidemux_plugins/ADM_videoFilters6/ass/ADM_libass \
        avidemux_core/ffmpeg_package/ffmpeg-3.0.3.tar.bz2
 
-# Copy ffmpeg-3.0.5.tar.bz2 to destination
+# Copy additional sources to destination
 cp %{SOURCE2} avidemux_core/ffmpeg_package/
+cp %{SOURCE3} avidemux_core/ffmpeg_package/patches/
 
 %build
 # Build avidemux_core

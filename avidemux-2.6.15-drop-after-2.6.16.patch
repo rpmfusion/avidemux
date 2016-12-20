@@ -1,60 +1,12 @@
-From f845288d3d1f5bc8f27eb76a4aacd111ca0811bc Mon Sep 17 00:00:00 2001
-From: eumagga0x2a <eumagga0x2a@users.noreply.github.com>
-Date: Sat, 17 Dec 2016 23:28:39 +0100
-Subject: [PATCH 1/2] [build/cmake] Fix NVENC detection and ffmpeg configure
- options
+commit eca1c17211c85fbd84c465dec7bd8716750e24ae
+Author: eumagga0x2a <eumagga0x2a@users.noreply.github.com>
+Date:   Sun Nov 20 14:30:11 2016 +0100
 
----
- cmake/admCheckNvEnc.cmake         | 5 +++--
- cmake/admFFmpegBuild_native.cmake | 1 +
- 2 files changed, 4 insertions(+), 2 deletions(-)
+    [UI/Render] Disable faulty check for remote display breaking VDPAU
 
-From 25d94f28cbae1a25e7dcdcce106f5bc5c4b637df Mon Sep 17 00:00:00 2001
-From: eumagga0x2a <eumagga0x2a@users.noreply.github.com>
-Date: Sat, 17 Dec 2016 23:56:24 +0100
-Subject: [PATCH] [build/cmake] Fix the status message from the previous commit
+ avidemux/common/gui_main.cpp | 2 ++
+ 1 file changed, 2 insertions(+)
 
----
- cmake/admCheckNvEnc.cmake | 3 +--
- 1 file changed, 1 insertion(+), 2 deletions(-)
-
-diff -rpU 3 a/cmake/admCheckNvEnc.cmake b/cmake/admCheckNvEnc.cmake
---- a/cmake/admCheckNvEnc.cmake	2016-11-19 08:58:39.000000000 +0100
-+++ b/cmake/admCheckNvEnc.cmake	2016-12-18 14:30:18.235236704 +0100
-@@ -6,10 +6,10 @@ MACRO(checkNvEnc)
- 		MESSAGE(STATUS "*****************")
- 
- 		IF (NVENC)
--                        FIND_PATH(NVENC_INCLUDE_DIR nvEncodeAPI.h 
--		      	PATHS /usr/include/x86_64-linux-gnu) # Needed for 64 bits linux
-+                        FIND_PATH(NVENC_INCLUDE_DIR nvEncodeAPI.h
-+                        PATHS /usr/include /usr/include/nvenc /usr/include/x86_64-linux-gnu) # Needed for 64 bits linux
-                         IF(NVENC_INCLUDE_DIR)
--				MESSAGE(STATUS " nvenc header Found ")
-+				MESSAGE(STATUS " nvenc header Found in ${NVENC_INCLUDE_DIR}")
-                                 SET(USE_NVENC True)
-                                 SET(NVENC_FOUND 1)
-                         ELSE(NVENC_INCLUDE_DIR)
-diff -rpU 3 a/cmake/admFFmpegBuild.cmake b/cmake/admFFmpegBuild.cmake
---- a/cmake/admFFmpegBuild.cmake	2016-11-19 08:58:39.000000000 +0100
-+++ b/cmake/admFFmpegBuild.cmake	2016-12-19 12:49:20.195852035 +0100
-@@ -9,7 +9,7 @@ ENDMACRO (xadd)
- 
- option(FF_INHERIT_BUILD_ENV "" ON)
- 
--set(FFMPEG_VERSION "3.0.3")
-+set(FFMPEG_VERSION "3.0.5")
- set(FFMPEG_ROOT_DIR "${AVIDEMUX_TOP_SOURCE_DIR}/avidemux_core/ffmpeg_package")
- set(FFMPEG_PATCH_DIR  "${FFMPEG_ROOT_DIR}/patches/")
- set(FFMPEG_SOURCE_ARCHIVE "ffmpeg-${FFMPEG_VERSION}.tar.bz2")
-@@ -47,6 +47,7 @@ IF(USE_NVENC)
-    SET(FFMPEG_ENCODERS ${FFMPEG_ENCODERS} nvenc)
-    xadd("--enable-nonfree")
-    xadd("--enable-nvenc")
-+   xadd("--extra-cflags=-I${NVENC_INCLUDE_DIR}")
-    set(FFMPEG_ENCODERS  ${FFMPEG_ENCODERS} nvenc_h264 nvenc_hevc)
- ENDIF(USE_NVENC)
- 
 diff --git a/avidemux/common/gui_main.cpp b/avidemux/common/gui_main.cpp
 index c27f279..536178b 100644
 --- a/avidemux/common/gui_main.cpp
@@ -74,16 +26,14 @@ index c27f279..536178b 100644
  
          if(prefs->get(VIDEODEVICE,&renderI)!=RC_OK)
          {
-From 547e6a8e1529ed588ce6f3edbc431d7bfffa52cc Mon Sep 17 00:00:00 2001
-From: mean <fixounet@free.fr>
-Date: Sun, 11 Dec 2016 18:54:34 +0100
-Subject: [PATCH] [qt] increase buffer to avoid stack overflow (1st bug found
- with vs)
+commit 547e6a8e1529ed588ce6f3edbc431d7bfffa52cc
+Author: mean <fixounet@free.fr>
+Date:   Sun Dec 11 18:54:34 2016 +0100
 
----
+    [qt] increase buffer to avoid stack overflow (1st bug found with vs)
+
  avidemux/qt4/ADM_userInterfaces/ADM_dialog/Q_working.cpp | 2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)
- mode change 100644 => 100755 avidemux/qt4/ADM_userInterfaces/ADM_dialog/Q_working.cpp
 
 diff --git a/avidemux/qt4/ADM_userInterfaces/ADM_dialog/Q_working.cpp b/avidemux/qt4/ADM_userInterfaces/ADM_dialog/Q_working.cpp
 old mode 100644
@@ -100,13 +50,12 @@ index ea33d85..b11a2d5
  
      ms2time(elapsed,&hh,&mm,&ss,&mms);
      sprintf(string,"%02d:%02d:%02d",hh,mm,ss);
-From d22a0fe6b5d0a120b832df4b5b96d4b3643b5529 Mon Sep 17 00:00:00 2001
-From: eumagga0x2a <eumagga0x2a@users.noreply.github.com>
-Date: Thu, 24 Nov 2016 02:22:21 +0100
-Subject: [PATCH] [Pref] Return false if loading config fails, avoid selecting
- dummy audio device in this case
+commit d22a0fe6b5d0a120b832df4b5b96d4b3643b5529
+Author: eumagga0x2a <eumagga0x2a@users.noreply.github.com>
+Date:   Thu Nov 24 02:22:21 2016 +0100
 
----
+    [Pref] Return false if loading config fails, avoid selecting dummy audio device in this case
+
  avidemux_core/ADM_coreUtils/src/prefs.cpp | 2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)
 
@@ -123,12 +72,12 @@ index ff84be0..5a18eff 100644
  }
  
  /**
-From e6482ab459c0221701d6eef0f01f5ca653f1e8ef Mon Sep 17 00:00:00 2001
-From: mean <fixounet@free.fr>
-Date: Sun, 4 Dec 2016 10:51:52 +0100
-Subject: [PATCH] [playback] Dont busy loop when there is no audio track
+commit e6482ab459c0221701d6eef0f01f5ca653f1e8ef
+Author: mean <fixounet@free.fr>
+Date:   Sun Dec 4 10:51:52 2016 +0100
 
----
+    [playback] Dont busy loop when there is no audio track
+
  avidemux/common/gui_play.cpp | 6 +++++-
  1 file changed, 5 insertions(+), 1 deletion(-)
 
@@ -151,25 +100,33 @@ index a3d1ccb..fd2b115 100644
                  }else
                      audioPump(false);
  
-From 6f0e2b9b945e48d72ce2f84e541b438d14c417de Mon Sep 17 00:00:00 2001
-From: eumagga0x2a <eumagga0x2a@users.noreply.github.com>
-Date: Sun, 18 Dec 2016 07:05:16 +0100
-Subject: [PATCH] [UI] Fix navigation in 1/2/4s steps
+commit 6f0e2b9b945e48d72ce2f84e541b438d14c417de
+Author: eumagga0x2a <eumagga0x2a@users.noreply.github.com>
+Date:   Sun Dec 18 07:05:16 2016 +0100
 
----
+    [UI] Fix navigation in 1/2/4s steps
+
  avidemux/common/A_functions.h    |  2 +-
- avidemux/common/gui_navigate.cpp | 98 +++++++++++++++++++++++++++++-----------
+ avidemux/common/gui_navigate.cpp | 98 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++--------------------------
  2 files changed, 73 insertions(+), 27 deletions(-)
 
-From fce680728be3a9fe71ae8f454b10fc2c10877d9d Mon Sep 17 00:00:00 2001
-From: eumagga0x2a <eumagga0x2a@users.noreply.github.com>
-Date: Sun, 18 Dec 2016 13:18:47 +0100
-Subject: [PATCH 1/2] [UI] Remove forgotten unused variable and simplify
- handling of pts==0 in A_jumpToTime
+commit fce680728be3a9fe71ae8f454b10fc2c10877d9d
+Author: eumagga0x2a <eumagga0x2a@users.noreply.github.com>
+Date:   Sun Dec 18 13:18:47 2016 +0100
 
----
+    [UI] Remove forgotten unused variable and simplify handling of pts==0 in A_jumpToTime
+
  avidemux/common/gui_navigate.cpp | 8 ++------
  1 file changed, 2 insertions(+), 6 deletions(-)
+
+commit ae55994da2c343dc0429d7bd0e80c436a6c20bc0
+Author: eumagga0x2a <eumagga0x2a@users.noreply.github.com>
+Date:   Sun Dec 18 14:24:35 2016 +0100
+
+    [UI] Move a variable declaration in GUI_lastFrameBeforePts where it belongs
+
+ avidemux/common/gui_navigate.cpp | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff -rpU 3 a/avidemux/common/A_functions.h b/avidemux/common/A_functions.h
 --- a/avidemux/common/A_functions.h	2016-11-19 08:58:39.000000000 +0100
@@ -309,14 +266,13 @@ diff -rpU 3 a/avidemux/common/gui_navigate.cpp b/avidemux/common/gui_navigate.cp
   * \fn A_timedError
   * \brief display error unless the last error is too recent
   * @param s
-From 1ac9568ce8a4aa39f9fd64912aa83c04ca94c3e8 Mon Sep 17 00:00:00 2001
-From: eumagga0x2a <eumagga0x2a@users.noreply.github.com>
-Date: Fri, 16 Dec 2016 08:49:45 +0100
-Subject: [PATCH] [Qt] Align the mute button and the volume slider, avoid
- clipping
+commit 1ac9568ce8a4aa39f9fd64912aa83c04ca94c3e8
+Author: eumagga0x2a <eumagga0x2a@users.noreply.github.com>
+Date:   Fri Dec 16 08:49:45 2016 +0100
 
----
- avidemux/qt4/ADM_userInterfaces/ADM_gui/gui2.ui | 26 +++++--------------------
+    [Qt] Align the mute button and the volume slider, avoid clipping
+
+ avidemux/qt4/ADM_userInterfaces/ADM_gui/gui2.ui | 26 +++++---------------------
  1 file changed, 5 insertions(+), 21 deletions(-)
 
 diff --git a/avidemux/qt4/ADM_userInterfaces/ADM_gui/gui2.ui b/avidemux/qt4/ADM_userInterfaces/ADM_gui/gui2.ui
@@ -377,12 +333,12 @@ index ab3a98d..d8b2131 100644
          </size>
         </property>
         <property name="maximum">
-From c093b9fbc407e2f28817310fd08c3c309521be35 Mon Sep 17 00:00:00 2001
-From: mean <fixounet@free.fr>
-Date: Tue, 13 Dec 2016 07:33:03 +0100
-Subject: [PATCH] [Ts/Demux] probe deeper to see if wanted audio track is there
+commit c093b9fbc407e2f28817310fd08c3c309521be35
+Author: mean <fixounet@free.fr>
+Date:   Tue Dec 13 07:33:03 2016 +0100
 
----
+    [Ts/Demux] probe deeper to see if wanted audio track is there
+
  avidemux_plugins/ADM_demuxers/MpegTS/ADM_tsPatPmt.cpp | 15 ++++++++++++---
  1 file changed, 12 insertions(+), 3 deletions(-)
 
@@ -412,15 +368,14 @@ index 2b3e2b9..010e6c5 100644
                      printf("[TS Demuxer] Track %i pid 0x%x does not seem to be there\n",i,list[i].trackPid);
              }
          }
-From c9efe8c9661038055faf83912b89164fe569dbe9 Mon Sep 17 00:00:00 2001
-From: eumagga0x2a <eumagga0x2a@users.noreply.github.com>
-Date: Mon, 28 Nov 2016 18:51:22 +0100
-Subject: [PATCH] [Qt/x265] Limit the number of ref frames in compliance with
- HEVC specs
+commit c9efe8c9661038055faf83912b89164fe569dbe9
+Author: eumagga0x2a <eumagga0x2a@users.noreply.github.com>
+Date:   Mon Nov 28 18:51:22 2016 +0100
 
----
- .../ADM_videoEncoder/x265/qt4/Q_x265.cpp           | 40 ++++++++++++++++++++++
- .../ADM_videoEncoder/x265/qt4/Q_x265.h             |  2 ++
+    [Qt/x265] Limit the number of ref frames in compliance with HEVC specs
+
+ avidemux_plugins/ADM_videoEncoder/x265/qt4/Q_x265.cpp | 40 ++++++++++++++++++++++++++++++++++++++++
+ avidemux_plugins/ADM_videoEncoder/x265/qt4/Q_x265.h   |  2 ++
  2 files changed, 42 insertions(+)
 
 diff --git a/avidemux_plugins/ADM_videoEncoder/x265/qt4/Q_x265.cpp b/avidemux_plugins/ADM_videoEncoder/x265/qt4/Q_x265.cpp
@@ -498,16 +453,14 @@ index 1f353cc..f03dda1 100644
          void encodingModeComboBox_currentIndexChanged(int index);
          void quantiserSlider_valueChanged(int value);
          void quantiserSpinBox_valueChanged(int value);
-From c8848ddaa70cd12a46ed139464af498fde9051c6 Mon Sep 17 00:00:00 2001
-From: mean <fixounet@free.fr>
-Date: Sat, 17 Dec 2016 20:40:03 +0100
-Subject: [PATCH] [build/ffmpeg] when using nvenc, update the key_frame field,
- it is part of an obsolete api
+commit c8848ddaa70cd12a46ed139464af498fde9051c6
+Author: mean <fixounet@free.fr>
+Date:   Sat Dec 17 20:40:03 2016 +0100
 
----
- .../ffmpeg_package/patches/libavcodec_nvenc.c.patch        | 14 ++++++++++++++
+    [build/ffmpeg] when using nvenc, update the key_frame field, it is part of an obsolete api
+
+ avidemux_core/ffmpeg_package/patches/libavcodec_nvenc.c.patch | 14 ++++++++++++++
  1 file changed, 14 insertions(+)
- create mode 100644 avidemux_core/ffmpeg_package/patches/libavcodec_nvenc.c.patch
 
 diff --git a/avidemux_core/ffmpeg_package/patches/libavcodec_nvenc.c.patch b/avidemux_core/ffmpeg_package/patches/libavcodec_nvenc.c.patch
 new file mode 100644
@@ -529,36 +482,36 @@ index 0000000..8161739
 +         pkt->flags |= AV_PKT_FLAG_KEY;
 + #if FF_API_CODED_FRAME
 + FF_DISABLE_DEPRECATION_WARNINGS
-From 343fa1212da77e00e6f960df30fed9ae2368d5dc Mon Sep 17 00:00:00 2001
-From: eumagga0x2a <eumagga0x2a@users.noreply.github.com>
-Date: Tue, 13 Dec 2016 12:01:17 +0100
-Subject: [PATCH] [build/plugins] Allow system libass, liba52 and libmad
+commit 343fa1212da77e00e6f960df30fed9ae2368d5dc
+Author: eumagga0x2a <eumagga0x2a@users.noreply.github.com>
+Date:   Tue Dec 13 12:01:17 2016 +0100
 
----
- .../ADM_audioDecoders/ADM_ad_ac3/ADM_ad_a52.cpp    |  5 +++
- .../ADM_audioDecoders/ADM_ad_ac3/CMakeLists.txt    | 11 ++++-
- .../ADM_audioDecoders/ADM_ad_mad/ADM_ad_mad.cpp    |  5 +++
- .../ADM_audioDecoders/ADM_ad_mad/CMakeLists.txt    | 11 ++++-
- .../ADM_videoFilters6/ass/ADM_vidASS.cpp           |  4 ++
- .../ADM_videoFilters6/ass/CMakeLists.txt           | 51 ++++++++++++----------
- avidemux_plugins/CMakeLists.txt                    | 31 ++++++++++++-
+    [build/plugins] Allow system libass, liba52 and libmad
+
+ avidemux_plugins/ADM_audioDecoders/ADM_ad_ac3/ADM_ad_a52.cpp |  5 +++++
+ avidemux_plugins/ADM_audioDecoders/ADM_ad_ac3/CMakeLists.txt | 11 +++++++++--
+ avidemux_plugins/ADM_audioDecoders/ADM_ad_mad/ADM_ad_mad.cpp |  5 +++++
+ avidemux_plugins/ADM_audioDecoders/ADM_ad_mad/CMakeLists.txt | 11 +++++++++--
+ avidemux_plugins/ADM_videoFilters6/ass/ADM_vidASS.cpp        |  4 ++++
+ avidemux_plugins/ADM_videoFilters6/ass/CMakeLists.txt        | 51 +++++++++++++++++++++++++++------------------------
+ avidemux_plugins/CMakeLists.txt                              | 31 ++++++++++++++++++++++++++++++-
  7 files changed, 89 insertions(+), 29 deletions(-)
 
-From 9bddbe65d731040e46fcb30c3006796d81956a49 Mon Sep 17 00:00:00 2001
-From: eumagga0x2a <eumagga0x2a@users.noreply.github.com>
-Date: Tue, 13 Dec 2016 12:30:11 +0100
-Subject: [PATCH] [build/plugins] Allow system libs: Remove forgotten leftover
+commit 9bddbe65d731040e46fcb30c3006796d81956a49
+Author: eumagga0x2a <eumagga0x2a@users.noreply.github.com>
+Date:   Tue Dec 13 12:30:11 2016 +0100
 
----
+    [build/plugins] Allow system libs: Remove forgotten leftover
+
  avidemux_plugins/CMakeLists.txt | 1 -
  1 file changed, 1 deletion(-)
 
-From ad3af857db49de41e56088a46d250ff22d027a85 Mon Sep 17 00:00:00 2001
-From: eumagga0x2a <eumagga0x2a@users.noreply.github.com>
-Date: Mon, 19 Dec 2016 20:40:58 +0100
-Subject: [PATCH] [build/plugins] Fix build with external libs (oops...)
+commit ad3af857db49de41e56088a46d250ff22d027a85
+Author: eumagga0x2a <eumagga0x2a@users.noreply.github.com>
+Date:   Mon Dec 19 20:40:58 2016 +0100
 
----
+    [build/plugins] Fix build with external libs (oops...)
+
  avidemux_plugins/ADM_audioDecoders/ADM_ad_ac3/CMakeLists.txt | 1 +
  avidemux_plugins/ADM_audioDecoders/ADM_ad_mad/CMakeLists.txt | 1 +
  avidemux_plugins/ADM_videoFilters6/ass/CMakeLists.txt        | 1 +
