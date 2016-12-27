@@ -1,0 +1,984 @@
+commit eca1c17211c85fbd84c465dec7bd8716750e24ae
+Author: eumagga0x2a <eumagga0x2a@users.noreply.github.com>
+Date:   Sun Nov 20 14:30:11 2016 +0100
+
+    [UI/Render] Disable faulty check for remote display breaking VDPAU
+
+ avidemux/common/gui_main.cpp | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/avidemux/common/gui_main.cpp b/avidemux/common/gui_main.cpp
+index c27f279..536178b 100644
+--- a/avidemux/common/gui_main.cpp
++++ b/avidemux/common/gui_main.cpp
+@@ -1578,12 +1578,14 @@ ADM_RENDER_TYPE UI_getPreferredRender(void)
+         {
+                 return RENDER_GTK;
+         }
++#if 0
+         if(strcmp(displ,":0") && strcmp(displ,":0.0"))
+         {
+                 printf("Looks like remote display, no Xv :%s\n",displ);
+                 return RENDER_GTK;
+         }
+ #endif
++#endif
+ 
+         if(prefs->get(VIDEODEVICE,&renderI)!=RC_OK)
+         {
+commit 547e6a8e1529ed588ce6f3edbc431d7bfffa52cc
+Author: mean <fixounet@free.fr>
+Date:   Sun Dec 11 18:54:34 2016 +0100
+
+    [qt] increase buffer to avoid stack overflow (1st bug found with vs)
+
+ avidemux/qt4/ADM_userInterfaces/ADM_dialog/Q_working.cpp | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/avidemux/qt4/ADM_userInterfaces/ADM_dialog/Q_working.cpp b/avidemux/qt4/ADM_userInterfaces/ADM_dialog/Q_working.cpp
+old mode 100644
+new mode 100755
+index ea33d85..b11a2d5
+--- a/avidemux/qt4/ADM_userInterfaces/ADM_dialog/Q_working.cpp
++++ b/avidemux/qt4/ADM_userInterfaces/ADM_dialog/Q_working.cpp
+@@ -105,7 +105,7 @@ uint8_t DIA_workingQt4::update(uint32_t percent)
+     lastper=percent;
+ 
+     uint32_t hh,mm,ss,mms;
+-    char string[9];
++    char string[32]; // keep margin
+ 
+     ms2time(elapsed,&hh,&mm,&ss,&mms);
+     sprintf(string,"%02d:%02d:%02d",hh,mm,ss);
+commit d22a0fe6b5d0a120b832df4b5b96d4b3643b5529
+Author: eumagga0x2a <eumagga0x2a@users.noreply.github.com>
+Date:   Thu Nov 24 02:22:21 2016 +0100
+
+    [Pref] Return false if loading config fails, avoid selecting dummy audio device in this case
+
+ avidemux_core/ADM_coreUtils/src/prefs.cpp | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/avidemux_core/ADM_coreUtils/src/prefs.cpp b/avidemux_core/ADM_coreUtils/src/prefs.cpp
+index ff84be0..5a18eff 100644
+--- a/avidemux_core/ADM_coreUtils/src/prefs.cpp
++++ b/avidemux_core/ADM_coreUtils/src/prefs.cpp
+@@ -187,7 +187,7 @@ bool preferences::load()
+         return true;
+     }
+     ADM_warning("An error happened while loading config\n");
+-    return true;
++    return false;
+ }
+ 
+ /**
+commit e6482ab459c0221701d6eef0f01f5ca653f1e8ef
+Author: mean <fixounet@free.fr>
+Date:   Sun Dec 4 10:51:52 2016 +0100
+
+    [playback] Dont busy loop when there is no audio track
+
+ avidemux/common/gui_play.cpp | 6 +++++-
+ 1 file changed, 5 insertions(+), 1 deletion(-)
+
+diff --git a/avidemux/common/gui_play.cpp b/avidemux/common/gui_play.cpp
+index a3d1ccb..fd2b115 100644
+--- a/avidemux/common/gui_play.cpp
++++ b/avidemux/common/gui_play.cpp
+@@ -294,9 +294,13 @@ bool GUIPlayback::run(void)
+             {
+                 if(stop_req)
+                     break;
++                
+                 if(delta>10)
+                 {
+-                    audioPump(true);
++                    if(playbackAudio)
++                        audioPump(true);
++                    else
++                        ADM_usleep(10*1000);
+                 }else
+                     audioPump(false);
+ 
+commit 6f0e2b9b945e48d72ce2f84e541b438d14c417de
+Author: eumagga0x2a <eumagga0x2a@users.noreply.github.com>
+Date:   Sun Dec 18 07:05:16 2016 +0100
+
+    [UI] Fix navigation in 1/2/4s steps
+
+ avidemux/common/A_functions.h    |  2 +-
+ avidemux/common/gui_navigate.cpp | 98 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++--------------------------
+ 2 files changed, 73 insertions(+), 27 deletions(-)
+
+commit fce680728be3a9fe71ae8f454b10fc2c10877d9d
+Author: eumagga0x2a <eumagga0x2a@users.noreply.github.com>
+Date:   Sun Dec 18 13:18:47 2016 +0100
+
+    [UI] Remove forgotten unused variable and simplify handling of pts==0 in A_jumpToTime
+
+ avidemux/common/gui_navigate.cpp | 8 ++------
+ 1 file changed, 2 insertions(+), 6 deletions(-)
+
+commit ae55994da2c343dc0429d7bd0e80c436a6c20bc0
+Author: eumagga0x2a <eumagga0x2a@users.noreply.github.com>
+Date:   Sun Dec 18 14:24:35 2016 +0100
+
+    [UI] Move a variable declaration in GUI_lastFrameBeforePts where it belongs
+
+ avidemux/common/gui_navigate.cpp | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff -uprN a/avidemux/common/A_functions.h b/avidemux/common/A_functions.h
+--- a/avidemux/common/A_functions.h	2016-11-19 08:58:39.000000000 +0100
++++ b/avidemux/common/A_functions.h	2016-12-19 10:55:49.934912450 +0100
+@@ -30,7 +30,7 @@ bool    A_TimeShift(void);
+ void    A_ResetMarkers(void);
+ void    A_Rewind(void);
+ void    A_jog(void);
+-uint8_t A_jumpToTime(uint32_t hh,uint32_t mm,uint32_t ss,uint32_t ms);
++bool    A_jumpToTime(uint32_t hh,uint32_t mm,uint32_t ss,uint32_t ms);
+ int 	A_openVideo		(const char *name);
+ int     A_saveAudio	(const char *name);
+ void 	A_saveAudioDecoded	(const char *name);
+diff -uprN a/avidemux/common/gui_navigate.cpp b/avidemux/common/gui_navigate.cpp
+--- a/avidemux/common/gui_navigate.cpp	2016-11-19 08:58:39.000000000 +0100
++++ b/avidemux/common/gui_navigate.cpp	2016-12-19 10:55:57.400838973 +0100
+@@ -40,9 +40,10 @@ static ADMCountdown  NaggingCountDown(50
+ extern uint8_t DIA_gotoTime(uint32_t *hh, uint32_t *mm, uint32_t *ss,uint32_t *ms);
+ bool   GUI_GoToTime(uint64_t time);
+ bool   GUI_infiniteForward(uint64_t pts);
++bool   GUI_lastFrameBeforePts(uint64_t pts);
+ bool   GUI_SeekByTime(int64_t time);
+ static void A_timedError(const char *s);
+-uint8_t A_jumpToTime(uint32_t hh,uint32_t mm,uint32_t ss,uint32_t ms);
++bool A_jumpToTime(uint32_t hh,uint32_t mm,uint32_t ss,uint32_t ms);
+ /**
+     \fn HandleAction_Navigate
+ 
+@@ -443,38 +444,53 @@ void GUI_setCurrentFrameAndTime(uint64_t
+     \fn A_jumpToTime
+     \brief Jump to a given time
+ */
+-uint8_t A_jumpToTime(uint32_t hh,uint32_t mm,uint32_t ss,uint32_t ms)
++bool A_jumpToTime(uint32_t hh,uint32_t mm,uint32_t ss,uint32_t ms)
+ {
+-uint64_t pts;
+-        pts=hh*3600+mm*60+ss;
+-        pts*=1000;
+-        pts+=ms;
+-        pts*=1000;
+-        // Try to find a frame just before pts...
+-//#warning Fixme, be more accurate
+-        if(false==video_body->getPKFramePTS(&pts)) return false;
+-
+-        //
+-        return GUI_GoToTime(pts);
+-
++    uint64_t pts;
++    pts=hh*3600+mm*60+ss;
++    pts*=1000;
++    pts+=ms;
++    pts*=1000;
++    if(pts > video_body->getVideoDuration())
++    {
++        ADM_warning("Cannot navigate beyond the end of the video\n");
++        return false;
++    }
++    uint64_t lastpts=pts;
++    if(false==video_body->getNKFramePTS(&lastpts)) // at the end of the video, be careful
++    {
++        if(false==video_body->getPKFramePTS(&lastpts))
++            return false;
++        GUI_infiniteForward(lastpts);
++        lastpts=admPreview::getCurrentPts();
++        if(pts>=lastpts) // if at or beyond the last frame but within the total duration
++            return GUI_GoToTime(lastpts); // go to the last frame
++    }
++    if(false==GUI_lastFrameBeforePts(pts)) // we are probably at the beginning of the video,
++        video_body->rewind(); // go to the first frame then
++    admPreview::samePicture();
++    GUI_setCurrentFrameAndTime();
++    return true;
+ }
+ /**
+     \fn GUI_SeekByTime
+ */
+ bool GUI_SeekByTime(int64_t time)
+ {
+-   uint64_t pts=admPreview::getCurrentPts(); 
+-
+-   if (time < 0 && pts < -time) 
+-         pts = 0; 
+-   else
+-         pts += time;
+-
+-   ADM_info("Seek to:%s ms \n",ADM_us2plain(pts));  
+-   if(video_body->getPKFramePTS(&pts))
+-       return GUI_GoToTime(pts);
++    uint64_t pts=admPreview::getCurrentPts();
+ 
+-   return false;
++    if (time < 0 && pts < -time)
++    {   // we can't assume that pts=0 were legitimate, rewind to the first frame instead
++        video_body->rewind();
++        admPreview::samePicture();
++        GUI_setCurrentFrameAndTime();
++        return true;
++    }else
++    {
++        pts += time;
++    }
++    ADM_info("Seek to:%s ms \n",ADM_us2plain(pts));
++    return GUI_lastFrameBeforePts(pts);
+ }
+ 
+ /**
+@@ -509,6 +525,32 @@ bool GUI_infiniteForward(uint64_t pts)
+ }
+ 
+ /**
++    \fn GUI_lastFrameBeforePts
++ */
++bool GUI_lastFrameBeforePts(uint64_t pts)
++{
++    uint64_t pts2=pts;
++    // Try to find a keyframe just before pts
++    if(video_body->getPKFramePTS(&pts2))
++    { // Starting from there, approach the last frame before pts
++        admPreview::deferDisplay(1);
++        GUI_GoToTime(pts2);
++        uint64_t tmp;
++        while(pts2<pts)
++        {
++            tmp=pts2;
++            admPreview::nextPicture();
++            tmp=admPreview::getCurrentPts();
++            if(tmp>pts) break; // otherwise we may overshoot
++            pts2=tmp;
++        }
++        admPreview::deferDisplay(0);
++        return GUI_GoToTime(pts2);
++    }
++    return false;
++}
++
++/**
+  * \fn A_timedError
+  * \brief display error unless the last error is too recent
+  * @param s
+commit 1ac9568ce8a4aa39f9fd64912aa83c04ca94c3e8
+Author: eumagga0x2a <eumagga0x2a@users.noreply.github.com>
+Date:   Fri Dec 16 08:49:45 2016 +0100
+
+    [Qt] Align the mute button and the volume slider, avoid clipping
+
+ avidemux/qt4/ADM_userInterfaces/ADM_gui/gui2.ui | 26 +++++--------------------
+ 1 file changed, 5 insertions(+), 21 deletions(-)
+
+commit 00d441186375ab80a611d6c9fe7dbe343b5d8637
+Author: eumagga0x2a <eumagga0x2a@users.noreply.github.com>
+Date:   Wed Dec 21 20:49:59 2016 +0100
+
+    [Qt] Reduce the minimum width of the selection widget
+
+ avidemux/qt4/ADM_userInterfaces/ADM_gui/gui2.ui | 10 ++--------
+ 1 file changed, 2 insertions(+), 8 deletions(-)
+
+--- a/avidemux/qt4/ADM_userInterfaces/ADM_gui/gui2.ui	2016-11-19 08:58:39.000000000 +0100
++++ b/avidemux/qt4/ADM_userInterfaces/ADM_gui/gui2.ui	2016-12-27 22:05:15.035595801 +0100
+@@ -1438,16 +1438,10 @@
+    </widget>
+   </widget>
+   <widget class="QDockWidget" name="selectionWidget">
+-   <property name="sizePolicy">
+-    <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
+-     <horstretch>0</horstretch>
+-     <verstretch>0</verstretch>
+-    </sizepolicy>
+-   </property>
+    <property name="minimumSize">
+     <size>
+-     <width>192</width>
+-     <height>163</height>
++     <width>160</width>
++     <height>150</height>
+     </size>
+    </property>
+    <property name="features">
+@@ -1603,8 +1597,8 @@
+    </attribute>
+    <widget class="QWidget" name="dockWidgetContents_5">
+     <layout class="QVBoxLayout" name="verticalLayout_4">
+-     <property name="topMargin">
+-      <number>0</number>
++     <property name="alignment">
++      <set>Qt::AlignHCenter</set>
+      </property>
+      <item>
+       <widget class="QToolButton" name="toolButtonAudioToggle">
+@@ -1619,7 +1613,7 @@
+        </property>
+        <property name="minimumSize">
+         <size>
+-         <width>0</width>
++         <width>22</width>
+          <height>22</height>
+         </size>
+        </property>
+@@ -1639,22 +1633,6 @@
+       </widget>
+      </item>
+      <item>
+-      <spacer name="verticalSpacer">
+-       <property name="orientation">
+-        <enum>Qt::Vertical</enum>
+-       </property>
+-       <property name="sizeType">
+-        <enum>QSizePolicy::MinimumExpanding</enum>
+-       </property>
+-       <property name="sizeHint" stdset="0">
+-        <size>
+-         <width>0</width>
+-         <height>0</height>
+-        </size>
+-       </property>
+-      </spacer>
+-     </item>
+-     <item>
+       <widget class="QSlider" name="horizontalSlider_2">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Fixed" vsizetype="Minimum">
+@@ -1664,8 +1642,8 @@
+        </property>
+        <property name="minimumSize">
+         <size>
+-         <width>0</width>
+-         <height>30</height>
++         <width>22</width>
++         <height>50</height>
+         </size>
+        </property>
+        <property name="maximum">
+commit f4c3a56bd70d6086859f1a311eaa2c9289873bda
+Author: eumagga0x2a <eumagga0x2a@users.noreply.github.com>
+Date:   Wed Dec 21 20:22:31 2016 +0100
+
+    [cosmetics] Show an uppercase string as decoder name for VDPAU
+---
+ avidemux/common/ADM_render/GUI_vdpauRender.h | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/avidemux/common/ADM_render/GUI_vdpauRender.h b/avidemux/common/ADM_render/GUI_vdpauRender.h
+index 3a95bcf..5d43047 100644
+--- a/avidemux/common/ADM_render/GUI_vdpauRender.h
++++ b/avidemux/common/ADM_render/GUI_vdpauRender.h
+@@ -34,7 +34,7 @@ class vdpauRender: public VideoRenderBase
+               virtual   bool refresh(void);
+               virtual   bool usingUIRedraw(void) {return false;}; // we can redraw by ourself
+               virtual   ADM_HW_IMAGE getPreferedImage(void ) {return ADM_HW_VDPAU;}
+-                        const char *getName() {return "Vdpau";}
++                        const char *getName() {return "VDPAU";}
+ };
+ 
+ 
+commit 4e3ede73d15c70de99afbc5d874368db0d96f302
+Author: eumagga0x2a <eumagga0x2a@users.noreply.github.com>
+Date:   Sun Dec 25 17:07:25 2016 +0100
+
+    [Qt] Take actual dimensions of widgets into account when resizing the main window
+---
+ avidemux/common/ADM_commonUI/GUI_ui.h              |  3 +++
+ avidemux/qt4/ADM_userInterfaces/ADM_gui/Q_gui2.cpp | 28 ++++++++++++++++++++++
+ .../qt4/ADM_userInterfaces/ADM_gui/T_preview.cpp   |  5 ++--
+ 3 files changed, 34 insertions(+), 2 deletions(-)
+
+diff --git a/avidemux/common/ADM_commonUI/GUI_ui.h b/avidemux/common/ADM_commonUI/GUI_ui.h
+index 4d02fbd..8f5c00b 100644
+--- a/avidemux/common/ADM_commonUI/GUI_ui.h
++++ b/avidemux/common/ADM_commonUI/GUI_ui.h
+@@ -18,6 +18,9 @@ void UI_setVProcessToggleStatus( uint8_t status );
+ void    UI_iconify( void );
+ void    UI_deiconify( void );
+ 
++uint32_t UI_requiredWidth(void);
++uint32_t UI_requiredHeight(void);
++
+ int     UI_readCurFrame( void );
+ int     UI_readCurTime(uint16_t &hh, uint16_t &mm, uint16_t &ss, uint16_t &ms);
+ void    UI_JumpDone(void);
+diff --git a/avidemux/qt4/ADM_userInterfaces/ADM_gui/Q_gui2.cpp b/avidemux/qt4/ADM_userInterfaces/ADM_gui/Q_gui2.cpp
+index 5dcfb96..70012e6 100644
+--- a/avidemux/qt4/ADM_userInterfaces/ADM_gui/Q_gui2.cpp
++++ b/avidemux/qt4/ADM_userInterfaces/ADM_gui/Q_gui2.cpp
+@@ -1527,6 +1527,34 @@ void UI_deiconify( void )
+     }
+ }
+ /**
++ *   \fn UI_requiredWidth
++ *   \brief calculate the horizontal space occupied by the coded widget incl. some margin
++ */
++uint32_t UI_requiredWidth(void)
++{
++    uint32_t reqw=18; // 2 x 9px margin
++    if(WIDGET(codecWidget)->isVisible())
++        reqw += WIDGET(codecWidget)->frameSize().width() + 6; // with codec widget visible a small extra margin is necessary
++    if(WIDGET(toolBar)->orientation()==Qt::Vertical && WIDGET(toolBar)->isVisible() && false==WIDGET(toolBar)->isFloating())
++        reqw += WIDGET(toolBar)->frameSize().width();
++    return reqw;
++}
++/**
++ *   \fn UI_requiredHeight
++ *   \brief calculate the vertical space occupied by widgets above and below the video window
++ */
++uint32_t UI_requiredHeight(void)
++{
++    uint32_t reqh=18; // 2 x 9px margin
++    if(WIDGET(menubar)->isVisible())
++        reqh += WIDGET(menubar)->height();
++    if(WIDGET(toolBar)->isVisible() && false==WIDGET(toolBar)->isFloating() && WIDGET(toolBar)->orientation()==Qt::Horizontal)
++        reqh += WIDGET(toolBar)->frameSize().height();
++    if(WIDGET(navigationWidget)->isVisible() || WIDGET(selectionWidget)->isVisible() || WIDGET(volumeWidget)->isVisible() || WIDGET(audioMetreWidget)->isVisible())
++        reqh += WIDGET(navigationWidget)->frameSize().height();
++    return reqh;
++}
++/**
+     \fn UI_setAudioTrackCount
+ */
+ void UI_setAudioTrackCount( int nb )
+diff --git a/avidemux/qt4/ADM_userInterfaces/ADM_gui/T_preview.cpp b/avidemux/qt4/ADM_userInterfaces/ADM_gui/T_preview.cpp
+index aefee79..ccc362b 100644
+--- a/avidemux/qt4/ADM_userInterfaces/ADM_gui/T_preview.cpp
++++ b/avidemux/qt4/ADM_userInterfaces/ADM_gui/T_preview.cpp
+@@ -44,6 +44,7 @@ extern "C"
+ #include "T_preview.h"
+ #include "../ADM_render/GUI_render.h"
+ #include "../ADM_render/GUI_accelRender.h"
++#include "GUI_ui.h"
+ #include "DIA_coreToolkit.h"
+     
+ void UI_QT4VideoWidget(QFrame *host);
+@@ -171,8 +172,8 @@ void  UI_updateDrawWindowSize(void *win,uint32_t w,uint32_t h)
+     // TODO: Resize the main window on restore event.
+     if(!QuiMainWindows->isMaximized())
+     {
+-        uint16_t extra_w=240; // take into account the width of the codec widget in px + some margin
+-        uint16_t extra_h=240; // take into account the height of the navigation widget in px + some margin
++        uint32_t extra_w=UI_requiredWidth();
++        uint32_t extra_h=UI_requiredHeight();
+         QuiMainWindows->resize(w+extra_w,h+extra_h);
+     }
+     videoWindow->setADMSize(w,h);
+commit c093b9fbc407e2f28817310fd08c3c309521be35
+Author: mean <fixounet@free.fr>
+Date:   Tue Dec 13 07:33:03 2016 +0100
+
+    [Ts/Demux] probe deeper to see if wanted audio track is there
+
+ avidemux_plugins/ADM_demuxers/MpegTS/ADM_tsPatPmt.cpp | 15 ++++++++++++---
+ 1 file changed, 12 insertions(+), 3 deletions(-)
+
+diff --git a/avidemux_plugins/ADM_demuxers/MpegTS/ADM_tsPatPmt.cpp b/avidemux_plugins/ADM_demuxers/MpegTS/ADM_tsPatPmt.cpp
+index 2b3e2b9..010e6c5 100644
+--- a/avidemux_plugins/ADM_demuxers/MpegTS/ADM_tsPatPmt.cpp
++++ b/avidemux_plugins/ADM_demuxers/MpegTS/ADM_tsPatPmt.cpp
+@@ -160,9 +160,18 @@ bool TS_scanForPrograms(const char *file,uint32_t *nbTracks, ADM_TS_TRACK **outT
+             {
+                 TSpacketInfo pkt;
+                 t->setPos(0);
+-                if(true==t->getNextPacket_NoHeader(list[i].trackPid,&pkt,false))
+-                    tracks[nb++]=list[i];
+-                else        
++                // Try several times, in case the audio only comes later one
++                int nbTry=3;
++                while(nbTry)
++                {
++                        if(true==t->getNextPacket_NoHeader(list[i].trackPid,&pkt,false))
++                        {
++                         tracks[nb++]=list[i];
++                         break;
++                        }
++                        nbTry--;
++                }
++                if(!nbTry)        
+                     printf("[TS Demuxer] Track %i pid 0x%x does not seem to be there\n",i,list[i].trackPid);
+             }
+         }
+commit c9efe8c9661038055faf83912b89164fe569dbe9
+Author: eumagga0x2a <eumagga0x2a@users.noreply.github.com>
+Date:   Mon Nov 28 18:51:22 2016 +0100
+
+    [Qt/x265] Limit the number of ref frames in compliance with HEVC specs
+
+ avidemux_plugins/ADM_videoEncoder/x265/qt4/Q_x265.cpp | 40 ++++++++++++++++++++++++++++++++++++++++
+ avidemux_plugins/ADM_videoEncoder/x265/qt4/Q_x265.h   |  2 ++
+ 2 files changed, 42 insertions(+)
+
+diff --git a/avidemux_plugins/ADM_videoEncoder/x265/qt4/Q_x265.cpp b/avidemux_plugins/ADM_videoEncoder/x265/qt4/Q_x265.cpp
+index b005ae6..6f6a80d 100644
+--- a/avidemux_plugins/ADM_videoEncoder/x265/qt4/Q_x265.cpp
++++ b/avidemux_plugins/ADM_videoEncoder/x265/qt4/Q_x265.cpp
+@@ -122,6 +122,8 @@ x265Dialog::x265Dialog(QWidget *parent, void *param) : QDialog(parent)
+         connect(ui.quantiserSlider, SIGNAL(valueChanged(int)), this, SLOT(quantiserSlider_valueChanged(int)));
+         connect(ui.meSlider, SIGNAL(valueChanged(int)), this, SLOT(meSlider_valueChanged(int)));
+         connect(ui.quantiserSpinBox, SIGNAL(valueChanged(int)), this, SLOT(quantiserSpinBox_valueChanged(int)));
++        connect(ui.maxBFramesSpinBox, SIGNAL(valueChanged(int)), this, SLOT(maxBFramesSpinBox_valueChanged(int)));
++        connect(ui.bFrameRefComboBox, SIGNAL(currentIndexChanged(int)), this, SLOT(bFrameRefComboBox_currentIndexChanged(int)));
+         connect(ui.meSpinBox, SIGNAL(valueChanged(int)), this, SLOT(meSpinBox_valueChanged(int)));
+         connect(ui.targetRateControlSpinBox, SIGNAL(valueChanged(int)), this, SLOT(targetRateControlSpinBox_valueChanged(int)));
+         connect(ui.cuTreeCheckBox, SIGNAL(toggled(bool)), this, SLOT(cuTreeCheckBox_toggled(bool)));
+@@ -634,10 +636,48 @@ void x265Dialog::meSlider_valueChanged(int value)
+ {
+ 	ui.meSpinBox->setValue(value);
+ }
++
+ void x265Dialog::quantiserSpinBox_valueChanged(int value)
+ {
+ 	ui.quantiserSlider->setValue(value);
+ }
++
++void x265Dialog::maxBFramesSpinBox_valueChanged(int value)
++{
++    // HEVC specification allows a maximum of 8 total reference frames only if B frames are disabled.
++    // Enforce the limit to ensure compliance.
++    if(!value)
++    {
++        ui.refFramesSpinBox->setMaximum(8);
++    }else // with B frames enabled, the maximum decreases to 7
++    {
++        if(ui.bFrameRefComboBox->currentIndex()>0)
++        { // max ref frames decreases further to 6 if B pyramid is enabled as well
++            ui.refFramesSpinBox->setMaximum(6);
++        }else
++        {
++            ui.refFramesSpinBox->setMaximum(7);
++        }
++    }
++}
++
++void x265Dialog::bFrameRefComboBox_currentIndexChanged(int index)
++{
++     if(ui.maxBFramesSpinBox->value()) // if B frames are enabled
++     {
++         if(index>0) // and B pyramid is enabled too, reduce max ref frames accordingly
++         {
++             ui.refFramesSpinBox->setMaximum(6);
++         }else
++         {
++             ui.refFramesSpinBox->setMaximum(7);
++         }
++     }else
++     {
++         ui.refFramesSpinBox->setMaximum(8);
++     }
++}
++
+ void x265Dialog::meSpinBox_valueChanged(int value)
+ {
+ 	ui.meSlider->setValue(value);
+diff --git a/avidemux_plugins/ADM_videoEncoder/x265/qt4/Q_x265.h b/avidemux_plugins/ADM_videoEncoder/x265/qt4/Q_x265.h
+index 1f353cc..f03dda1 100644
+--- a/avidemux_plugins/ADM_videoEncoder/x265/qt4/Q_x265.h
++++ b/avidemux_plugins/ADM_videoEncoder/x265/qt4/Q_x265.h
+@@ -38,6 +38,8 @@ private slots:
+         void useAdvancedConfigurationCheckBox_toggled(bool checked);
+         void meSpinBox_valueChanged(int value);
+         void meSlider_valueChanged(int value);
++        void maxBFramesSpinBox_valueChanged(int value);
++        void bFrameRefComboBox_currentIndexChanged(int index);
+         void encodingModeComboBox_currentIndexChanged(int index);
+         void quantiserSlider_valueChanged(int value);
+         void quantiserSpinBox_valueChanged(int value);
+commit c8848ddaa70cd12a46ed139464af498fde9051c6
+Author: mean <fixounet@free.fr>
+Date:   Sat Dec 17 20:40:03 2016 +0100
+
+    [build/ffmpeg] when using nvenc, update the key_frame field, it is part of an obsolete api
+
+ avidemux_core/ffmpeg_package/patches/libavcodec_nvenc.c.patch | 14 ++++++++++++++
+ 1 file changed, 14 insertions(+)
+
+diff --git a/avidemux_core/ffmpeg_package/patches/libavcodec_nvenc.c.patch b/avidemux_core/ffmpeg_package/patches/libavcodec_nvenc.c.patch
+new file mode 100644
+index 0000000..8161739
+--- /dev/null
++++ b/avidemux_core/ffmpeg_package/patches/libavcodec_nvenc.c.patch
+@@ -0,0 +1,14 @@
++--- libavcodec/nvenc.c.org	2016-12-17 20:35:41.567875083 +0100
+++++ libavcodec/nvenc.c	2016-12-17 20:36:24.587708057 +0100
++@@ -1208,8 +1208,11 @@
++     if (nv_status != NV_ENC_SUCCESS)
++         av_log(avctx, AV_LOG_ERROR, "Failed unlocking bitstream buffer, expect the gates of mordor to open\n");
++ 
+++    avctx->coded_frame->key_frame = 0;
+++
++     switch (lock_params.pictureType) {
++     case NV_ENC_PIC_TYPE_IDR:
+++        avctx->coded_frame->key_frame = 1;
++         pkt->flags |= AV_PKT_FLAG_KEY;
++ #if FF_API_CODED_FRAME
++ FF_DISABLE_DEPRECATION_WARNINGS
+commit 886dbdc6da9575273707df4f253ce8d665c2fbfc
+Author: mean <fixounet@free.fr>
+Date:   Sun Dec 25 08:45:37 2016 +0100
+
+    [ffmpeg/patch] Backport patch from 3.1 ffmpeg branch about nvenc not requiring non free. Since it is possible due to the MIT licensing of nvenc header, it should applies to all branches
+
+ ...configure-Don-t-require-nonfree-for-nvenc.patch | 29 ++++++++++++++++++++++
+ 1 file changed, 29 insertions(+)
+
+commit 1fcc65f358c4bfc817e7bde8a3fb285d12e78b99
+Author: mean <fixounet@free.fr>
+Date:   Sun Dec 25 08:52:11 2016 +0100
+
+    [core/ffmpeg] Backport nvenc not requiring nonfree flag from ffmpeg 3.1
+
+ ...0001-configure-Don-t-require-nonfree-for-nvenc.patch | 17 +++++++----------
+ cmake/admFFmpegBuild_native.cmake                       |  1 -
+ 2 files changed, 7 insertions(+), 11 deletions(-)
+
+diff -urN a/avidemux_core/ffmpeg_package/patches/0001-configure-Don-t-require-nonfree-for-nvenc.patch b/avidemux_core/ffmpeg_package/patches/0001-configure-Don-t-require-nonfree-for-nvenc.patch
+--- a/avidemux_core/ffmpeg_package/patches/0001-configure-Don-t-require-nonfree-for-nvenc.patch	1970-01-01 01:00:00.000000000 +0100
++++ b/avidemux_core/ffmpeg_package/patches/0001-configure-Don-t-require-nonfree-for-nvenc.patch	2016-12-26 00:51:45.650289823 +0100
+@@ -0,0 +1,26 @@
++From 09522a303db014b48f844443f0f3aaa00af8f165 Mon Sep 17 00:00:00 2001
++From: Timo Rothenpieler <timo@rothenpieler.org>
++Date: Sat, 23 Apr 2016 18:55:51 +0200
++Subject: [PATCH] configure: Don't require nonfree for nvenc
++
++As the nvEncodeApi.h header is now MIT licensed, this can be dropped.
++The loaded CUDA and NVENC libraries are part of the nvidia driver, and
++thus count as system libraries.
++
++Signed-off-by: Anton Khirnov <anton@khirnov.net>
++---
++ configure | 1 -
++ 1 file changed, 1 deletion(-)
++
++diff --git a/configure b/configure
++index 6bab581..43c563f 100755
++--- configure.old       2016-12-25 08:47:40.205283452 +0100
+++++ configure   2016-12-25 08:48:02.125200834 +0100
++@@ -4882,7 +4882,6 @@
++ die_license_disabled gpl x11grab
++ 
++ die_license_disabled nonfree libfaac
++-die_license_disabled nonfree nvenc
++ enabled gpl && die_license_disabled_gpl nonfree libfdk_aac
++ enabled gpl && die_license_disabled_gpl nonfree openssl
++
+commit f845288d3d1f5bc8f27eb76a4aacd111ca0811bc
+Author: eumagga0x2a <eumagga0x2a@users.noreply.github.com>
+Date:   Sat Dec 17 23:28:39 2016 +0100
+
+    [build/cmake] Fix NVENC detection and ffmpeg configure options
+
+ cmake/admCheckNvEnc.cmake         | 5 +++--
+ cmake/admFFmpegBuild_native.cmake | 1 +
+ 2 files changed, 4 insertions(+), 2 deletions(-)
+
+commit 25d94f28cbae1a25e7dcdcce106f5bc5c4b637df
+Author: eumagga0x2a <eumagga0x2a@users.noreply.github.com>
+Date:   Sat Dec 17 23:56:24 2016 +0100
+
+    [build/cmake] Fix the status message from the previous commit
+
+ cmake/admCheckNvEnc.cmake | 3 +--
+ 1 file changed, 1 insertion(+), 2 deletions(-)
+
+commit f27e9e53929fb08852b767b66b035a6ccd4cd404
+Author: mean <fixounet@free.fr>
+Date:   Sun Dec 18 08:25:03 2016 +0100
+
+    [build/core] update ffmpeg to 3.0.5
+
+ avidemux_core/ffmpeg_package/ffmpeg-3.0.3.tar.bz2 | Bin 8885942 -> 0 bytes
+ avidemux_core/ffmpeg_package/ffmpeg-3.0.5.tar.bz2 | Bin 0 -> 8890675 bytes
+ cmake/admFFmpegBuild_helpers.cmake                |   2 +-
+ 3 files changed, 1 insertion(+), 1 deletion(-)
+
+commit 1fcc65f358c4bfc817e7bde8a3fb285d12e78b99
+Author: mean <fixounet@free.fr>
+Date:   Sun Dec 25 08:52:11 2016 +0100
+
+    [core/ffmpeg] Backport nvenc not requiring nonfree flag from ffmpeg 3.1
+
+ ...0001-configure-Don-t-require-nonfree-for-nvenc.patch | 17 +++++++----------
+ cmake/admFFmpegBuild_native.cmake                       |  1 -
+ 2 files changed, 7 insertions(+), 11 deletions(-)
+diff -uprN a/cmake/admCheckNvEnc.cmake b/cmake/admCheckNvEnc.cmake
+--- a/cmake/admCheckNvEnc.cmake	2016-11-19 08:58:39.000000000 +0100
++++ b/cmake/admCheckNvEnc.cmake	2016-12-27 21:39:40.230160619 +0100
+@@ -6,10 +6,10 @@ MACRO(checkNvEnc)
+ 		MESSAGE(STATUS "*****************")
+ 
+ 		IF (NVENC)
+-                        FIND_PATH(NVENC_INCLUDE_DIR nvEncodeAPI.h 
+-		      	PATHS /usr/include/x86_64-linux-gnu) # Needed for 64 bits linux
++                        FIND_PATH(NVENC_INCLUDE_DIR nvEncodeAPI.h
++                        PATHS /usr/include /usr/include/nvenc /usr/include/x86_64-linux-gnu) # Needed for 64 bits linux
+                         IF(NVENC_INCLUDE_DIR)
+-				MESSAGE(STATUS " nvenc header Found ")
++				MESSAGE(STATUS " nvenc header Found in ${NVENC_INCLUDE_DIR}")
+                                 SET(USE_NVENC True)
+                                 SET(NVENC_FOUND 1)
+                         ELSE(NVENC_INCLUDE_DIR)
+diff -uprN a/cmake/admFFmpegBuild.cmake b/cmake/admFFmpegBuild.cmake
+--- a/cmake/admFFmpegBuild.cmake	2016-11-19 08:58:39.000000000 +0100
++++ b/cmake/admFFmpegBuild.cmake	2016-12-27 21:39:40.231160612 +0100
+@@ -9,7 +9,7 @@ ENDMACRO (xadd)
+ 
+ option(FF_INHERIT_BUILD_ENV "" ON)
+ 
+-set(FFMPEG_VERSION "3.0.3")
++set(FFMPEG_VERSION "3.0.5")
+ set(FFMPEG_ROOT_DIR "${AVIDEMUX_TOP_SOURCE_DIR}/avidemux_core/ffmpeg_package")
+ set(FFMPEG_PATCH_DIR  "${FFMPEG_ROOT_DIR}/patches/")
+ set(FFMPEG_SOURCE_ARCHIVE "ffmpeg-${FFMPEG_VERSION}.tar.bz2")
+@@ -45,8 +45,8 @@ xadd("--disable-libx265")
+ xadd("--disable-libx264")
+ IF(USE_NVENC)
+    SET(FFMPEG_ENCODERS ${FFMPEG_ENCODERS} nvenc)
+-   xadd("--enable-nonfree")
+    xadd("--enable-nvenc")
++   xadd("--extra-cflags=-I${NVENC_INCLUDE_DIR}")
+    set(FFMPEG_ENCODERS  ${FFMPEG_ENCODERS} nvenc_h264 nvenc_hevc)
+ ENDIF(USE_NVENC)
+ 
+commit 343fa1212da77e00e6f960df30fed9ae2368d5dc
+Author: eumagga0x2a <eumagga0x2a@users.noreply.github.com>
+Date:   Tue Dec 13 12:01:17 2016 +0100
+
+    [build/plugins] Allow system libass, liba52 and libmad
+
+ avidemux_plugins/ADM_audioDecoders/ADM_ad_ac3/ADM_ad_a52.cpp |  5 +++++
+ avidemux_plugins/ADM_audioDecoders/ADM_ad_ac3/CMakeLists.txt | 11 +++++++++--
+ avidemux_plugins/ADM_audioDecoders/ADM_ad_mad/ADM_ad_mad.cpp |  5 +++++
+ avidemux_plugins/ADM_audioDecoders/ADM_ad_mad/CMakeLists.txt | 11 +++++++++--
+ avidemux_plugins/ADM_videoFilters6/ass/ADM_vidASS.cpp        |  4 ++++
+ avidemux_plugins/ADM_videoFilters6/ass/CMakeLists.txt        | 51 +++++++++++++++++++++++++++------------------------
+ avidemux_plugins/CMakeLists.txt                              | 31 ++++++++++++++++++++++++++++++-
+ 7 files changed, 89 insertions(+), 29 deletions(-)
+
+commit 9bddbe65d731040e46fcb30c3006796d81956a49
+Author: eumagga0x2a <eumagga0x2a@users.noreply.github.com>
+Date:   Tue Dec 13 12:30:11 2016 +0100
+
+    [build/plugins] Allow system libs: Remove forgotten leftover
+
+ avidemux_plugins/CMakeLists.txt | 1 -
+ 1 file changed, 1 deletion(-)
+
+commit ad3af857db49de41e56088a46d250ff22d027a85
+Author: eumagga0x2a <eumagga0x2a@users.noreply.github.com>
+Date:   Mon Dec 19 20:40:58 2016 +0100
+
+    [build/plugins] Fix build with external libs (oops...)
+
+ avidemux_plugins/ADM_audioDecoders/ADM_ad_ac3/CMakeLists.txt | 1 +
+ avidemux_plugins/ADM_audioDecoders/ADM_ad_mad/CMakeLists.txt | 1 +
+ avidemux_plugins/ADM_videoFilters6/ass/CMakeLists.txt        | 1 +
+ 3 files changed, 3 insertions(+)
+
+diff -uprN a/avidemux_plugins/ADM_audioDecoders/ADM_ad_ac3/ADM_ad_a52.cpp b/avidemux_plugins/ADM_audioDecoders/ADM_ad_ac3/ADM_ad_a52.cpp
+--- a/avidemux_plugins/ADM_audioDecoders/ADM_ad_ac3/ADM_ad_a52.cpp	2016-11-19 08:58:39.000000000 +0100
++++ b/avidemux_plugins/ADM_audioDecoders/ADM_ad_ac3/ADM_ad_a52.cpp	2016-12-19 21:09:28.417839524 +0100
+@@ -18,8 +18,13 @@
+ #include "ADM_ad_plugin.h"
+ 
+ extern "C" {
++#ifdef USE_EXTERNAL_LIBA52
++#include "a52dec/a52.h"
++#include "a52dec/mm_accel.h"
++#else
+ #include "ADM_liba52/a52.h"
+ #include "ADM_liba52/mm_accel.h"
++#endif
+ };
+ 
+ #define AC3_HANDLE ((a52_state_t *)ac3_handle)
+diff -uprN a/avidemux_plugins/ADM_audioDecoders/ADM_ad_ac3/CMakeLists.txt b/avidemux_plugins/ADM_audioDecoders/ADM_ad_ac3/CMakeLists.txt
+--- a/avidemux_plugins/ADM_audioDecoders/ADM_ad_ac3/CMakeLists.txt	2016-11-19 08:58:39.000000000 +0100
++++ b/avidemux_plugins/ADM_audioDecoders/ADM_ad_ac3/CMakeLists.txt	2016-12-19 21:09:44.506723455 +0100
+@@ -1,11 +1,19 @@
+ INCLUDE(ad_plugin)
+ 
+-ADD_SUBDIRECTORY(ADM_liba52)
++IF(NOT USE_EXTERNAL_LIBA52)
++    ADD_SUBDIRECTORY(ADM_liba52)
++ENDIF()
+ 
+ SET(ADM_ad_a52_SRCS ADM_ad_a52.cpp)
+ 
+ ADD_AUDIO_DECODER( ADM_ad_a52  ${ADM_ad_a52_SRCS})
+-TARGET_LINK_LIBRARIES(ADM_ad_a52 ADM_liba52)
++
++IF(USE_EXTERNAL_LIBA52)
++    ADD_DEFINITIONS("-DUSE_EXTERNAL_LIBA52")
++    TARGET_LINK_LIBRARIES(ADM_ad_a52 ${LIBA52_LIBRARIES})
++ELSE()
++    TARGET_LINK_LIBRARIES(ADM_ad_a52 ADM_liba52)
++ENDIF()
+ 
+ INIT_AUDIO_PLUGIN(ADM_ad_a52)
+ INSTALL_AUDIODECODER(ADM_ad_a52)
+diff -uprN a/avidemux_plugins/ADM_audioDecoders/ADM_ad_mad/ADM_ad_mad.cpp b/avidemux_plugins/ADM_audioDecoders/ADM_ad_mad/ADM_ad_mad.cpp
+--- a/avidemux_plugins/ADM_audioDecoders/ADM_ad_mad/ADM_ad_mad.cpp	2016-11-19 08:58:39.000000000 +0100
++++ b/avidemux_plugins/ADM_audioDecoders/ADM_ad_mad/ADM_ad_mad.cpp	2016-12-19 21:09:28.418839517 +0100
+@@ -16,7 +16,12 @@
+  ***************************************************************************/
+ #include "ADM_default.h"
+ #include "ADM_ad_plugin.h"
++
++#ifdef USE_EXTERNAL_LIBMAD
++#include "mad.h"
++#else
+ #include "ADM_libMad/mad.h"
++#endif
+ 
+ #define Stream ((mad_stream *)_stream)
+ #define Frame ((mad_frame *)_frame)
+diff -uprN a/avidemux_plugins/ADM_audioDecoders/ADM_ad_mad/CMakeLists.txt b/avidemux_plugins/ADM_audioDecoders/ADM_ad_mad/CMakeLists.txt
+--- a/avidemux_plugins/ADM_audioDecoders/ADM_ad_mad/CMakeLists.txt	2016-11-19 08:58:39.000000000 +0100
++++ b/avidemux_plugins/ADM_audioDecoders/ADM_ad_mad/CMakeLists.txt	2016-12-19 21:09:44.507723448 +0100
+@@ -10,13 +10,21 @@ ELSEIF (ADM_CPU_ARMEL)
+ 	ADD_DEFINITIONS("-DFPM_ARM")
+ ENDIF (ADM_CPU_X86_32)
+ 
+-ADD_SUBDIRECTORY(ADM_libMad)
++IF(NOT USE_EXTERNAL_LIBMAD)
++    ADD_SUBDIRECTORY(ADM_libMad)
++ENDIF()
+ 
+ ADD_DEFINITIONS("-DHAVE_ASSERT_H")
+ SET(ADM_ad_Mad_SRCS ADM_ad_mad.cpp)
+ 
+ ADD_AUDIO_DECODER( ADM_ad_Mad ${ADM_ad_Mad_SRCS})
+-TARGET_LINK_LIBRARIES(ADM_ad_Mad ADM_libMad)
++
++IF(USE_EXTERNAL_LIBMAD)
++    ADD_DEFINITIONS("-DUSE_EXTERNAL_LIBMAD")
++    TARGET_LINK_LIBRARIES(ADM_ad_Mad ${LIBMAD_LIBRARIES})
++ELSE()
++    TARGET_LINK_LIBRARIES(ADM_ad_Mad ADM_libMad)
++ENDIF()
+ 
+ INIT_AUDIO_PLUGIN(ADM_ad_Mad)
+ INSTALL_AUDIODECODER(ADM_ad_Mad)
+diff -uprN a/avidemux_plugins/ADM_videoFilters6/ass/ADM_vidASS.cpp b/avidemux_plugins/ADM_videoFilters6/ass/ADM_vidASS.cpp
+--- a/avidemux_plugins/ADM_videoFilters6/ass/ADM_vidASS.cpp	2016-11-19 08:58:39.000000000 +0100
++++ b/avidemux_plugins/ADM_videoFilters6/ass/ADM_vidASS.cpp	2016-12-19 21:09:28.418839517 +0100
+@@ -24,7 +24,11 @@
+ #include "prefs.h"
+ extern "C"
+ {
++#ifdef USE_EXTERNAL_LIBASS
++#include "ass/ass.h"
++#else
+ #include "ADM_libass/ass.h"
++#endif
+ }
+ 
+ /**
+diff -uprN a/avidemux_plugins/ADM_videoFilters6/ass/CMakeLists.txt b/avidemux_plugins/ADM_videoFilters6/ass/CMakeLists.txt
+--- a/avidemux_plugins/ADM_videoFilters6/ass/CMakeLists.txt	2016-11-19 08:58:39.000000000 +0100
++++ b/avidemux_plugins/ADM_videoFilters6/ass/CMakeLists.txt	2016-12-19 21:09:44.507723448 +0100
+@@ -1,24 +1,28 @@
+-INCLUDE(admCheckFreeType)
+-INCLUDE(admCheckFridibi)
+-ADD_CORE_INCLUDE(ADM_coreSubtitles)
+-checkFreeType()
+-checkFridibi("0.19")
+-
+-IF (USE_FREETYPE AND USE_FRIDIBI)
+-	ADD_SUBDIRECTORY(ADM_libass)
+-
+-	INCLUDE(vf_plugin)
+-	SET(ADM_vf_ssa_SRCS ADM_vidASS.cpp)
+-
+-	ADD_VIDEO_FILTER(ADM_vf_ssa ${ADM_vf_ssa_SRCS})
+-
+-	IF(DO_COMMON)
+-		TARGET_LINK_LIBRARIES(ADM_vf_ssa ADM_libass ${FREETYPE2_LDFLAGS} ${FRIDIBI_LDFLAGS} ADM_coreSubtitle)
+-                # We force the use of fontconfig
+-                ADD_DEFINITIONS("-DUSE_FONTCONFIG")
+-                TARGET_LINK_LIBRARIES(ADM_vf_ssa ${FONTCONFIG_LDFLAGS})
+-	ENDIF(DO_COMMON)
+-
+-	INIT_VIDEO_FILTER(ADM_vf_ssa)
+-	INSTALL_VIDEO_FILTER(ADM_vf_ssa)
+-ENDIF (USE_FREETYPE AND USE_FRIDIBI)
++INCLUDE(admCheckFreeType)
++INCLUDE(admCheckFridibi)
++ADD_CORE_INCLUDE(ADM_coreSubtitles)
++checkFreeType()
++checkFridibi("0.19")
++
++IF (USE_FREETYPE AND USE_FRIDIBI)
++    INCLUDE(vf_plugin)
++    SET(ADM_vf_ssa_SRCS ADM_vidASS.cpp)
++
++    ADD_VIDEO_FILTER(ADM_vf_ssa ${ADM_vf_ssa_SRCS})
++
++    IF(DO_COMMON)
++        IF(USE_EXTERNAL_LIBASS)
++            ADD_DEFINITIONS("-DUSE_EXTERNAL_LIBASS")
++            TARGET_LINK_LIBRARIES(ADM_vf_ssa ${LIBASS_LIBRARIES} ${FREETYPE2_LDFLAGS} ${FRIDIBI_LDFLAGS} ADM_coreSubtitle)
++        ELSE(USE_EXTERNAL_LIBASS)
++            ADD_SUBDIRECTORY(ADM_libass)
++            TARGET_LINK_LIBRARIES(ADM_vf_ssa ADM_libass ${FREETYPE2_LDFLAGS} ${FRIDIBI_LDFLAGS} ADM_coreSubtitle)
++        ENDIF(USE_EXTERNAL_LIBASS)
++        # We force the use of fontconfig
++        ADD_DEFINITIONS("-DUSE_FONTCONFIG")
++        TARGET_LINK_LIBRARIES(ADM_vf_ssa ${FONTCONFIG_LDFLAGS})
++    ENDIF(DO_COMMON)
++
++    INIT_VIDEO_FILTER(ADM_vf_ssa)
++    INSTALL_VIDEO_FILTER(ADM_vf_ssa)
++ENDIF (USE_FREETYPE AND USE_FRIDIBI)
+diff -uprN a/avidemux_plugins/CMakeLists.txt b/avidemux_plugins/CMakeLists.txt
+--- a/avidemux_plugins/CMakeLists.txt	2016-11-19 08:58:39.000000000 +0100
++++ b/avidemux_plugins/CMakeLists.txt	2016-12-19 21:09:36.103784041 +0100
+@@ -16,7 +16,7 @@ MESSAGE(STATUS "Checking for avidemux de
+ IF(NOT FAKEROOT)
+ 	SET(AVIDEMUX_FAKEROOT "")
+ else(NOT FAKEROOT)
+-	SET(AVIDEMUX_FAKEROOT "${FAKEROOT}/")
++	SET(AVIDEMUX_FAKEROOT "${FAKEROOT}")
+ endif(NOT FAKEROOT)
+ 
+ 
+@@ -64,6 +64,34 @@ include(admCoreIncludes)
+ LINK_DIRECTORIES("${AVIDEMUX_SEARCH_LIB_DIR}")
+ INCLUDE_DIRECTORIES("${AVIDEMUX_SEARCH_INCLUDE_DIR}/avidemux/2.6")
+ 
++#########################################
++# Unbundle some libraries here
++#########################################
++OPTION(USE_EXTERNAL_LIBASS "Use system installed libass library." OFF)
++OPTION(USE_EXTERNAL_LIBMAD "Use system installed libmad library." OFF)
++OPTION(USE_EXTERNAL_LIBA52 "Use system installed liba52 library." OFF)
++
++INCLUDE(FindPkgConfig)
++
++# libass
++IF(USE_EXTERNAL_LIBASS)
++        PKG_CHECK_MODULES(LIBASS REQUIRED libass)
++        INCLUDE_DIRECTORIES(SYSTEM ${LIBASS_INCLUDE_DIRS})
++ENDIF()
++
++# libmad
++IF(USE_EXTERNAL_LIBMAD)
++        FIND_PATH(LIBMAD_INCLUDE_DIR mad.h)
++        FIND_LIBRARY(LIBMAD_LIBRARIES mad)
++        INCLUDE_DIRECTORIES(SYSTEM ${LIBMAD_INCLUDE_DIRS})
++ENDIF()
++
++# liba52
++IF(USE_EXTERNAL_LIBA52)
++        FIND_PATH(LIBA52_INCLUDE_DIR a52dec/a52.h)
++        FIND_LIBRARY(LIBA52_LIBRARIES a52)
++        INCLUDE_DIRECTORIES(SYSTEM ${LIBA52_INCLUDE_DIR})
++ENDIF()
+ 
+ IF (FRESH_BUILD)
+ 	MESSAGE("")
