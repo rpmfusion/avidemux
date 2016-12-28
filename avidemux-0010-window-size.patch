@@ -1,0 +1,87 @@
+commit 4e3ede73d15c70de99afbc5d874368db0d96f302
+Author: eumagga0x2a <eumagga0x2a@users.noreply.github.com>
+Date:   Sun Dec 25 17:07:25 2016 +0100
+
+    [Qt] Take actual dimensions of widgets into account when resizing the main window
+---
+ avidemux/common/ADM_commonUI/GUI_ui.h              |  3 +++
+ avidemux/qt4/ADM_userInterfaces/ADM_gui/Q_gui2.cpp | 28 ++++++++++++++++++++++
+ .../qt4/ADM_userInterfaces/ADM_gui/T_preview.cpp   |  5 ++--
+ 3 files changed, 34 insertions(+), 2 deletions(-)
+
+diff --git a/avidemux/common/ADM_commonUI/GUI_ui.h b/avidemux/common/ADM_commonUI/GUI_ui.h
+index 4d02fbd..8f5c00b 100644
+--- a/avidemux/common/ADM_commonUI/GUI_ui.h
++++ b/avidemux/common/ADM_commonUI/GUI_ui.h
+@@ -18,6 +18,9 @@ void UI_setVProcessToggleStatus( uint8_t status );
+ void    UI_iconify( void );
+ void    UI_deiconify( void );
+ 
++uint32_t UI_requiredWidth(void);
++uint32_t UI_requiredHeight(void);
++
+ int     UI_readCurFrame( void );
+ int     UI_readCurTime(uint16_t &hh, uint16_t &mm, uint16_t &ss, uint16_t &ms);
+ void    UI_JumpDone(void);
+diff --git a/avidemux/qt4/ADM_userInterfaces/ADM_gui/Q_gui2.cpp b/avidemux/qt4/ADM_userInterfaces/ADM_gui/Q_gui2.cpp
+index 5dcfb96..70012e6 100644
+--- a/avidemux/qt4/ADM_userInterfaces/ADM_gui/Q_gui2.cpp
++++ b/avidemux/qt4/ADM_userInterfaces/ADM_gui/Q_gui2.cpp
+@@ -1527,6 +1527,34 @@ void UI_deiconify( void )
+     }
+ }
+ /**
++ *   \fn UI_requiredWidth
++ *   \brief calculate the horizontal space occupied by the coded widget incl. some margin
++ */
++uint32_t UI_requiredWidth(void)
++{
++    uint32_t reqw=18; // 2 x 9px margin
++    if(WIDGET(codecWidget)->isVisible())
++        reqw += WIDGET(codecWidget)->frameSize().width() + 6; // with codec widget visible a small extra margin is necessary
++    if(WIDGET(toolBar)->orientation()==Qt::Vertical && WIDGET(toolBar)->isVisible() && false==WIDGET(toolBar)->isFloating())
++        reqw += WIDGET(toolBar)->frameSize().width();
++    return reqw;
++}
++/**
++ *   \fn UI_requiredHeight
++ *   \brief calculate the vertical space occupied by widgets above and below the video window
++ */
++uint32_t UI_requiredHeight(void)
++{
++    uint32_t reqh=18; // 2 x 9px margin
++    if(WIDGET(menubar)->isVisible())
++        reqh += WIDGET(menubar)->height();
++    if(WIDGET(toolBar)->isVisible() && false==WIDGET(toolBar)->isFloating() && WIDGET(toolBar)->orientation()==Qt::Horizontal)
++        reqh += WIDGET(toolBar)->frameSize().height();
++    if(WIDGET(navigationWidget)->isVisible() || WIDGET(selectionWidget)->isVisible() || WIDGET(volumeWidget)->isVisible() || WIDGET(audioMetreWidget)->isVisible())
++        reqh += WIDGET(navigationWidget)->frameSize().height();
++    return reqh;
++}
++/**
+     \fn UI_setAudioTrackCount
+ */
+ void UI_setAudioTrackCount( int nb )
+diff --git a/avidemux/qt4/ADM_userInterfaces/ADM_gui/T_preview.cpp b/avidemux/qt4/ADM_userInterfaces/ADM_gui/T_preview.cpp
+index aefee79..ccc362b 100644
+--- a/avidemux/qt4/ADM_userInterfaces/ADM_gui/T_preview.cpp
++++ b/avidemux/qt4/ADM_userInterfaces/ADM_gui/T_preview.cpp
+@@ -44,6 +44,7 @@ extern "C"
+ #include "T_preview.h"
+ #include "../ADM_render/GUI_render.h"
+ #include "../ADM_render/GUI_accelRender.h"
++#include "GUI_ui.h"
+ #include "DIA_coreToolkit.h"
+     
+ void UI_QT4VideoWidget(QFrame *host);
+@@ -171,8 +172,8 @@ void  UI_updateDrawWindowSize(void *win,uint32_t w,uint32_t h)
+     // TODO: Resize the main window on restore event.
+     if(!QuiMainWindows->isMaximized())
+     {
+-        uint16_t extra_w=240; // take into account the width of the codec widget in px + some margin
+-        uint16_t extra_h=240; // take into account the height of the navigation widget in px + some margin
++        uint32_t extra_w=UI_requiredWidth();
++        uint32_t extra_h=UI_requiredHeight();
+         QuiMainWindows->resize(w+extra_w,h+extra_h);
+     }
+     videoWindow->setADMSize(w,h);

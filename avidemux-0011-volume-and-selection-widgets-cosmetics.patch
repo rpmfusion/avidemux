@@ -1,0 +1,93 @@
+commit 1ac9568ce8a4aa39f9fd64912aa83c04ca94c3e8
+Author: eumagga0x2a <eumagga0x2a@users.noreply.github.com>
+Date:   Fri Dec 16 08:49:45 2016 +0100
+
+    [Qt] Align the mute button and the volume slider, avoid clipping
+
+ avidemux/qt4/ADM_userInterfaces/ADM_gui/gui2.ui | 26 +++++--------------------
+ 1 file changed, 5 insertions(+), 21 deletions(-)
+
+commit 00d441186375ab80a611d6c9fe7dbe343b5d8637
+Author: eumagga0x2a <eumagga0x2a@users.noreply.github.com>
+Date:   Wed Dec 21 20:49:59 2016 +0100
+
+    [Qt] Reduce the minimum width of the selection widget
+
+ avidemux/qt4/ADM_userInterfaces/ADM_gui/gui2.ui | 10 ++--------
+ 1 file changed, 2 insertions(+), 8 deletions(-)
+
+--- a/avidemux/qt4/ADM_userInterfaces/ADM_gui/gui2.ui	2016-11-19 08:58:39.000000000 +0100
++++ b/avidemux/qt4/ADM_userInterfaces/ADM_gui/gui2.ui	2016-12-27 22:05:15.035595801 +0100
+@@ -1438,16 +1438,10 @@
+    </widget>
+   </widget>
+   <widget class="QDockWidget" name="selectionWidget">
+-   <property name="sizePolicy">
+-    <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
+-     <horstretch>0</horstretch>
+-     <verstretch>0</verstretch>
+-    </sizepolicy>
+-   </property>
+    <property name="minimumSize">
+     <size>
+-     <width>192</width>
+-     <height>163</height>
++     <width>160</width>
++     <height>150</height>
+     </size>
+    </property>
+    <property name="features">
+@@ -1603,8 +1597,8 @@
+    </attribute>
+    <widget class="QWidget" name="dockWidgetContents_5">
+     <layout class="QVBoxLayout" name="verticalLayout_4">
+-     <property name="topMargin">
+-      <number>0</number>
++     <property name="alignment">
++      <set>Qt::AlignHCenter</set>
+      </property>
+      <item>
+       <widget class="QToolButton" name="toolButtonAudioToggle">
+@@ -1619,7 +1613,7 @@
+        </property>
+        <property name="minimumSize">
+         <size>
+-         <width>0</width>
++         <width>22</width>
+          <height>22</height>
+         </size>
+        </property>
+@@ -1639,22 +1633,6 @@
+       </widget>
+      </item>
+      <item>
+-      <spacer name="verticalSpacer">
+-       <property name="orientation">
+-        <enum>Qt::Vertical</enum>
+-       </property>
+-       <property name="sizeType">
+-        <enum>QSizePolicy::MinimumExpanding</enum>
+-       </property>
+-       <property name="sizeHint" stdset="0">
+-        <size>
+-         <width>0</width>
+-         <height>0</height>
+-        </size>
+-       </property>
+-      </spacer>
+-     </item>
+-     <item>
+       <widget class="QSlider" name="horizontalSlider_2">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Fixed" vsizetype="Minimum">
+@@ -1664,8 +1642,8 @@
+        </property>
+        <property name="minimumSize">
+         <size>
+-         <width>0</width>
+-         <height>30</height>
++         <width>22</width>
++         <height>50</height>
+         </size>
+        </property>
+        <property name="maximum">

@@ -1,0 +1,22 @@
+commit d22a0fe6b5d0a120b832df4b5b96d4b3643b5529
+Author: eumagga0x2a <eumagga0x2a@users.noreply.github.com>
+Date:   Thu Nov 24 02:22:21 2016 +0100
+
+    [Pref] Return false if loading config fails, avoid selecting dummy audio device in this case
+
+ avidemux_core/ADM_coreUtils/src/prefs.cpp | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/avidemux_core/ADM_coreUtils/src/prefs.cpp b/avidemux_core/ADM_coreUtils/src/prefs.cpp
+index ff84be0..5a18eff 100644
+--- a/avidemux_core/ADM_coreUtils/src/prefs.cpp
++++ b/avidemux_core/ADM_coreUtils/src/prefs.cpp
+@@ -187,7 +187,7 @@ bool preferences::load()
+         return true;
+     }
+     ADM_warning("An error happened while loading config\n");
+-    return true;
++    return false;
+ }
+ 
+ /**

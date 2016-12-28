@@ -1,0 +1,156 @@
+commit c8848ddaa70cd12a46ed139464af498fde9051c6
+Author: mean <fixounet@free.fr>
+Date:   Sat Dec 17 20:40:03 2016 +0100
+
+    [build/ffmpeg] when using nvenc, update the key_frame field, it is part of an obsolete api
+
+ avidemux_core/ffmpeg_package/patches/libavcodec_nvenc.c.patch | 14 ++++++++++++++
+ 1 file changed, 14 insertions(+)
+
+diff --git a/avidemux_core/ffmpeg_package/patches/libavcodec_nvenc.c.patch b/avidemux_core/ffmpeg_package/patches/libavcodec_nvenc.c.patch
+new file mode 100644
+index 0000000..8161739
+--- /dev/null
++++ b/avidemux_core/ffmpeg_package/patches/libavcodec_nvenc.c.patch
+@@ -0,0 +1,14 @@
++--- libavcodec/nvenc.c.org	2016-12-17 20:35:41.567875083 +0100
+++++ libavcodec/nvenc.c	2016-12-17 20:36:24.587708057 +0100
++@@ -1208,8 +1208,11 @@
++     if (nv_status != NV_ENC_SUCCESS)
++         av_log(avctx, AV_LOG_ERROR, "Failed unlocking bitstream buffer, expect the gates of mordor to open\n");
++ 
+++    avctx->coded_frame->key_frame = 0;
+++
++     switch (lock_params.pictureType) {
++     case NV_ENC_PIC_TYPE_IDR:
+++        avctx->coded_frame->key_frame = 1;
++         pkt->flags |= AV_PKT_FLAG_KEY;
++ #if FF_API_CODED_FRAME
++ FF_DISABLE_DEPRECATION_WARNINGS
+commit 886dbdc6da9575273707df4f253ce8d665c2fbfc
+Author: mean <fixounet@free.fr>
+Date:   Sun Dec 25 08:45:37 2016 +0100
+
+    [ffmpeg/patch] Backport patch from 3.1 ffmpeg branch about nvenc not requiring non free. Since it is possible due to the MIT licensing of nvenc header, it should applies to all branches
+
+ ...configure-Don-t-require-nonfree-for-nvenc.patch | 29 ++++++++++++++++++++++
+ 1 file changed, 29 insertions(+)
+
+commit 1fcc65f358c4bfc817e7bde8a3fb285d12e78b99
+Author: mean <fixounet@free.fr>
+Date:   Sun Dec 25 08:52:11 2016 +0100
+
+    [core/ffmpeg] Backport nvenc not requiring nonfree flag from ffmpeg 3.1
+
+ ...0001-configure-Don-t-require-nonfree-for-nvenc.patch | 17 +++++++----------
+ cmake/admFFmpegBuild_native.cmake                       |  1 -
+ 2 files changed, 7 insertions(+), 11 deletions(-)
+
+diff -urN a/avidemux_core/ffmpeg_package/patches/0001-configure-Don-t-require-nonfree-for-nvenc.patch b/avidemux_core/ffmpeg_package/patches/0001-configure-Don-t-require-nonfree-for-nvenc.patch
+--- a/avidemux_core/ffmpeg_package/patches/0001-configure-Don-t-require-nonfree-for-nvenc.patch	1970-01-01 01:00:00.000000000 +0100
++++ b/avidemux_core/ffmpeg_package/patches/0001-configure-Don-t-require-nonfree-for-nvenc.patch	2016-12-26 00:51:45.650289823 +0100
+@@ -0,0 +1,26 @@
++From 09522a303db014b48f844443f0f3aaa00af8f165 Mon Sep 17 00:00:00 2001
++From: Timo Rothenpieler <timo@rothenpieler.org>
++Date: Sat, 23 Apr 2016 18:55:51 +0200
++Subject: [PATCH] configure: Don't require nonfree for nvenc
++
++As the nvEncodeApi.h header is now MIT licensed, this can be dropped.
++The loaded CUDA and NVENC libraries are part of the nvidia driver, and
++thus count as system libraries.
++
++Signed-off-by: Anton Khirnov <anton@khirnov.net>
++---
++ configure | 1 -
++ 1 file changed, 1 deletion(-)
++
++diff --git a/configure b/configure
++index 6bab581..43c563f 100755
++--- configure.old       2016-12-25 08:47:40.205283452 +0100
+++++ configure   2016-12-25 08:48:02.125200834 +0100
++@@ -4882,7 +4882,6 @@
++ die_license_disabled gpl x11grab
++ 
++ die_license_disabled nonfree libfaac
++-die_license_disabled nonfree nvenc
++ enabled gpl && die_license_disabled_gpl nonfree libfdk_aac
++ enabled gpl && die_license_disabled_gpl nonfree openssl
++
+commit f845288d3d1f5bc8f27eb76a4aacd111ca0811bc
+Author: eumagga0x2a <eumagga0x2a@users.noreply.github.com>
+Date:   Sat Dec 17 23:28:39 2016 +0100
+
+    [build/cmake] Fix NVENC detection and ffmpeg configure options
+
+ cmake/admCheckNvEnc.cmake         | 5 +++--
+ cmake/admFFmpegBuild_native.cmake | 1 +
+ 2 files changed, 4 insertions(+), 2 deletions(-)
+
+commit 25d94f28cbae1a25e7dcdcce106f5bc5c4b637df
+Author: eumagga0x2a <eumagga0x2a@users.noreply.github.com>
+Date:   Sat Dec 17 23:56:24 2016 +0100
+
+    [build/cmake] Fix the status message from the previous commit
+
+ cmake/admCheckNvEnc.cmake | 3 +--
+ 1 file changed, 1 insertion(+), 2 deletions(-)
+
+commit f27e9e53929fb08852b767b66b035a6ccd4cd404
+Author: mean <fixounet@free.fr>
+Date:   Sun Dec 18 08:25:03 2016 +0100
+
+    [build/core] update ffmpeg to 3.0.5
+
+ avidemux_core/ffmpeg_package/ffmpeg-3.0.3.tar.bz2 | Bin 8885942 -> 0 bytes
+ avidemux_core/ffmpeg_package/ffmpeg-3.0.5.tar.bz2 | Bin 0 -> 8890675 bytes
+ cmake/admFFmpegBuild_helpers.cmake                |   2 +-
+ 3 files changed, 1 insertion(+), 1 deletion(-)
+
+commit 1fcc65f358c4bfc817e7bde8a3fb285d12e78b99
+Author: mean <fixounet@free.fr>
+Date:   Sun Dec 25 08:52:11 2016 +0100
+
+    [core/ffmpeg] Backport nvenc not requiring nonfree flag from ffmpeg 3.1
+
+ ...0001-configure-Don-t-require-nonfree-for-nvenc.patch | 17 +++++++----------
+ cmake/admFFmpegBuild_native.cmake                       |  1 -
+ 2 files changed, 7 insertions(+), 11 deletions(-)
+diff -uprN a/cmake/admCheckNvEnc.cmake b/cmake/admCheckNvEnc.cmake
+--- a/cmake/admCheckNvEnc.cmake	2016-11-19 08:58:39.000000000 +0100
++++ b/cmake/admCheckNvEnc.cmake	2016-12-27 21:39:40.230160619 +0100
+@@ -6,10 +6,10 @@ MACRO(checkNvEnc)
+ 		MESSAGE(STATUS "*****************")
+ 
+ 		IF (NVENC)
+-                        FIND_PATH(NVENC_INCLUDE_DIR nvEncodeAPI.h 
+-		      	PATHS /usr/include/x86_64-linux-gnu) # Needed for 64 bits linux
++                        FIND_PATH(NVENC_INCLUDE_DIR nvEncodeAPI.h
++                        PATHS /usr/include /usr/include/nvenc /usr/include/x86_64-linux-gnu) # Needed for 64 bits linux
+                         IF(NVENC_INCLUDE_DIR)
+-				MESSAGE(STATUS " nvenc header Found ")
++				MESSAGE(STATUS " nvenc header Found in ${NVENC_INCLUDE_DIR}")
+                                 SET(USE_NVENC True)
+                                 SET(NVENC_FOUND 1)
+                         ELSE(NVENC_INCLUDE_DIR)
+diff -uprN a/cmake/admFFmpegBuild.cmake b/cmake/admFFmpegBuild.cmake
+--- a/cmake/admFFmpegBuild.cmake	2016-11-19 08:58:39.000000000 +0100
++++ b/cmake/admFFmpegBuild.cmake	2016-12-27 21:39:40.231160612 +0100
+@@ -9,7 +9,7 @@ ENDMACRO (xadd)
+ 
+ option(FF_INHERIT_BUILD_ENV "" ON)
+ 
+-set(FFMPEG_VERSION "3.0.3")
++set(FFMPEG_VERSION "3.0.5")
+ set(FFMPEG_ROOT_DIR "${AVIDEMUX_TOP_SOURCE_DIR}/avidemux_core/ffmpeg_package")
+ set(FFMPEG_PATCH_DIR  "${FFMPEG_ROOT_DIR}/patches/")
+ set(FFMPEG_SOURCE_ARCHIVE "ffmpeg-${FFMPEG_VERSION}.tar.bz2")
+@@ -45,8 +45,8 @@ xadd("--disable-libx265")
+ xadd("--disable-libx264")
+ IF(USE_NVENC)
+    SET(FFMPEG_ENCODERS ${FFMPEG_ENCODERS} nvenc)
+-   xadd("--enable-nonfree")
+    xadd("--enable-nvenc")
++   xadd("--extra-cflags=-I${NVENC_INCLUDE_DIR}")
+    set(FFMPEG_ENCODERS  ${FFMPEG_ENCODERS} nvenc_h264 nvenc_hevc)
+ ENDIF(USE_NVENC)
+ 
