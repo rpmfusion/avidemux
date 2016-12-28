@@ -2,17 +2,28 @@
 
 Name:           avidemux
 Version:        2.6.15
-Release:        1%{?dist}
+Release:        2%{?dist}
 Summary:        Graphical video editing and transcoding tool
 
 License:        GPLv2+
 URL:            http://www.avidemux.org
 Source0:        http://downloads.sourceforge.net/%{name}/%{name}_%{version}.tar.gz
 Source1:        avidemux-qt.desktop
+Source2:        ffmpeg-3.0.5.tar.bz2
 
-Patch0:         avidemux-2.6.10-bundled_libs.patch
-Patch1:         avidemux-2.6.15-hwaccel.patch
-Patch2:         avidemux-2.6.15-disable-vpx-decoder-plugin.patch
+Patch0:         avidemux-2.6.15-disable-vpx-decoder-plugin.patch
+Patch1:         avidemux-0001-hwaccel.patch
+Patch2:         avidemux-0002-external-libs.patch
+Patch3:         avidemux-0003-ffmpeg-nvenc.patch
+Patch4:         avidemux-0004-fix-busy-loop-without-audio.patch
+Patch5:         avidemux-0005-ts-demuxer-audio-probe.patch
+Patch6:         avidemux-0006-apply-defaults-if-loading-config-fails.patch
+Patch7:         avidemux-0007-qt-stack-overflow.patch
+Patch8:         avidemux-0008-navigation.patch
+Patch9:         avidemux-0009-hevc-encoder-dialog.patch
+Patch10:        avidemux-0010-window-size.patch
+Patch11:        avidemux-0011-volume-and-selection-widgets-cosmetics.patch
+Patch12:        avidemux-0012-vdpau-to-upper.patch
 
 # Don't try to build on arm
 ExcludeArch: %{arm}
@@ -31,7 +42,7 @@ BuildRequires:  yasm-devel
 BuildRequires:  libxml2-devel >= 2.6.8
 BuildRequires:  fontconfig-devel
 BuildRequires:  freetype-devel
-BuildRequires:  js-devel
+BuildRequires:  fribidi-devel
 BuildRequires:  libXv-devel
 BuildRequires:  libXmu-devel
 BuildRequires:  libsamplerate-devel
@@ -59,12 +70,13 @@ BuildRequires:  libdca-devel
 BuildRequires:  opencore-amr-devel
 BuildRequires:  libvpx-devel
 BuildRequires:  twolame-devel
+BuildRequires:  opus-devel
 
 # Video Codecs
 BuildRequires:  xvidcore-devel >= 1.0.2
 BuildRequires:  x264-devel
 BuildRequires:  x265-devel
-BuildRequires:  ffmpeg-devel
+BuildRequires:  nvenc-devel
 
 # Main package is a metapackage, bring in something useful.
 Requires:       %{name}-gui = %{version}-%{release}
@@ -120,12 +132,26 @@ This package contains translation files for %{name}.
 %patch0 -p1
 %patch1 -p1
 %patch2 -p1
+%patch3 -p1
+%patch4 -p1
+%patch5 -p1
+%patch6 -p1
+%patch7 -p1
+%patch8 -p1
+%patch9 -p1
+%patch10 -p1
+%patch11 -p1
+%patch12 -p1
 
 # Remove sources of bundled libraries.
 rm -rf avidemux_plugins/ADM_audioDecoders/ADM_ad_ac3/ADM_liba52 \
        avidemux_plugins/ADM_audioDecoders/ADM_ad_mad/ADM_libMad \
        avidemux_plugins/ADM_audioEncoders/twolame/ADM_libtwolame \
-       avidemux_plugins/ADM_videoFilters6/ass/ADM_libass
+       avidemux_plugins/ADM_videoFilters6/ass/ADM_libass \
+       avidemux_core/ffmpeg_package/ffmpeg-3.0.3.tar.bz2
+
+# Copy ffmpeg-3.0.5.tar.bz2 to destination
+cp %{SOURCE2} avidemux_core/ffmpeg_package/
 
 %build
 # Build avidemux_core
@@ -169,7 +195,6 @@ rm -rf build_plugins_common && mkdir build_plugins_common && pushd build_plugins
        -DUSE_EXTERNAL_LIBASS=TRUE \
        -DUSE_EXTERNAL_LIBMAD=TRUE \
        -DUSE_EXTERNAL_LIBA52=TRUE \
-       -DUSE_EXTERNAL_TWOLAME=TRUE \
        ../avidemux_plugins
 make %{?_smp_mflags}
 make install DESTDIR=%{_pkgbuilddir}/fakeRoot
@@ -185,7 +210,6 @@ rm -rf build_plugins_cli && mkdir build_plugins_cli && pushd build_plugins_cli
        -DUSE_EXTERNAL_LIBASS=TRUE \
        -DUSE_EXTERNAL_LIBMAD=TRUE \
        -DUSE_EXTERNAL_LIBA52=TRUE \
-       -DUSE_EXTERNAL_TWOLAME=TRUE \
        ../avidemux_plugins
 make %{?_smp_mflags}
 make install DESTDIR=%{_pkgbuilddir}/fakeRoot
@@ -201,7 +225,6 @@ rm -rf build_plugins_qt5 && mkdir build_plugins_qt5 && pushd build_plugins_qt5
        -DUSE_EXTERNAL_LIBASS=TRUE \
        -DUSE_EXTERNAL_LIBMAD=TRUE \
        -DUSE_EXTERNAL_LIBA52=TRUE \
-       -DUSE_EXTERNAL_TWOLAME=TRUE \
        ../avidemux_plugins
 make %{?_smp_mflags}
 make install DESTDIR=%{_pkgbuilddir}/fakeRoot

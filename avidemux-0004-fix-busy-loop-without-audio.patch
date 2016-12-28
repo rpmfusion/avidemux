@@ -1,0 +1,28 @@
+commit e6482ab459c0221701d6eef0f01f5ca653f1e8ef
+Author: mean <fixounet@free.fr>
+Date:   Sun Dec 4 10:51:52 2016 +0100
+
+    [playback] Dont busy loop when there is no audio track
+
+ avidemux/common/gui_play.cpp | 6 +++++-
+ 1 file changed, 5 insertions(+), 1 deletion(-)
+
+diff --git a/avidemux/common/gui_play.cpp b/avidemux/common/gui_play.cpp
+index a3d1ccb..fd2b115 100644
+--- a/avidemux/common/gui_play.cpp
++++ b/avidemux/common/gui_play.cpp
+@@ -294,9 +294,13 @@ bool GUIPlayback::run(void)
+             {
+                 if(stop_req)
+                     break;
++                
+                 if(delta>10)
+                 {
+-                    audioPump(true);
++                    if(playbackAudio)
++                        audioPump(true);
++                    else
++                        ADM_usleep(10*1000);
+                 }else
+                     audioPump(false);
+ 

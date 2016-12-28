@@ -1,3 +1,12 @@
+commit eca1c17211c85fbd84c465dec7bd8716750e24ae
+Author: eumagga0x2a <eumagga0x2a@users.noreply.github.com>
+Date:   Sun Nov 20 14:30:11 2016 +0100
+
+    [UI/Render] Disable faulty check for remote display breaking VDPAU
+
+ avidemux/common/gui_main.cpp | 2 ++
+ 1 file changed, 2 insertions(+)
+
 diff --git a/avidemux/common/gui_main.cpp b/avidemux/common/gui_main.cpp
 index c27f279..536178b 100644
 --- a/avidemux/common/gui_main.cpp

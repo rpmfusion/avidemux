@@ -1,0 +1,35 @@
+commit c093b9fbc407e2f28817310fd08c3c309521be35
+Author: mean <fixounet@free.fr>
+Date:   Tue Dec 13 07:33:03 2016 +0100
+
+    [Ts/Demux] probe deeper to see if wanted audio track is there
+
+ avidemux_plugins/ADM_demuxers/MpegTS/ADM_tsPatPmt.cpp | 15 ++++++++++++---
+ 1 file changed, 12 insertions(+), 3 deletions(-)
+
+diff --git a/avidemux_plugins/ADM_demuxers/MpegTS/ADM_tsPatPmt.cpp b/avidemux_plugins/ADM_demuxers/MpegTS/ADM_tsPatPmt.cpp
+index 2b3e2b9..010e6c5 100644
+--- a/avidemux_plugins/ADM_demuxers/MpegTS/ADM_tsPatPmt.cpp
++++ b/avidemux_plugins/ADM_demuxers/MpegTS/ADM_tsPatPmt.cpp
+@@ -160,9 +160,18 @@ bool TS_scanForPrograms(const char *file,uint32_t *nbTracks, ADM_TS_TRACK **outT
+             {
+                 TSpacketInfo pkt;
+                 t->setPos(0);
+-                if(true==t->getNextPacket_NoHeader(list[i].trackPid,&pkt,false))
+-                    tracks[nb++]=list[i];
+-                else        
++                // Try several times, in case the audio only comes later one
++                int nbTry=3;
++                while(nbTry)
++                {
++                        if(true==t->getNextPacket_NoHeader(list[i].trackPid,&pkt,false))
++                        {
++                         tracks[nb++]=list[i];
++                         break;
++                        }
++                        nbTry--;
++                }
++                if(!nbTry)        
+                     printf("[TS Demuxer] Track %i pid 0x%x does not seem to be there\n",i,list[i].trackPid);
+             }
+         }

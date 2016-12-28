@@ -1,0 +1,24 @@
+commit 547e6a8e1529ed588ce6f3edbc431d7bfffa52cc
+Author: mean <fixounet@free.fr>
+Date:   Sun Dec 11 18:54:34 2016 +0100
+
+    [qt] increase buffer to avoid stack overflow (1st bug found with vs)
+
+ avidemux/qt4/ADM_userInterfaces/ADM_dialog/Q_working.cpp | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/avidemux/qt4/ADM_userInterfaces/ADM_dialog/Q_working.cpp b/avidemux/qt4/ADM_userInterfaces/ADM_dialog/Q_working.cpp
+old mode 100644
+new mode 100755
+index ea33d85..b11a2d5
+--- a/avidemux/qt4/ADM_userInterfaces/ADM_dialog/Q_working.cpp
++++ b/avidemux/qt4/ADM_userInterfaces/ADM_dialog/Q_working.cpp
+@@ -105,7 +105,7 @@ uint8_t DIA_workingQt4::update(uint32_t percent)
+     lastper=percent;
+ 
+     uint32_t hh,mm,ss,mms;
+-    char string[9];
++    char string[32]; // keep margin
+ 
+     ms2time(elapsed,&hh,&mm,&ss,&mms);
+     sprintf(string,"%02d:%02d:%02d",hh,mm,ss);

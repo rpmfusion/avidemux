@@ -1,0 +1,22 @@
+commit f4c3a56bd70d6086859f1a311eaa2c9289873bda
+Author: eumagga0x2a <eumagga0x2a@users.noreply.github.com>
+Date:   Wed Dec 21 20:22:31 2016 +0100
+
+    [cosmetics] Show an uppercase string as decoder name for VDPAU
+---
+ avidemux/common/ADM_render/GUI_vdpauRender.h | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/avidemux/common/ADM_render/GUI_vdpauRender.h b/avidemux/common/ADM_render/GUI_vdpauRender.h
+index 3a95bcf..5d43047 100644
+--- a/avidemux/common/ADM_render/GUI_vdpauRender.h
++++ b/avidemux/common/ADM_render/GUI_vdpauRender.h
+@@ -34,7 +34,7 @@ class vdpauRender: public VideoRenderBase
+               virtual   bool refresh(void);
+               virtual   bool usingUIRedraw(void) {return false;}; // we can redraw by ourself
+               virtual   ADM_HW_IMAGE getPreferedImage(void ) {return ADM_HW_VDPAU;}
+-                        const char *getName() {return "Vdpau";}
++                        const char *getName() {return "VDPAU";}
+ };
+ 
+ 

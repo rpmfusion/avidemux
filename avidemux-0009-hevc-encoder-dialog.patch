@@ -1,0 +1,85 @@
+commit c9efe8c9661038055faf83912b89164fe569dbe9
+Author: eumagga0x2a <eumagga0x2a@users.noreply.github.com>
+Date:   Mon Nov 28 18:51:22 2016 +0100
+
+    [Qt/x265] Limit the number of ref frames in compliance with HEVC specs
+
+ avidemux_plugins/ADM_videoEncoder/x265/qt4/Q_x265.cpp | 40 ++++++++++++++++++++++++++++++++++++++++
+ avidemux_plugins/ADM_videoEncoder/x265/qt4/Q_x265.h   |  2 ++
+ 2 files changed, 42 insertions(+)
+
+diff --git a/avidemux_plugins/ADM_videoEncoder/x265/qt4/Q_x265.cpp b/avidemux_plugins/ADM_videoEncoder/x265/qt4/Q_x265.cpp
+index b005ae6..6f6a80d 100644
+--- a/avidemux_plugins/ADM_videoEncoder/x265/qt4/Q_x265.cpp
++++ b/avidemux_plugins/ADM_videoEncoder/x265/qt4/Q_x265.cpp
+@@ -122,6 +122,8 @@ x265Dialog::x265Dialog(QWidget *parent, void *param) : QDialog(parent)
+         connect(ui.quantiserSlider, SIGNAL(valueChanged(int)), this, SLOT(quantiserSlider_valueChanged(int)));
+         connect(ui.meSlider, SIGNAL(valueChanged(int)), this, SLOT(meSlider_valueChanged(int)));
+         connect(ui.quantiserSpinBox, SIGNAL(valueChanged(int)), this, SLOT(quantiserSpinBox_valueChanged(int)));
++        connect(ui.maxBFramesSpinBox, SIGNAL(valueChanged(int)), this, SLOT(maxBFramesSpinBox_valueChanged(int)));
++        connect(ui.bFrameRefComboBox, SIGNAL(currentIndexChanged(int)), this, SLOT(bFrameRefComboBox_currentIndexChanged(int)));
+         connect(ui.meSpinBox, SIGNAL(valueChanged(int)), this, SLOT(meSpinBox_valueChanged(int)));
+         connect(ui.targetRateControlSpinBox, SIGNAL(valueChanged(int)), this, SLOT(targetRateControlSpinBox_valueChanged(int)));
+         connect(ui.cuTreeCheckBox, SIGNAL(toggled(bool)), this, SLOT(cuTreeCheckBox_toggled(bool)));
+@@ -634,10 +636,48 @@ void x265Dialog::meSlider_valueChanged(int value)
+ {
+ 	ui.meSpinBox->setValue(value);
+ }
++
+ void x265Dialog::quantiserSpinBox_valueChanged(int value)
+ {
+ 	ui.quantiserSlider->setValue(value);
+ }
++
++void x265Dialog::maxBFramesSpinBox_valueChanged(int value)
++{
++    // HEVC specification allows a maximum of 8 total reference frames only if B frames are disabled.
++    // Enforce the limit to ensure compliance.
++    if(!value)
++    {
++        ui.refFramesSpinBox->setMaximum(8);
++    }else // with B frames enabled, the maximum decreases to 7
++    {
++        if(ui.bFrameRefComboBox->currentIndex()>0)
++        { // max ref frames decreases further to 6 if B pyramid is enabled as well
++            ui.refFramesSpinBox->setMaximum(6);
++        }else
++        {
++            ui.refFramesSpinBox->setMaximum(7);
++        }
++    }
++}
++
++void x265Dialog::bFrameRefComboBox_currentIndexChanged(int index)
++{
++     if(ui.maxBFramesSpinBox->value()) // if B frames are enabled
++     {
++         if(index>0) // and B pyramid is enabled too, reduce max ref frames accordingly
++         {
++             ui.refFramesSpinBox->setMaximum(6);
++         }else
++         {
++             ui.refFramesSpinBox->setMaximum(7);
++         }
++     }else
++     {
++         ui.refFramesSpinBox->setMaximum(8);
++     }
++}
++
+ void x265Dialog::meSpinBox_valueChanged(int value)
+ {
+ 	ui.meSlider->setValue(value);
+diff --git a/avidemux_plugins/ADM_videoEncoder/x265/qt4/Q_x265.h b/avidemux_plugins/ADM_videoEncoder/x265/qt4/Q_x265.h
+index 1f353cc..f03dda1 100644
+--- a/avidemux_plugins/ADM_videoEncoder/x265/qt4/Q_x265.h
++++ b/avidemux_plugins/ADM_videoEncoder/x265/qt4/Q_x265.h
+@@ -38,6 +38,8 @@ private slots:
+         void useAdvancedConfigurationCheckBox_toggled(bool checked);
+         void meSpinBox_valueChanged(int value);
+         void meSlider_valueChanged(int value);
++        void maxBFramesSpinBox_valueChanged(int value);
++        void bFrameRefComboBox_currentIndexChanged(int index);
+         void encodingModeComboBox_currentIndexChanged(int index);
+         void quantiserSlider_valueChanged(int value);
+         void quantiserSpinBox_valueChanged(int value);
