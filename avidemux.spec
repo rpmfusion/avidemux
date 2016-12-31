@@ -1,7 +1,7 @@
 %global _pkgbuilddir %{_builddir}/%{name}_%{version}
 
 Name:           avidemux
-Version:        2.6.15
+Version:        2.6.16
 Release:        1%{?dist}
 Summary:        Graphical video editing and transcoding tool
 
@@ -10,9 +10,7 @@ URL:            http://www.avidemux.org
 Source0:        http://downloads.sourceforge.net/%{name}/%{name}_%{version}.tar.gz
 Source1:        avidemux-qt.desktop
 
-Patch0:         avidemux-2.6.10-bundled_libs.patch
-Patch1:         avidemux-2.6.15-hwaccel.patch
-Patch2:         avidemux-2.6.15-disable-vpx-decoder-plugin.patch
+Patch0:         avidemux-2.6.15-disable-vpx-decoder-plugin.patch
 
 # Don't try to build on arm
 ExcludeArch: %{arm}
@@ -31,10 +29,9 @@ BuildRequires:  yasm-devel
 BuildRequires:  libxml2-devel >= 2.6.8
 BuildRequires:  fontconfig-devel
 BuildRequires:  freetype-devel
-BuildRequires:  js-devel
+BuildRequires:  fribidi-devel
 BuildRequires:  libXv-devel
 BuildRequires:  libXmu-devel
-BuildRequires:  libsamplerate-devel
 BuildRequires:  jack-audio-connection-kit-devel
 BuildRequires:  libass-devel
 
@@ -59,12 +56,13 @@ BuildRequires:  libdca-devel
 BuildRequires:  opencore-amr-devel
 BuildRequires:  libvpx-devel
 BuildRequires:  twolame-devel
+BuildRequires:  opus-devel
 
 # Video Codecs
 BuildRequires:  xvidcore-devel >= 1.0.2
 BuildRequires:  x264-devel
 BuildRequires:  x265-devel
-BuildRequires:  ffmpeg-devel
+BuildRequires:  nvenc-devel
 
 # Main package is a metapackage, bring in something useful.
 Requires:       %{name}-gui = %{version}-%{release}
@@ -118,8 +116,6 @@ This package contains translation files for %{name}.
 %prep
 %setup -q -n %{name}_%{version}
 %patch0 -p1
-%patch1 -p1
-%patch2 -p1
 
 # Remove sources of bundled libraries.
 rm -rf avidemux_plugins/ADM_audioDecoders/ADM_ad_ac3/ADM_liba52 \
