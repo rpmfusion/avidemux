@@ -1,4 +1,7 @@
 %global _pkgbuilddir %{_builddir}/%{name}_%{version}
+# Turn off the brp-python-bytecompile script as in this case the scripts are
+# internally interpreted.
+%global __os_install_post %(echo '%{__os_install_post}' | sed -e 's!/usr/lib[^[:space:]]*/brp-python-bytecompile[[:space:]].*$!!g')
 
 Name:           avidemux
 Version:        2.6.16
@@ -265,11 +268,7 @@ fi
 # Catch the stuff missed using install_manifest.txt
 %dir %{_libdir}/ADM_plugins6
 %dir %{_libdir}/ADM_plugins6/*
-%{_libdir}/ADM_plugins6/autoScripts/*.pyc
-%{_libdir}/ADM_plugins6/autoScripts/*.pyo
 %dir %{_libdir}/ADM_plugins6/autoScripts/lib
-%{_libdir}/ADM_plugins6/autoScripts/lib/*.pyc
-%{_libdir}/ADM_plugins6/autoScripts/lib/*.pyo
 
 %files cli -f build_plugins_cli/install_manifest.txt
 %{_bindir}/avidemux3_cli
@@ -300,6 +299,10 @@ fi
 
 
 %changelog
+* Sat Dec 31 2016 Richard Shaw <hobbes1069@gmail.com> - 2.6.16-1
+- Update to the 2.6.16 release.
+- Include pull request from RFBZ#4395.
+
 * Tue Nov 22 2016 Sérgio Basto <sergio@serjux.com> - 2.6.15-1
 - Update to the 2.6.15 release, rfbz#4344
 
