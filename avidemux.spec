@@ -5,7 +5,7 @@
 
 Name:           avidemux
 Version:        2.6.16
-Release:        1%{?dist}
+Release:        2%{?dist}
 Summary:        Graphical video editing and transcoding tool
 
 License:        GPLv2+
@@ -299,6 +299,9 @@ fi
 
 
 %changelog
+* Tue Jan 03 2017 Dominik Mierzejewski <rpm@greysector.net> - 2.6.16-2
+- rebuild for x265
+
 * Sat Dec 31 2016 Richard Shaw <hobbes1069@gmail.com> - 2.6.16-1
 - Update to the 2.6.16 release.
 - Include pull request from RFBZ#4395.
