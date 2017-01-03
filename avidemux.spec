@@ -14,6 +14,9 @@ Source0:        http://downloads.sourceforge.net/%{name}/%{name}_%{version}.tar.
 Source1:        avidemux-qt.desktop
 
 Patch0:         avidemux-2.6.15-disable-vpx-decoder-plugin.patch
+Patch1:         avidemux-2.6.16-filter-preview.patch
+Patch2:         avidemux-2.6.16-unbundle-libmp4v2.patch
+Patch3:         avidemux-2.6.16-mp4muxer-eac3.patch
 
 # Don't try to build on arm
 ExcludeArch: %{arm}
@@ -37,6 +40,7 @@ BuildRequires:  libXv-devel
 BuildRequires:  libXmu-devel
 BuildRequires:  jack-audio-connection-kit-devel
 BuildRequires:  libass-devel
+BuildRequires:  libmp4v2-devel
 
 # Sound out
 BuildRequires:  alsa-lib-devel >= 1.0.3
@@ -119,12 +123,15 @@ This package contains translation files for %{name}.
 %prep
 %setup -q -n %{name}_%{version}
 %patch0 -p1
+%patch1 -p1
+%patch2 -p1
+%patch3 -p1
 
 # Remove sources of bundled libraries.
 rm -rf avidemux_plugins/ADM_audioDecoders/ADM_ad_ac3/ADM_liba52 \
        avidemux_plugins/ADM_audioDecoders/ADM_ad_mad/ADM_libMad \
-       avidemux_plugins/ADM_audioEncoders/twolame/ADM_libtwolame \
-       avidemux_plugins/ADM_videoFilters6/ass/ADM_libass
+       avidemux_plugins/ADM_videoFilters6/ass/ADM_libass \
+       avidemux_plugins/ADM_muxers/muxerMp4v2/libmp4v2
 
 %build
 # Build avidemux_core
@@ -168,7 +175,7 @@ rm -rf build_plugins_common && mkdir build_plugins_common && pushd build_plugins
        -DUSE_EXTERNAL_LIBASS=TRUE \
        -DUSE_EXTERNAL_LIBMAD=TRUE \
        -DUSE_EXTERNAL_LIBA52=TRUE \
-       -DUSE_EXTERNAL_TWOLAME=TRUE \
+       -DUSE_EXTERNAL_MP4V2=TRUE \
        ../avidemux_plugins
 make %{?_smp_mflags}
 make install DESTDIR=%{_pkgbuilddir}/fakeRoot
@@ -184,7 +191,7 @@ rm -rf build_plugins_cli && mkdir build_plugins_cli && pushd build_plugins_cli
        -DUSE_EXTERNAL_LIBASS=TRUE \
        -DUSE_EXTERNAL_LIBMAD=TRUE \
        -DUSE_EXTERNAL_LIBA52=TRUE \
-       -DUSE_EXTERNAL_TWOLAME=TRUE \
+       -DUSE_EXTERNAL_MP4V2=TRUE \
        ../avidemux_plugins
 make %{?_smp_mflags}
 make install DESTDIR=%{_pkgbuilddir}/fakeRoot
@@ -200,7 +207,7 @@ rm -rf build_plugins_qt5 && mkdir build_plugins_qt5 && pushd build_plugins_qt5
        -DUSE_EXTERNAL_LIBASS=TRUE \
        -DUSE_EXTERNAL_LIBMAD=TRUE \
        -DUSE_EXTERNAL_LIBA52=TRUE \
-       -DUSE_EXTERNAL_TWOLAME=TRUE \
+       -DUSE_EXTERNAL_MP4V2=TRUE \
        ../avidemux_plugins
 make %{?_smp_mflags}
 make install DESTDIR=%{_pkgbuilddir}/fakeRoot
