@@ -5,13 +5,14 @@
 
 Name:           avidemux
 Version:        2.6.16
-Release:        3%{?dist}
+Release:        4%{?dist}
 Summary:        Graphical video editing and transcoding tool
 
 License:        GPLv2+
 URL:            http://www.avidemux.org
 Source0:        http://downloads.sourceforge.net/%{name}/%{name}_%{version}.tar.gz
 Source1:        avidemux-qt.desktop
+Source2:        avidemux-qt.appdata.xml
 
 Patch0:         avidemux-2.6.15-disable-vpx-decoder-plugin.patch
 Patch1:         avidemux-2.6.16-filter-preview.patch
@@ -29,6 +30,7 @@ BuildRequires:  desktop-file-utils
 BuildRequires:  pkgconfig
 BuildRequires:  sqlite-devel
 BuildRequires:  bzip2
+BuildRequires:  libappstream-glib
 
 # Libraries
 BuildRequires:  yasm-devel
@@ -233,6 +235,12 @@ desktop-file-install --vendor rpmfusion \
     --dir %{buildroot}%{_datadir}/applications \
     %{SOURCE1}
 
+# Appdata for software center
+install -pDm 0644 %{SOURCE2} \
+    %{buildroot}%{_datadir}/appdata/avidemux-qt.appdata.xml
+appstream-util validate-relax --nonet \
+    %{buildroot}%{_datadir}/appdata/avidemux-qt.appdata.xml || :
+
 # Install icons
 install -pDm 0644 avidemux/gtk/ADM_userInterfaces/glade/main/avidemux_icon_small.png \
         %{buildroot}%{_datadir}/icons/hicolor/48x48/apps/avidemux.png
@@ -296,6 +304,7 @@ fi
 %{_libdir}/libADM_UIQT*.so
 %{_libdir}/libADM_render6_QT5.so
 %{_datadir}/applications/rpmfusion-avidemux-qt.desktop
+%{_datadir}/appdata/avidemux-qt.appdata.xml
 # QT plugins
 %{_libdir}/ADM_plugins6/videoEncoders/qt5/
 %{_libdir}/ADM_plugins6/videoFilters/qt5/
@@ -306,6 +315,10 @@ fi
 
 
 %changelog
+* Sun Feb 12 2017 Adrien Vergé <adrienverge@gmail.com> - 2.6.16-4
+- Add AppData support, to have Avidemux installable from software centers
+  (see http://people.freedesktop.org/~hughsient/appdata/)
+
 * Tue Jan  3 2017 Richard Shaw <hobbes1069@gmail.com> - 2.6.16-3
 - Disable byte-compiling of python scrips as they are designed to be 
   interpreted internally.
