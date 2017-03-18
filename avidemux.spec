@@ -5,7 +5,7 @@
 
 Name:           avidemux
 Version:        2.6.16
-Release:        3%{?dist}
+Release:        4%{?dist}
 Summary:        Graphical video editing and transcoding tool
 
 License:        GPLv2+
@@ -306,6 +306,9 @@ fi
 
 
 %changelog
+* Sat Mar 18 2017 RPM Fusion Release Engineering <kwizart@rpmfusion.org> - 2.6.16-4
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_26_Mass_Rebuild
+
 * Tue Jan  3 2017 Richard Shaw <hobbes1069@gmail.com> - 2.6.16-3
 - Disable byte-compiling of python scrips as they are designed to be 
   interpreted internally.
