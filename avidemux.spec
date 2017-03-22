@@ -5,7 +5,7 @@
 
 Name:           avidemux
 Version:        2.6.16
-Release:        4%{?dist}
+Release:        5%{?dist}
 Summary:        Graphical video editing and transcoding tool
 
 License:        GPLv2+
@@ -18,8 +18,8 @@ Patch1:         avidemux-2.6.16-filter-preview.patch
 Patch2:         avidemux-2.6.16-unbundle-libmp4v2.patch
 Patch3:         avidemux-2.6.16-mp4muxer-eac3.patch
 
-# Don't try to build on arm
-ExcludeArch: %{arm}
+# Don't try to build on arm or aarch64
+ExcludeArch: %{arm} aarch64
 
 # Utilities
 BuildRequires:  cmake
@@ -306,6 +306,9 @@ fi
 
 
 %changelog
+* Wed Mar 22 2017 Leigh Scott <leigh123linux@googlemail.com> - 2.6.16-5
+- Add aarch64 to ExcludeArch
+
 * Sat Mar 18 2017 RPM Fusion Release Engineering <kwizart@rpmfusion.org> - 2.6.16-4
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_26_Mass_Rebuild
 
