@@ -4,7 +4,7 @@
 %global __os_install_post %(echo '%{__os_install_post}' | sed -e 's!/usr/lib[^[:space:]]*/brp-python-bytecompile[[:space:]].*$!!g')
 
 Name:           avidemux
-Version:        2.6.16
+Version:        2.6.19
 Release:        5%{?dist}
 Summary:        Graphical video editing and transcoding tool
 
@@ -14,9 +14,9 @@ Source0:        http://downloads.sourceforge.net/%{name}/%{name}_%{version}.tar.
 Source1:        avidemux-qt.desktop
 
 Patch0:         avidemux-2.6.15-disable-vpx-decoder-plugin.patch
-Patch1:         avidemux-2.6.16-filter-preview.patch
-Patch2:         avidemux-2.6.16-unbundle-libmp4v2.patch
-Patch3:         avidemux-2.6.16-mp4muxer-eac3.patch
+#Patch1:         avidemux-2.6.16-filter-preview.patch
+#Patch2:         avidemux-2.6.16-unbundle-libmp4v2.patch
+#Patch3:         avidemux-2.6.16-mp4muxer-eac3.patch
 
 # Don't try to build on arm, aarch64 or ppc
 ExclusiveArch:  i686 x86_64
@@ -121,11 +121,7 @@ This package contains translation files for %{name}.
 
 
 %prep
-%setup -q -n %{name}_%{version}
-%patch0 -p1
-%patch1 -p1
-%patch2 -p1
-%patch3 -p1
+%autosetup -p1 -n %{name}_%{version}
 
 # Remove sources of bundled libraries.
 rm -rf avidemux_plugins/ADM_audioDecoders/ADM_ad_ac3/ADM_liba52 \
@@ -306,6 +302,9 @@ fi
 
 
 %changelog
+* Sat Apr 22 2017 Richard Shaw <hobbes1069@gmail.com> - 2.6.19-1
+- Update to latest upstream release, 2.6.19.
+
 * Wed Mar 22 2017 Leigh Scott <leigh123linux@googlemail.com> - 2.6.16-5
 - Build for x86 only
 
