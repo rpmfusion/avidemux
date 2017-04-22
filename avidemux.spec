@@ -5,7 +5,7 @@
 
 Name:           avidemux
 Version:        2.6.19
-Release:        5%{?dist}
+Release:        1%{?dist}
 Summary:        Graphical video editing and transcoding tool
 
 License:        GPLv2+
@@ -13,10 +13,9 @@ URL:            http://www.avidemux.org
 Source0:        http://downloads.sourceforge.net/%{name}/%{name}_%{version}.tar.gz
 Source1:        avidemux-qt.desktop
 
-Patch0:         avidemux-2.6.15-disable-vpx-decoder-plugin.patch
-#Patch1:         avidemux-2.6.16-filter-preview.patch
-#Patch2:         avidemux-2.6.16-unbundle-libmp4v2.patch
-#Patch3:         avidemux-2.6.16-mp4muxer-eac3.patch
+Patch0:         avidemux-2.6.19-vpx-decoder.patch
+Patch1:         avidemux-2.6.19-version-string-generation.patch
+Patch2:         avidemux-2.6.19-i18n-ru-fix-crop-filter.patch
 
 # Don't try to build on arm, aarch64 or ppc
 ExclusiveArch:  i686 x86_64
