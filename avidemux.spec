@@ -4,7 +4,7 @@
 %global __os_install_post %(echo '%{__os_install_post}' | sed -e 's!/usr/lib[^[:space:]]*/brp-python-bytecompile[[:space:]].*$!!g')
 
 Name:           avidemux
-Version:        2.6.19
+Version:        2.6.20
 Release:        1%{?dist}
 Summary:        Graphical video editing and transcoding tool
 
@@ -12,10 +12,6 @@ License:        GPLv2+
 URL:            http://www.avidemux.org
 Source0:        http://downloads.sourceforge.net/%{name}/%{name}_%{version}.tar.gz
 Source1:        avidemux-qt.desktop
-
-Patch0:         avidemux-2.6.19-vpx-decoder.patch
-Patch1:         avidemux-2.6.19-version-string-generation.patch
-Patch2:         avidemux-2.6.19-i18n-ru-fix-crop-filter.patch
 
 # Don't try to build on arm, aarch64 or ppc
 ExclusiveArch:  i686 x86_64
@@ -76,9 +72,9 @@ Requires:       %{name}-gui = %{version}-%{release}
 
 %description
 Avidemux is a free video editor designed for simple cutting, filtering and
-encoding tasks. It supports many file types, including AVI, DVD compatible
-MPEG files, MP4 and ASF, using a variety of codecs. Tasks can be automated
-using projects, job queue and powerful scripting capabilities.
+encoding tasks. It supports many file types, including MKV, MP4, TS, DVD
+compatible MPEG files and AVI, using a variety of codecs. Tasks can be
+automated using projects, job queue and powerful scripting capabilities.
 
 This is a meta package that brings in all interfaces: QT and CLI.
 
@@ -301,6 +297,9 @@ fi
 
 
 %changelog
+* Sat Apr 29 2017 Richard Shaw <hobbes1069@gmail.com> - 2.6.20-1
+- Update to latest upstream release, 2.6.20.
+
 * Sat Apr 22 2017 Richard Shaw <hobbes1069@gmail.com> - 2.6.19-1
 - Update to latest upstream release, 2.6.19.
 
