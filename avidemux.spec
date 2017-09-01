@@ -4,8 +4,8 @@
 %global __os_install_post %(echo '%{__os_install_post}' | sed -e 's!/usr/lib[^[:space:]]*/brp-python-bytecompile[[:space:]].*$!!g')
 
 Name:           avidemux
-Version:        2.6.20
-Release:        2%{?dist}
+Version:        2.7.0
+Release:        1%{?dist}
 Summary:        Graphical video editing and transcoding tool
 
 License:        GPLv2+
@@ -273,13 +273,6 @@ fi
 %{_libdir}/libADM_UI_Cli*.so
 %{_libdir}/libADM_render6_cli.so
 
-#%files gtk -f build_plugins_gtk/install_manifest.txt
-#%{_bindir}/avidemux3_gtk
-#%{_libdir}/libADM_UIGtk*.so
-#%{_libdir}/libADM_render6_gtk.so
-#%{_libdir}/ADM_glade/
-#%{_datadir}/applications/rpmfusion-avidemux-gtk.desktop
-
 %files qt 
 %{_bindir}/avidemux3_qt5
 %{_bindir}/avidemux3_jobs_qt5
@@ -297,6 +290,10 @@ fi
 
 
 %changelog
+* Fri Sep 01 2017 Leigh Scott <leigh123linux@googlemail.com> - 2.7.0-1
+- Update to latest upstream release, 2.7.0.
+- Remove gtk files section
+
 * Thu Aug 31 2017 RPM Fusion Release Engineering <kwizart@rpmfusion.org> - 2.6.20-2
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_27_Mass_Rebuild
 
