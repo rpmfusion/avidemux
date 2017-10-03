@@ -5,13 +5,15 @@
 
 Name:           avidemux
 Version:        2.7.0
-Release:        1%{?dist}
+Release:        2%{?dist}
 Summary:        Graphical video editing and transcoding tool
 
 License:        GPLv2+
 URL:            http://www.avidemux.org
 Source0:        http://downloads.sourceforge.net/%{name}/%{name}_%{version}.tar.gz
 Source1:        avidemux-qt.desktop
+
+Patch0:         avidemux-pow10f.patch
 
 # Don't try to build on arm, aarch64 or ppc
 ExclusiveArch:  i686 x86_64
@@ -290,6 +292,11 @@ fi
 
 
 %changelog
+* Tue Oct  3 2017 Richard Shaw <hobbes1069@gmail.com> - 2.7.0-2
+- Rebuild for f28.
+- Add patch to deal with removal of pow10f function from glibc, fixes
+  RFBZ#4672.
+
 * Fri Sep 01 2017 Leigh Scott <leigh123linux@googlemail.com> - 2.7.0-1
 - Update to latest upstream release, 2.7.0.
 - Remove gtk files section
