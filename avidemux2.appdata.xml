@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Copyright 2017 Richard Shaw -->
+<component type="desktop-application">
+    <id>avidemux-gtk.desktop</id>
+    <metadata_license>CC0</metadata_license>
+    <name>Avidemux</name>
+    <summary>Graphical video editing and transcoding tool</summary>
+    <description>
+        <p>
+            Avidemux is a free video editor designed for simple cutting, filtering and encoding tasks. It supports many file types, including AVI, DVD compatible MPEG files, MP4 and ASF, using a variety of codecs. Tasks can be automated using projects, job queue and powerful scripting capabilities.
+        </p>
+    </description>
+    <categories>
+        <category>AudioVideo</category>
+        <category>AudioVideoEditing</category>
+        <category>Video</category>
+    </categories>
+    <url type="homepage">https://www.avidemux.org/</url>
+    <provides>
+        <binary>avidemux2_gtk</binary>
+    </provides>
+    <project_license>GPL-2.0+</project_license>
+    <update_contact>Avidemux team -- avidemux.org/smif/</update_contact>
+    <screenshots>
+        <screenshot type="default">http://fixounet.free.fr/avidemux/index_files/screenshot1.png</screenshot>
+        <screenshot type="default">http://fixounet.free.fr/avidemux/index_files/screenshot2.png</screenshot>
+    </screenshots>
+</component>

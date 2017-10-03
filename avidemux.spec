@@ -12,6 +12,7 @@ License:        GPLv2+
 URL:            http://www.avidemux.org
 Source0:        http://downloads.sourceforge.net/%{name}/%{name}_%{version}.tar.gz
 Source1:        avidemux-qt.desktop
+Source2:        avidemux2.appdata.xml
 
 Patch0:         avidemux-pow10f.patch
 
@@ -26,6 +27,7 @@ BuildRequires:  desktop-file-utils
 BuildRequires:  pkgconfig
 BuildRequires:  sqlite-devel
 BuildRequires:  bzip2
+BuildRequires:  libappstream-glib
 
 # Libraries
 BuildRequires:  yasm-devel
@@ -226,6 +228,10 @@ desktop-file-install --vendor rpmfusion \
     --dir %{buildroot}%{_datadir}/applications \
     %{SOURCE1}
 
+# Install appdata file
+mkdir -p %{buildroot}%{_datadir}/metainfo
+install -pm 0644 %{SOURCE2} %{buildroot}%{_datadir}/metainfo/
+
 # Install icons
 install -pDm 0644 avidemux/gtk/ADM_userInterfaces/glade/main/avidemux_icon_small.png \
         %{buildroot}%{_datadir}/icons/hicolor/48x48/apps/avidemux.png
@@ -234,6 +240,10 @@ install -pDm 0644 avidemux_icon.png \
 
 # Fix library permissions
 find %{buildroot}%{_libdir} -type f -name "*.so.*" -exec chmod 0755 {} \;
+
+%check
+appstream-util validate-relax --nonet \
+    %{buildroot}%{_datadir}/metainfo/*.appdata.xml
 
 
 %post libs -p /sbin/ldconfig
@@ -282,6 +292,7 @@ fi
 %{_libdir}/libADM_UIQT*.so
 %{_libdir}/libADM_render6_QT5.so
 %{_datadir}/applications/rpmfusion-avidemux-qt.desktop
+%{_datadir}/metainfo/*.appdata.xml
 # QT plugins
 %{_libdir}/ADM_plugins6/videoEncoders/qt5/
 %{_libdir}/ADM_plugins6/videoFilters/qt5/
