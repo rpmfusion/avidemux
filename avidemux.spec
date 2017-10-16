@@ -5,7 +5,7 @@
 
 Name:           avidemux
 Version:        2.7.0
-Release:        2%{?dist}
+Release:        3%{?dist}
 Summary:        Graphical video editing and transcoding tool
 
 License:        GPLv2+
@@ -303,6 +303,9 @@ fi
 
 
 %changelog
+* Mon Oct 16 2017 Leigh Scott <leigh123linux@googlemail.com> - 2.7.0-3
+- Rebuild for ffmpeg update
+
 * Tue Oct  3 2017 Richard Shaw <hobbes1069@gmail.com> - 2.7.0-2
 - Rebuild for f28.
 - Add patch to deal with removal of pow10f function from glibc, fixes
