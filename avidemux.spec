@@ -5,7 +5,7 @@
 
 Name:           avidemux
 Version:        2.7.0
-Release:        5%{?dist}
+Release:        6%{?dist}
 Summary:        Graphical video editing and transcoding tool
 
 License:        GPLv2+
@@ -20,7 +20,7 @@ Patch0:         avidemux-pow10f.patch
 ExclusiveArch:  i686 x86_64
 
 # Utilities
-BuildRequires:  cmake
+BuildRequires:  cmake3
 BuildRequires:  gettext intltool
 BuildRequires:  libxslt
 BuildRequires:  desktop-file-utils
@@ -132,7 +132,7 @@ rm -rf avidemux_plugins/ADM_audioDecoders/ADM_ad_ac3/ADM_liba52 \
 # Build avidemux_core
 export LDFLAGS="-lc -Wl,--as-needed"
 rm -rf build_core && mkdir build_core && pushd build_core
-%cmake -DCMAKE_BUILD_TYPE=RelWithDebInfo \
+%cmake3 -DCMAKE_BUILD_TYPE=RelWithDebInfo \
        ../avidemux_core
 make 
 
@@ -143,7 +143,7 @@ popd
 
 # Build cli interface
 rm -rf build_cli && mkdir build_cli && pushd build_cli
-%cmake -DCMAKE_BUILD_TYPE=RelWithDebInfo \
+%cmake3 -DCMAKE_BUILD_TYPE=RelWithDebInfo \
        -DFAKEROOT=%{_pkgbuilddir}/fakeRoot \
        ../avidemux/cli
 make %{?_smp_mflags}
@@ -152,7 +152,7 @@ popd
 
 # Build QT5 gui
 rm -rf build_qt5 && mkdir build_qt5 && pushd build_qt5
-%cmake -DCMAKE_BUILD_TYPE=RelWithDebInfo \
+%cmake3 -DCMAKE_BUILD_TYPE=RelWithDebInfo \
        -DFAKEROOT=%{_pkgbuilddir}/fakeRoot \
        -DENABLE_QT5=TRUE \
        ../avidemux/qt4
@@ -162,7 +162,7 @@ popd
 
 # Build avidemux_plugins_common
 rm -rf build_plugins_common && mkdir build_plugins_common && pushd build_plugins_common
-%cmake -DCMAKE_BUILD_TYPE=RelWithDebInfo \
+%cmake3 -DCMAKE_BUILD_TYPE=RelWithDebInfo \
        -DFAKEROOT=%{_pkgbuilddir}/fakeRoot \
        -DAVIDEMUX_SOURCE_DIR=%{_builddir}/%{name}_%{version} \
        -DENABLE_QT5=TRUE \
@@ -178,7 +178,7 @@ popd
 
 # Build avidemux_plugins_cli
 rm -rf build_plugins_cli && mkdir build_plugins_cli && pushd build_plugins_cli
-%cmake -DCMAKE_BUILD_TYPE=RelWithDebInfo \
+%cmake3 -DCMAKE_BUILD_TYPE=RelWithDebInfo \
        -DFAKEROOT=%{_pkgbuilddir}/fakeRoot \
        -DAVIDEMUX_SOURCE_DIR=%{_builddir}/%{name}_%{version} \
        -DENABLE_QT5=TRUE \
@@ -194,7 +194,7 @@ popd
 
 # Build avidemux_plugins_qt5
 rm -rf build_plugins_qt5 && mkdir build_plugins_qt5 && pushd build_plugins_qt5
-%cmake -DCMAKE_BUILD_TYPE=RelWithDebInfo \
+%cmake3 -DCMAKE_BUILD_TYPE=RelWithDebInfo \
        -DFAKEROOT=%{_pkgbuilddir}/fakeRoot \
        -DAVIDEMUX_SOURCE_DIR=%{_builddir}/%{name}_%{version} \
        -DENABLE_QT5=TRUE \
@@ -246,24 +246,7 @@ appstream-util validate-relax --nonet \
     %{buildroot}%{_datadir}/metainfo/*.appdata.xml
 
 
-%post libs -p /sbin/ldconfig
-
-%postun libs -p /sbin/ldconfig
-
-%post qt
-/bin/touch --no-create %{_datadir}/icons/hicolor &>/dev/null || :
-/usr/bin/update-desktop-database &> /dev/null || :
-
-%postun qt
-if [ $1 -eq 0 ] ; then
-    /bin/touch --no-create %{_datadir}/icons/hicolor &>/dev/null
-    /usr/bin/gtk-update-icon-cache %{_datadir}/icons/hicolor &>/dev/null || :
-fi
-/usr/bin/update-desktop-database &> /dev/null || :
-
-%posttrans qt
-/usr/bin/gtk-update-icon-cache %{_datadir}/icons/hicolor &>/dev/null || :
-
+%ldconfig_scriptlets libs
 
 %files
 %doc AUTHORS README
@@ -303,6 +286,10 @@ fi
 
 
 %changelog
+* Wed Feb 28 2018 Leigh Scott <leigh123linux@googlemail.com> - 2.7.0-6
+- Rebuilt for new x265
+- Fix scriptlets
+
 * Mon Jan 15 2018 Nicolas Chauvet <kwizart@gmail.com> - 2.7.0-5
 - Rebuilt for VA-API 1.0.0
 
