@@ -5,7 +5,7 @@
 
 Name:           avidemux
 Version:        2.7.1
-Release:        1%{?dist}
+Release:        2%{?dist}
 Summary:        Graphical video editing and transcoding tool
 
 License:        GPLv2+
@@ -283,8 +283,9 @@ appstream-util validate-relax --nonet \
 
 
 %changelog
-* Thu Jun 07 2018 Richard Shaw <hobbes1069@gmail.com> - 2.7.1-1
+* Thu Jun 07 2018 Richard Shaw <hobbes1069@gmail.com> - 2.7.1-2
 - Update to 2.7.1
+- Fix appdata file and build requires tweaks.
 
 * Wed Feb 28 2018 Leigh Scott <leigh123linux@googlemail.com> - 2.7.0-6
 - Rebuilt for new x265
