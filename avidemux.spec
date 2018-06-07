@@ -18,7 +18,7 @@ Source2:        avidemux2.appdata.xml
 ExclusiveArch:  i686 x86_64
 
 # Utilities
-BuildRequires:  cmake3
+BuildRequires:  cmake3 gcc-c++ yasm
 BuildRequires:  gettext intltool
 BuildRequires:  libxslt
 BuildRequires:  desktop-file-utils
@@ -28,7 +28,6 @@ BuildRequires:  bzip2
 BuildRequires:  libappstream-glib
 
 # Libraries
-BuildRequires:  yasm-devel
 BuildRequires:  libxml2-devel >= 2.6.8
 BuildRequires:  fontconfig-devel
 BuildRequires:  freetype-devel

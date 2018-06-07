@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!-- Copyright 2017 Richard Shaw -->
 <component type="desktop-application">
-    <id>avidemux-gtk.desktop</id>
+    <id>rpmfusion-avidemux-qt.desktop</id>
     <metadata_license>CC0</metadata_license>
     <name>Avidemux</name>
     <summary>Graphical video editing and transcoding tool</summary>
@@ -17,7 +17,7 @@
     </categories>
     <url type="homepage">https://www.avidemux.org/</url>
     <provides>
-        <binary>avidemux2_gtk</binary>
+        <binary>avidemux3_qt5</binary>
     </provides>
     <project_license>GPL-2.0+</project_license>
     <update_contact>Avidemux team -- avidemux.org/smif/</update_contact>
