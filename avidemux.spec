@@ -12,7 +12,7 @@ License:        GPLv2+
 URL:            http://www.avidemux.org
 Source0:        http://downloads.sourceforge.net/%{name}/%{name}_%{version}.tar.gz
 Source1:        avidemux-qt.desktop
-Source2:        avidemux2.appdata.xml
+Source2:        rpmfusion-avidemux-qt.appdata.xml
 
 # Don't try to build on arm, aarch64 or ppc
 ExclusiveArch:  i686 x86_64
