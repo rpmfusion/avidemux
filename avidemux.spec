@@ -4,8 +4,8 @@
 %global __os_install_post %(echo '%{__os_install_post}' | sed -e 's!/usr/lib[^[:space:]]*/brp-python-bytecompile[[:space:]].*$!!g')
 
 Name:           avidemux
-Version:        2.7.0
-Release:        6%{?dist}
+Version:        2.7.1
+Release:        1%{?dist}
 Summary:        Graphical video editing and transcoding tool
 
 License:        GPLv2+
@@ -13,8 +13,6 @@ URL:            http://www.avidemux.org
 Source0:        http://downloads.sourceforge.net/%{name}/%{name}_%{version}.tar.gz
 Source1:        avidemux-qt.desktop
 Source2:        avidemux2.appdata.xml
-
-Patch0:         avidemux-pow10f.patch
 
 # Don't try to build on arm, aarch64 or ppc
 ExclusiveArch:  i686 x86_64
@@ -286,6 +284,9 @@ appstream-util validate-relax --nonet \
 
 
 %changelog
+* Thu Jun 07 2018 Richard Shaw <hobbes1069@gmail.com> - 2.7.1-1
+- Update to 2.7.1
+
 * Wed Feb 28 2018 Leigh Scott <leigh123linux@googlemail.com> - 2.7.0-6
 - Rebuilt for new x265
 - Fix scriptlets
