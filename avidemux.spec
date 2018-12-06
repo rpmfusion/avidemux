@@ -5,7 +5,7 @@
 
 Name:           avidemux
 Version:        2.7.1
-Release:        6%{?dist}
+Release:        7%{?dist}
 Summary:        Graphical video editing and transcoding tool
 
 License:        GPLv2+
@@ -19,6 +19,7 @@ ExclusiveArch:  i686 x86_64
 
 # Utilities
 BuildRequires:  cmake3 gcc-c++ yasm
+%{?el7:BuildRequires: epel-rpm-macros}
 BuildRequires:  gettext intltool
 BuildRequires:  libxslt
 BuildRequires:  desktop-file-utils
@@ -100,6 +101,7 @@ BuildRequires:  qt5-linguist
 BuildRequires:  libxslt
 Provides:       %{name}-gui = %{version}-%{release}
 Requires:       %{name}-libs%{?_isa} = %{version}-%{release}
+Requires:       hicolor-icon-theme
 Obsoletes:      %{name}-gtk < 2.6.10
 Obsoletes:      %{name}-help
 
@@ -131,7 +133,7 @@ export LDFLAGS="-lc -Wl,--as-needed"
 rm -rf build_core && mkdir build_core && pushd build_core
 %cmake3 -DCMAKE_BUILD_TYPE=RelWithDebInfo \
        ../avidemux_core
-make 
+%make_build V=1
 
 # We have to do a fake install so header files are avaialble for the other
 # packages.
@@ -143,7 +145,7 @@ rm -rf build_cli && mkdir build_cli && pushd build_cli
 %cmake3 -DCMAKE_BUILD_TYPE=RelWithDebInfo \
        -DFAKEROOT=%{_pkgbuilddir}/fakeRoot \
        ../avidemux/cli
-make %{?_smp_mflags}
+%make_build V=1
 make install DESTDIR=%{_pkgbuilddir}/fakeRoot
 popd
 
@@ -153,7 +155,7 @@ rm -rf build_qt5 && mkdir build_qt5 && pushd build_qt5
        -DFAKEROOT=%{_pkgbuilddir}/fakeRoot \
        -DENABLE_QT5=TRUE \
        ../avidemux/qt4
-make %{?_smp_mflags}
+%make_build V=1
 make install DESTDIR=%{_pkgbuilddir}/fakeRoot
 popd
 
@@ -169,7 +171,7 @@ rm -rf build_plugins_common && mkdir build_plugins_common && pushd build_plugins
        -DUSE_EXTERNAL_LIBA52=TRUE \
        -DUSE_EXTERNAL_MP4V2=TRUE \
        ../avidemux_plugins
-make %{?_smp_mflags}
+%make_build V=1
 make install DESTDIR=%{_pkgbuilddir}/fakeRoot
 popd
 
@@ -185,7 +187,7 @@ rm -rf build_plugins_cli && mkdir build_plugins_cli && pushd build_plugins_cli
        -DUSE_EXTERNAL_LIBA52=TRUE \
        -DUSE_EXTERNAL_MP4V2=TRUE \
        ../avidemux_plugins
-make %{?_smp_mflags}
+%make_build V=1
 make install DESTDIR=%{_pkgbuilddir}/fakeRoot
 popd
 
@@ -201,18 +203,18 @@ rm -rf build_plugins_qt5 && mkdir build_plugins_qt5 && pushd build_plugins_qt5
        -DUSE_EXTERNAL_LIBA52=TRUE \
        -DUSE_EXTERNAL_MP4V2=TRUE \
        ../avidemux_plugins
-make %{?_smp_mflags}
+%make_build V=1
 make install DESTDIR=%{_pkgbuilddir}/fakeRoot
 popd
 
 
 %install
-make -C build_core install DESTDIR=%{buildroot}
-make -C build_cli install DESTDIR=%{buildroot}
-make -C build_qt5 install DESTDIR=%{buildroot}
-make -C build_plugins_common install DESTDIR=%{buildroot}
-make -C build_plugins_cli install DESTDIR=%{buildroot}
-make -C build_plugins_qt5 install DESTDIR=%{buildroot}
+%make_install -C build_core
+%make_install -C build_cli
+%make_install -C build_qt5
+%make_install -C build_plugins_common
+%make_install -C build_plugins_cli
+%make_install -C build_plugins_qt5
 
 # Remove useless devel files
 rm -rf %{buildroot}%{_includedir}/%{name}
@@ -220,8 +222,13 @@ rm -rf %{buildroot}%{_includedir}/%{name}
 # FFMpeg libraries are not being installed as executable.
 chmod +x %{buildroot}%{_libdir}/libADM6*.so.*
 
+# INstall PNG file
+mkdir -p %{buildroot}%{_datadir}/icons/%{name}
+install -pm 0644 ./appImage/%{name}.png %{buildroot}%{_datadir}/icons/%{name}/
+
 # Install desktop files
 desktop-file-install --vendor rpmfusion \
+    --set-icon=%{_datadir}/icons/%{name}/%{name}.png \
     --dir %{buildroot}%{_datadir}/applications \
     %{SOURCE1}
 
@@ -244,6 +251,29 @@ appstream-util validate-relax --nonet \
 
 
 %ldconfig_scriptlets libs
+%ldconfig_scriptlets qt
+%ldconfig_scriptlets cli
+
+
+%if 0%{?el7}
+%post
+/bin/touch --no-create %{_datadir}/icons/hicolor &>/dev/null || :
+/bin/touch --no-create %{_datadir}/icons/%{name} &>/dev/null || :
+/usr/bin/update-desktop-database &> /dev/null || :
+
+%postun
+if [ $1 -eq 0 ] ; then
+    /bin/touch --no-create %{_datadir}/icons/hicolor &>/dev/null
+    /usr/bin/gtk-update-icon-cache %{_datadir}/icons/hicolor &>/dev/null || :
+    /bin/touch --no-create %{_datadir}/icons/%{name} &>/dev/null
+    /usr/bin/gtk-update-icon-cache %{_datadir}/icons/%{name} &>/dev/null || :
+fi
+/usr/bin/update-desktop-database &> /dev/null || :
+
+%posttrans
+/usr/bin/gtk-update-icon-cache %{_datadir}/icons/hicolor &>/dev/null || :
+/usr/bin/gtk-update-icon-cache %{_datadir}/icons/%{name} &>/dev/null || :
+%endif
 
 %files
 %doc AUTHORS README
@@ -251,7 +281,6 @@ appstream-util validate-relax --nonet \
 %files libs -f build_plugins_common/install_manifest.txt
 %license COPYING
 %dir %{_datadir}/avidemux6
-%{_datadir}/icons/hicolor/*/apps/avidemux.png
 %{_libdir}/libADM*
 %exclude %{_libdir}/libADM_render*
 %exclude %{_libdir}/libADM_UI*
@@ -273,6 +302,8 @@ appstream-util validate-relax --nonet \
 %{_libdir}/libADM_render6_QT5.so
 %{_datadir}/applications/rpmfusion-avidemux-qt.desktop
 %{_datadir}/metainfo/*.appdata.xml
+%{_datadir}/icons/hicolor/*/apps/avidemux.png
+%{_datadir}/icons/%{name}/
 # QT plugins
 %{_libdir}/ADM_plugins6/videoEncoders/qt5/
 %{_libdir}/ADM_plugins6/videoFilters/qt5/
@@ -283,6 +314,12 @@ appstream-util validate-relax --nonet \
 
 
 %changelog
+* Wed Nov 21 2018 Antonio Trande <sagitter@fedoraproject.org> - 2.7.1-7
+- Rebuild for x265-2.9 on el7
+- Rebuild for x264-0.148 on el7
+- Install avidemux.png
+- Add scriptlets for epel
+
 * Sun Nov 18 2018 Leigh Scott <leigh123linux@googlemail.com> - 2.7.1-6
 - Rebuild for new x265
 
