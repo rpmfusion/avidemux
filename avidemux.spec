@@ -5,7 +5,7 @@
 
 Name:           avidemux
 Version:        2.7.1
-Release:        9%{?dist}
+Release:        10%{?dist}
 Summary:        Graphical video editing and transcoding tool
 
 License:        GPLv2+
@@ -13,6 +13,7 @@ URL:            http://www.avidemux.org
 Source0:        http://downloads.sourceforge.net/%{name}/%{name}_%{version}.tar.gz
 Source1:        avidemux-qt.desktop
 Source2:        rpmfusion-avidemux-qt.appdata.xml
+Source100:      avidemux-ffmpeg_gcc9.patch
 
 # Don't try to build on arm, aarch64 or ppc
 ExclusiveArch:  i686 x86_64
@@ -127,10 +128,15 @@ rm -rf avidemux_plugins/ADM_audioDecoders/ADM_ad_ac3/ADM_liba52 \
        avidemux_plugins/ADM_videoFilters6/ass/ADM_libass \
        avidemux_plugins/ADM_muxers/muxerMp4v2/libmp4v2
 
+# Add patch to bundled ffmpeg for gcc 9
+#
+install -pm 0644 %{SOURCE100} ./avidemux_core/ffmpeg_package/patches/libavutil_mem_h.patch
+
+
 %build
 # Build avidemux_core
 export LDFLAGS="-lc -Wl,--as-needed"
-rm -rf build_core && mkdir build_core && pushd build_core
+mkdir build_core && pushd build_core
 %cmake3 -DCMAKE_BUILD_TYPE=RelWithDebInfo \
        ../avidemux_core
 %make_build V=1
@@ -245,6 +251,7 @@ install -pDm 0644 avidemux_icon.png \
 # Fix library permissions
 find %{buildroot}%{_libdir} -type f -name "*.so.*" -exec chmod 0755 {} \;
 
+
 %check
 appstream-util validate-relax --nonet \
     %{buildroot}%{_datadir}/metainfo/*.appdata.xml
@@ -314,6 +321,9 @@ fi
 
 
 %changelog
+* Mon Mar 04 2019 Richard Shaw <hobbes1069@gmail.com> - 2.7.1-10
+- Add patch for gcc 9 to fix bundled ffmpeg building, fixes RFBZ#5175.
+
 * Mon Mar 04 2019 RPM Fusion Release Engineering <leigh123linux@gmail.com> - 2.7.1-9
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_30_Mass_Rebuild
 
