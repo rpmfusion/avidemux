@@ -5,7 +5,7 @@
 
 Name:           avidemux
 Version:        2.7.1
-Release:        10%{?dist}
+Release:        11%{?dist}
 Summary:        Graphical video editing and transcoding tool
 
 License:        GPLv2+
@@ -321,6 +321,9 @@ fi
 
 
 %changelog
+* Tue Mar 12 2019 Sérgio Basto <sergio@serjux.com> - 2.7.1-11
+- Mass rebuild for x264
+
 * Mon Mar 04 2019 Richard Shaw <hobbes1069@gmail.com> - 2.7.1-10
 - Add patch for gcc 9 to fix bundled ffmpeg building, fixes RFBZ#5175.
 
