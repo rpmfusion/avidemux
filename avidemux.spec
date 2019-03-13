@@ -5,7 +5,7 @@
 
 Name:           avidemux
 Version:        2.7.1
-Release:        11%{?dist}
+Release:        12%{?dist}
 Summary:        Graphical video editing and transcoding tool
 
 License:        GPLv2+
@@ -67,7 +67,7 @@ BuildRequires:  opus-devel
 BuildRequires:  xvidcore-devel >= 1.0.2
 BuildRequires:  x264-devel
 BuildRequires:  x265-devel
-BuildRequires:  nvenc-devel
+BuildRequires:  nv-codec-headers
 
 # Main package is a metapackage, bring in something useful.
 Requires:       %{name}-gui = %{version}-%{release}
@@ -121,6 +121,8 @@ This package contains translation files for %{name}.
 
 %prep
 %autosetup -p1 -n %{name}_%{version}
+# nvenc is retired in favor nv-codec-headers
+sed -i -e 's@/usr/include/x86_64-linux-gnu@/usr/include/ffnvcodec@g' cmake/admCheckNvEnc.cmake
 
 # Remove sources of bundled libraries.
 rm -rf avidemux_plugins/ADM_audioDecoders/ADM_ad_ac3/ADM_liba52 \
@@ -321,6 +323,9 @@ fi
 
 
 %changelog
+* Wed Mar 13 2019 Leigh Scott <leigh123linux@googlemail.com> - 2.7.1-12
+- Switch to nv-codec-headers
+
 * Tue Mar 12 2019 Sérgio Basto <sergio@serjux.com> - 2.7.1-11
 - Mass rebuild for x264
 
