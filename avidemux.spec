@@ -4,16 +4,16 @@
 %global __os_install_post %(echo '%{__os_install_post}' | sed -e 's!/usr/lib[^[:space:]]*/brp-python-bytecompile[[:space:]].*$!!g')
 
 Name:           avidemux
-Version:        2.7.1
-Release:        12%{?dist}
+Version:        2.7.3
+Release:        1%{?dist}
 Summary:        Graphical video editing and transcoding tool
 
 License:        GPLv2+
 URL:            http://www.avidemux.org
 Source0:        http://downloads.sourceforge.net/%{name}/%{name}_%{version}.tar.gz
-Source1:        avidemux-qt.desktop
-Source2:        rpmfusion-avidemux-qt.appdata.xml
-Source100:      avidemux-ffmpeg_gcc9.patch
+
+Patch0:         avidemux-2.7.3-ad_lav.patch
+Patch1:         avidemux-2.7.3-frame_matching.patch
 
 # Don't try to build on arm, aarch64 or ppc
 ExclusiveArch:  i686 x86_64
@@ -59,7 +59,6 @@ BuildRequires:  libogg-devel >= 1.1
 BuildRequires:  libvorbis-devel >= 1.0.1
 BuildRequires:  libdca-devel
 BuildRequires:  opencore-amr-devel
-BuildRequires:  libvpx-devel
 BuildRequires:  twolame-devel
 BuildRequires:  opus-devel
 
@@ -121,19 +120,12 @@ This package contains translation files for %{name}.
 
 %prep
 %autosetup -p1 -n %{name}_%{version}
-# nvenc is retired in favor nv-codec-headers
-sed -i -e 's@/usr/include/x86_64-linux-gnu@/usr/include/ffnvcodec@g' cmake/admCheckNvEnc.cmake
 
 # Remove sources of bundled libraries.
 rm -rf avidemux_plugins/ADM_audioDecoders/ADM_ad_ac3/ADM_liba52 \
        avidemux_plugins/ADM_audioDecoders/ADM_ad_mad/ADM_libMad \
        avidemux_plugins/ADM_videoFilters6/ass/ADM_libass \
        avidemux_plugins/ADM_muxers/muxerMp4v2/libmp4v2
-
-# Add patch to bundled ffmpeg for gcc 9
-#
-install -pm 0644 %{SOURCE100} ./avidemux_core/ffmpeg_package/patches/libavutil_mem_h.patch
-
 
 %build
 # Build avidemux_core
@@ -230,31 +222,12 @@ rm -rf %{buildroot}%{_includedir}/%{name}
 # FFMpeg libraries are not being installed as executable.
 chmod +x %{buildroot}%{_libdir}/libADM6*.so.*
 
-# INstall PNG file
-mkdir -p %{buildroot}%{_datadir}/icons/%{name}
-install -pm 0644 ./appImage/%{name}.png %{buildroot}%{_datadir}/icons/%{name}/
-
-# Install desktop files
-desktop-file-install --vendor rpmfusion \
-    --set-icon=%{_datadir}/icons/%{name}/%{name}.png \
-    --dir %{buildroot}%{_datadir}/applications \
-    %{SOURCE1}
-
-# Install appdata file
-mkdir -p %{buildroot}%{_datadir}/metainfo
-install -pm 0644 %{SOURCE2} %{buildroot}%{_datadir}/metainfo/
-
-# Install icons
-install -pDm 0644 avidemux/gtk/ADM_userInterfaces/glade/main/avidemux_icon_small.png \
-        %{buildroot}%{_datadir}/icons/hicolor/48x48/apps/avidemux.png
-install -pDm 0644 avidemux_icon.png \
-        %{buildroot}%{_datadir}/icons/hicolor/64x64/apps/avidemux.png
-
 # Fix library permissions
 find %{buildroot}%{_libdir} -type f -name "*.so.*" -exec chmod 0755 {} \;
 
 
 %check
+desktop-file-validate %{buildroot}%{_datadir}/applications/*.desktop
 appstream-util validate-relax --nonet \
     %{buildroot}%{_datadir}/metainfo/*.appdata.xml
 
@@ -267,7 +240,6 @@ appstream-util validate-relax --nonet \
 %if 0%{?el7}
 %post
 /bin/touch --no-create %{_datadir}/icons/hicolor &>/dev/null || :
-/bin/touch --no-create %{_datadir}/icons/%{name} &>/dev/null || :
 /usr/bin/update-desktop-database &> /dev/null || :
 
 %postun
@@ -309,10 +281,9 @@ fi
 %{_libdir}/libADM_openGLQT*.so
 %{_libdir}/libADM_UIQT*.so
 %{_libdir}/libADM_render6_QT5.so
-%{_datadir}/applications/rpmfusion-avidemux-qt.desktop
-%{_datadir}/metainfo/*.appdata.xml
-%{_datadir}/icons/hicolor/*/apps/avidemux.png
-%{_datadir}/icons/%{name}/
+%{_datadir}/applications/org.avidemux.Avidemux.desktop
+%{_datadir}/metainfo/org.avidemux.Avidemux.appdata.xml
+%{_datadir}/icons/hicolor/*/apps/org.avidemux.Avidemux.png
 # QT plugins
 %{_libdir}/ADM_plugins6/videoEncoders/qt5/
 %{_libdir}/ADM_plugins6/videoFilters/qt5/
@@ -323,6 +294,10 @@ fi
 
 
 %changelog
+* Wed Mar 27 2019 Richard Shaw <hobbes1069@gmail.com> - 2.7.3-1
+- Update to 2.7.3 and apply upstream patches per user request.
+  Fixes RFBZ#5208.
+
 * Wed Mar 13 2019 Leigh Scott <leigh123linux@googlemail.com> - 2.7.1-12
 - Switch to nv-codec-headers
 
