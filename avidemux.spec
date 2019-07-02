@@ -5,7 +5,7 @@
 
 Name:           avidemux
 Version:        2.7.3
-Release:        1%{?dist}
+Release:        2%{?dist}
 Summary:        Graphical video editing and transcoding tool
 
 License:        GPLv2+
@@ -294,6 +294,9 @@ fi
 
 
 %changelog
+* Tue Jul 02 2019 Nicolas Chauvet <kwizart@gmail.com> - 2.7.3-2
+- Rebuilt for x265
+
 * Wed Mar 27 2019 Richard Shaw <hobbes1069@gmail.com> - 2.7.3-1
 - Update to 2.7.3 and apply upstream patches per user request.
   Fixes RFBZ#5208.
