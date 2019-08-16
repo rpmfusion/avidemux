@@ -4,8 +4,8 @@
 %global __os_install_post %(echo '%{__os_install_post}' | sed -e 's!/usr/lib[^[:space:]]*/brp-python-bytecompile[[:space:]].*$!!g')
 
 Name:           avidemux
-Version:        2.7.3
-Release:        3%{?dist}
+Version:        2.7.4
+Release:        1%{?dist}
 Summary:        Graphical video editing and transcoding tool
 
 License:        GPLv2+
@@ -294,6 +294,9 @@ fi
 
 
 %changelog
+* Fri Aug 16 2019 Richard Shaw <hobbes1069@gmail.com> - 2.7.4-1
+- Update to 2.7.4.
+
 * Fri Aug 09 2019 RPM Fusion Release Engineering <leigh123linux@gmail.com> - 2.7.3-3
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_31_Mass_Rebuild
 
