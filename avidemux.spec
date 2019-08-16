@@ -12,8 +12,6 @@ License:        GPLv2+
 URL:            http://www.avidemux.org
 Source0:        http://downloads.sourceforge.net/%{name}/%{name}_%{version}.tar.gz
 
-Patch0:         avidemux-2.7.3-frame_matching.patch
-
 # Don't try to build on arm, aarch64 or ppc
 ExclusiveArch:  i686 x86_64
 
