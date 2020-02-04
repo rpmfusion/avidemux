@@ -5,7 +5,7 @@
 
 Name:           avidemux
 Version:        2.7.4
-Release:        3%{?dist}
+Release:        4%{?dist}
 Summary:        Graphical video editing and transcoding tool
 
 License:        GPLv2+
@@ -291,6 +291,9 @@ fi
 
 
 %changelog
+* Tue Feb 04 2020 RPM Fusion Release Engineering <leigh123linux@gmail.com> - 2.7.4-4
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_32_Mass_Rebuild
+
 * Tue Dec 17 2019 Leigh Scott <leigh123linux@gmail.com> - 2.7.4-3
 - Mass rebuild for x264
 
