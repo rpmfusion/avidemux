@@ -4,13 +4,15 @@
 %global __os_install_post %(echo '%{__os_install_post}' | sed -e 's!/usr/lib[^[:space:]]*/brp-python-bytecompile[[:space:]].*$!!g')
 
 Name:           avidemux
-Version:        2.7.4
-Release:        7%{?dist}
+Version:        2.7.6
+Release:        1%{?dist}
 Summary:        Graphical video editing and transcoding tool
 
 License:        GPLv2+
 URL:            http://www.avidemux.org
 Source0:        http://downloads.sourceforge.net/%{name}/%{name}_%{version}.tar.gz
+
+Patch0:         avidemux-2.7.6-external-libass.patch
 
 # Don't try to build on arm, aarch64 or ppc
 ExclusiveArch:  i686 x86_64
@@ -34,8 +36,10 @@ BuildRequires:  fribidi-devel
 BuildRequires:  libXv-devel
 BuildRequires:  libXmu-devel
 BuildRequires:  jack-audio-connection-kit-devel
+BuildRequires:  libaom-devel
 BuildRequires:  libass-devel
 BuildRequires:  libmp4v2-devel
+BuildRequires:  vapoursynth-devel
 
 # Sound out
 BuildRequires:  alsa-lib-devel >= 1.0.3
@@ -49,7 +53,7 @@ BuildRequires:  libva-devel
 # Audio Codecs
 BuildRequires:  a52dec-devel >= 0.7.4
 %{?_with_faac:BuildRequires:  faac-devel >= 1.24}
-BuildRequires:  faad2-devel >= 2.0
+%{?_with_fdk_aac:BuildRequires:  fdk-aac-devel >= 0.1.6}
 BuildRequires:  lame-devel >= 3.96.1
 BuildRequires:  libmad-devel >= 0.15.1
 BuildRequires:  libogg-devel >= 1.1
@@ -169,7 +173,6 @@ rm -rf build_plugins_common && mkdir build_plugins_common && pushd build_plugins
        -DUSE_EXTERNAL_MP4V2=TRUE \
        ../avidemux_plugins
 %make_build V=1
-make install DESTDIR=%{_pkgbuilddir}/fakeRoot
 popd
 
 # Build avidemux_plugins_cli
@@ -185,7 +188,6 @@ rm -rf build_plugins_cli && mkdir build_plugins_cli && pushd build_plugins_cli
        -DUSE_EXTERNAL_MP4V2=TRUE \
        ../avidemux_plugins
 %make_build V=1
-make install DESTDIR=%{_pkgbuilddir}/fakeRoot
 popd
 
 # Build avidemux_plugins_qt5
@@ -201,7 +203,6 @@ rm -rf build_plugins_qt5 && mkdir build_plugins_qt5 && pushd build_plugins_qt5
        -DUSE_EXTERNAL_MP4V2=TRUE \
        ../avidemux_plugins
 %make_build V=1
-make install DESTDIR=%{_pkgbuilddir}/fakeRoot
 popd
 
 
@@ -269,12 +270,14 @@ fi
 
 %files cli -f build_plugins_cli/install_manifest.txt
 %{_bindir}/avidemux3_cli
+%{_bindir}/vsProxy
 %{_libdir}/libADM_UI_Cli*.so
 %{_libdir}/libADM_render6_cli.so
 
 %files qt 
 %{_bindir}/avidemux3_qt5
 %{_bindir}/avidemux3_jobs_qt5
+%{_bindir}/vsProxy_gui_qt5
 %{_libdir}/libADM_openGLQT*.so
 %{_libdir}/libADM_UIQT*.so
 %{_libdir}/libADM_render6_QT5.so
@@ -291,6 +294,9 @@ fi
 
 
 %changelog
+* Tue Jul  7 2020 Richard Shaw <hobbes1069@gmail.com> - 2.7.6-1
+- Update to 2.7.6.
+
 * Tue Jul 07 2020 Sérgio Basto <sergio@serjux.com> - 2.7.4-7
 - Mass rebuild for x264
 
