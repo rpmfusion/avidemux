@@ -2,6 +2,8 @@
 # Turn off the brp-python-bytecompile script as in this case the scripts are
 # internally interpreted.
 %global __os_install_post %(echo '%{__os_install_post}' | sed -e 's!/usr/lib[^[:space:]]*/brp-python-bytecompile[[:space:]].*$!!g')
+# Use old cmake macro
+%global __cmake_in_source_build 1
 
 Name:           avidemux
 Version:        2.7.6
