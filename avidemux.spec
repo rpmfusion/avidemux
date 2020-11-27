@@ -9,7 +9,7 @@
 
 Name:           avidemux
 Version:        2.7.6
-Release:        3%{?dist}
+Release:        4%{?dist}
 Summary:        Graphical video editing and transcoding tool
 
 License:        GPLv2+
@@ -108,7 +108,7 @@ Provides:       %{name}-gui = %{version}-%{release}
 Requires:       %{name}-libs%{?_isa} = %{version}-%{release}
 Requires:       hicolor-icon-theme
 Obsoletes:      %{name}-gtk < 2.6.10
-Obsoletes:      %{name}-help
+Obsoletes:      %{name}-help < 2.6.15
 
 %description qt
 This package contains the Qt graphical interface for %{name}.
@@ -298,6 +298,9 @@ fi
 
 
 %changelog
+* Fri Nov 27 2020 Sérgio Basto <sergio@serjux.com> - 2.7.6-4
+- Mass rebuild for x264-0.161
+
 * Mon Aug 17 2020 RPM Fusion Release Engineering <leigh123linux@gmail.com> - 2.7.6-3
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_33_Mass_Rebuild
 
