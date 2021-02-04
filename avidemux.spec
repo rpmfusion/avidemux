@@ -1,4 +1,5 @@
 %global _pkgbuilddir %{_builddir}/%{name}_%{version}
+
 # Turn off the brp-python-bytecompile script as in this case the scripts are
 # internally interpreted.
 %global __os_install_post %(echo '%{__os_install_post}' | sed -e 's!/usr/lib[^[:space:]]*/brp-python-bytecompile[[:space:]].*$!!g')
@@ -132,13 +133,17 @@ rm -rf avidemux_plugins/ADM_audioDecoders/ADM_ad_ac3/ADM_liba52 \
        avidemux_plugins/ADM_videoFilters6/ass/ADM_libass \
        avidemux_plugins/ADM_muxers/muxerMp4v2/libmp4v2
 
+
 %build
+export LDFLAGS="%{optflags} -lc -Wl,--as-needed"
+
 # Build avidemux_core
-export LDFLAGS="-lc -Wl,--as-needed"
-mkdir build_core && pushd build_core
+mkdir build_avidemux_core
+pushd build_avidemux_core
 %cmake3 -DCMAKE_BUILD_TYPE=RelWithDebInfo \
-       ../avidemux_core
-%make_build V=1
+        -DCMAKE_CXX_STANDARD=14 \
+		../avidemux_core
+%cmake_build
 
 # We have to do a fake install so header files are avaialble for the other
 # packages.
@@ -146,26 +151,31 @@ make install DESTDIR=%{_pkgbuilddir}/fakeRoot
 popd
 
 # Build cli interface
-rm -rf build_cli && mkdir build_cli && pushd build_cli
+mkdir build_avidemux_cli
+pushd build_avidemux_cli
 %cmake3 -DCMAKE_BUILD_TYPE=RelWithDebInfo \
-       -DFAKEROOT=%{_pkgbuilddir}/fakeRoot \
-       ../avidemux/cli
-%make_build V=1
+        -DFAKEROOT=%{_pkgbuilddir}/fakeRoot \
+		../avidemux/cli
+%cmake_build
+
 make install DESTDIR=%{_pkgbuilddir}/fakeRoot
 popd
 
 # Build QT5 gui
-rm -rf build_qt5 && mkdir build_qt5 && pushd build_qt5
+mkdir build_avidemux_qt4
+pushd build_avidemux_qt4
 %cmake3 -DCMAKE_BUILD_TYPE=RelWithDebInfo \
        -DFAKEROOT=%{_pkgbuilddir}/fakeRoot \
        -DENABLE_QT5=TRUE \
-       ../avidemux/qt4
-%make_build V=1
+	   ../avidemux/qt4
+%cmake_build
+
 make install DESTDIR=%{_pkgbuilddir}/fakeRoot
 popd
 
 # Build avidemux_plugins_common
-rm -rf build_plugins_common && mkdir build_plugins_common && pushd build_plugins_common
+mkdir build_plugins_common
+pushd build_plugins_common
 %cmake3 -DCMAKE_BUILD_TYPE=RelWithDebInfo \
        -DFAKEROOT=%{_pkgbuilddir}/fakeRoot \
        -DAVIDEMUX_SOURCE_DIR=%{_builddir}/%{name}_%{version} \
@@ -175,12 +185,13 @@ rm -rf build_plugins_common && mkdir build_plugins_common && pushd build_plugins
        -DUSE_EXTERNAL_LIBMAD=TRUE \
        -DUSE_EXTERNAL_LIBA52=TRUE \
        -DUSE_EXTERNAL_MP4V2=TRUE \
-       ../avidemux_plugins
-%make_build V=1
+	   ../avidemux_plugins
+%cmake_build
 popd
 
 # Build avidemux_plugins_cli
-rm -rf build_plugins_cli && mkdir build_plugins_cli && pushd build_plugins_cli
+mkdir build_plugins_cli
+pushd build_plugins_cli
 %cmake3 -DCMAKE_BUILD_TYPE=RelWithDebInfo \
        -DFAKEROOT=%{_pkgbuilddir}/fakeRoot \
        -DAVIDEMUX_SOURCE_DIR=%{_builddir}/%{name}_%{version} \
@@ -190,12 +201,13 @@ rm -rf build_plugins_cli && mkdir build_plugins_cli && pushd build_plugins_cli
        -DUSE_EXTERNAL_LIBMAD=TRUE \
        -DUSE_EXTERNAL_LIBA52=TRUE \
        -DUSE_EXTERNAL_MP4V2=TRUE \
-       ../avidemux_plugins
-%make_build V=1
+	   ../avidemux_plugins
+%cmake_build
 popd
 
 # Build avidemux_plugins_qt5
-rm -rf build_plugins_qt5 && mkdir build_plugins_qt5 && pushd build_plugins_qt5
+mkdir build_plugins_qt5
+pushd build_plugins_qt5
 %cmake3 -DCMAKE_BUILD_TYPE=RelWithDebInfo \
        -DFAKEROOT=%{_pkgbuilddir}/fakeRoot \
        -DAVIDEMUX_SOURCE_DIR=%{_builddir}/%{name}_%{version} \
@@ -205,15 +217,14 @@ rm -rf build_plugins_qt5 && mkdir build_plugins_qt5 && pushd build_plugins_qt5
        -DUSE_EXTERNAL_LIBMAD=TRUE \
        -DUSE_EXTERNAL_LIBA52=TRUE \
        -DUSE_EXTERNAL_MP4V2=TRUE \
-       ../avidemux_plugins
-%make_build V=1
+	   ../avidemux_plugins
+%cmake_build
 popd
 
-
 %install
-%make_install -C build_core
-%make_install -C build_cli
-%make_install -C build_qt5
+%make_install -C build_avidemux_core
+%make_install -C build_avidemux_cli
+%make_install -C build_avidemux_qt4
 %make_install -C build_plugins_common
 %make_install -C build_plugins_cli
 %make_install -C build_plugins_qt5
