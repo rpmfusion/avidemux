@@ -10,7 +10,7 @@
 
 Name:           avidemux
 Version:        2.7.6
-Release:        5%{?dist}
+Release:        6%{?dist}
 Summary:        Graphical video editing and transcoding tool
 
 License:        GPLv2+
@@ -69,6 +69,9 @@ BuildRequires:  twolame-devel
 BuildRequires:  opus-devel
 
 # Video Codecs
+%if 0%{?fedora} || 0%{?rhel} > 7
+BuildRequires:  libvpx-devel
+%endif
 BuildRequires:  xvidcore-devel >= 1.0.2
 BuildRequires:  x264-devel
 BuildRequires:  x265-devel
@@ -309,6 +312,9 @@ fi
 
 
 %changelog
+* Wed Feb 17 2021 Leigh Scott <leigh123linux@gmail.com> - 2.7.6-6
+- Enable libvpx (rfbz#5925)
+
 * Wed Feb 03 2021 RPM Fusion Release Engineering <leigh123linux@gmail.com> - 2.7.6-5
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_34_Mass_Rebuild
 
