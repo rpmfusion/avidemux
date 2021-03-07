@@ -9,15 +9,14 @@
 %global _lto_cflags %{nil}
 
 Name:           avidemux
-Version:        2.7.6
-Release:        6%{?dist}
+Version:        2.7.8
+Release:        1%{?dist}
 Summary:        Graphical video editing and transcoding tool
 
 License:        GPLv2+
 URL:            http://www.avidemux.org
 Source0:        http://downloads.sourceforge.net/%{name}/%{name}_%{version}.tar.gz
 
-Patch0:         avidemux-2.7.6-external-libass.patch
 
 # Don't try to build on arm, aarch64 or ppc
 ExclusiveArch:  i686 x86_64
@@ -312,6 +311,9 @@ fi
 
 
 %changelog
+* Sun Mar 07 2021 Leigh Scott <leigh123linux@gmail.com> - 2.7.8-1
+- Update to 2.7.8.
+
 * Wed Feb 17 2021 Leigh Scott <leigh123linux@gmail.com> - 2.7.6-6
 - Enable libvpx (rfbz#5925)
 
