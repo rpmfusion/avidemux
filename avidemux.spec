@@ -10,13 +10,14 @@
 
 Name:           avidemux
 Version:        2.7.8
-Release:        1%{?dist}
+Release:        2%{?dist}
 Summary:        Graphical video editing and transcoding tool
 
 License:        GPLv2+
 URL:            http://www.avidemux.org
 Source0:        http://downloads.sourceforge.net/%{name}/%{name}_%{version}.tar.gz
 
+Patch0:         https://github.com/mean00/avidemux2/commit/991bd96c4b729e62300caf87ff343b046f41616f.patch#/force_currentTime.patch
 
 # Don't try to build on arm, aarch64 or ppc
 ExclusiveArch:  i686 x86_64
@@ -311,6 +312,9 @@ fi
 
 
 %changelog
+* Mon Mar 08 2021 Leigh Scott <leigh123linux@gmail.com> - 2.7.8-2
+- Ensure text margins in current time display are zero (rfbz#5948)
+
 * Sun Mar 07 2021 Leigh Scott <leigh123linux@gmail.com> - 2.7.8-1
 - Update to 2.7.8.
 
