@@ -1,0 +1,32 @@
+From d7ecad79c55e6c21d6462bc69d2d0491efe3c184 Mon Sep 17 00:00:00 2001
+From: eumagga0x2a <eumagga0x2a@users.noreply.github.com>
+Date: Tue, 9 Mar 2021 21:55:47 +0100
+Subject: [PATCH] [ffNvEnc] Resolve name clash between H264 and HEVC encoders
+ created by 284b2afd7b5
+
+---
+ avidemux_plugins/ADM_videoEncoder/ffNvEnc/ffNvEncPlugin.cpp | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/avidemux_plugins/ADM_videoEncoder/ffNvEnc/ffNvEncPlugin.cpp b/avidemux_plugins/ADM_videoEncoder/ffNvEnc/ffNvEncPlugin.cpp
+index 3c83bfbf3..d2a1b9c03 100644
+--- a/avidemux_plugins/ADM_videoEncoder/ffNvEnc/ffNvEncPlugin.cpp
++++ b/avidemux_plugins/ADM_videoEncoder/ffNvEnc/ffNvEncPlugin.cpp
+@@ -79,7 +79,7 @@ extern "C"
+ 
+ ADM_DECLARE_VIDEO_ENCODER_PREAMBLE(ADM_ffNvEncEncoder);
+ #ifdef H265_ENCODER
+-ADM_DECLARE_VIDEO_ENCODER_MAIN_EX("ffNvEnc",
++ADM_DECLARE_VIDEO_ENCODER_MAIN_EX("ffNvEncHEVC",
+                                "Nvidia HEVC",
+                                "Nvidia hw encoder",
+                                 ffNvEncConfigure, // configuration
+@@ -90,7 +90,7 @@ ADM_DECLARE_VIDEO_ENCODER_MAIN_EX("ffNvEnc",
+                                 nvEncProbe
+ );
+ #else
+-ADM_DECLARE_VIDEO_ENCODER_MAIN_EX("ffNvEnc",
++ADM_DECLARE_VIDEO_ENCODER_MAIN_EX("ffNvEncH264",
+                                "Nvidia H264",
+                                "Nvidia hw encoder",
+                                 ffNvEncConfigure, // configuration

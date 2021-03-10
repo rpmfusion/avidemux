@@ -10,7 +10,7 @@
 
 Name:           avidemux
 Version:        2.7.8
-Release:        2%{?dist}
+Release:        3%{?dist}
 Summary:        Graphical video editing and transcoding tool
 
 License:        GPLv2+
@@ -18,6 +18,7 @@ URL:            http://www.avidemux.org
 Source0:        http://downloads.sourceforge.net/%{name}/%{name}_%{version}.tar.gz
 
 Patch0:         https://github.com/mean00/avidemux2/commit/991bd96c4b729e62300caf87ff343b046f41616f.patch#/force_currentTime.patch
+Patch1:         https://github.com/mean00/avidemux2/commit/d7ecad79c55e6c21d6462bc69d2d0491efe3c184.patch#/fix_encoder_name.patch
 
 # Don't try to build on arm, aarch64 or ppc
 ExclusiveArch:  i686 x86_64
@@ -312,6 +313,9 @@ fi
 
 
 %changelog
+* Wed Mar 10 2021 Leigh Scott <leigh123linux@gmail.com> - 2.7.8-3
+- Resolve name clash between H264 and HEVC encoders (rfbz#5949)
+
 * Mon Mar 08 2021 Leigh Scott <leigh123linux@gmail.com> - 2.7.8-2
 - Ensure text margins in current time display are zero (rfbz#5948)
 
