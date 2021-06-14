@@ -10,7 +10,7 @@
 
 Name:           avidemux
 Version:        2.7.8
-Release:        4%{?dist}
+Release:        3%{?dist}
 Summary:        Graphical video editing and transcoding tool
 
 License:        GPLv2+
@@ -313,9 +313,6 @@ fi
 
 
 %changelog
-* Sun Jun 13 2021 Robert-André Mauchin <zebob.m@gmail.com> - 2.7.8-4
-- Rebuild for new aom
-
 * Wed Mar 10 2021 Leigh Scott <leigh123linux@gmail.com> - 2.7.8-3
 - Resolve name clash between H264 and HEVC encoders (rfbz#5949)
 
