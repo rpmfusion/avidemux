@@ -10,7 +10,7 @@
 
 Name:           avidemux
 Version:        2.7.8
-Release:        3%{?dist}
+Release:        5%{?dist}
 Summary:        Graphical video editing and transcoding tool
 
 License:        GPLv2+
@@ -24,7 +24,7 @@ Patch1:         https://github.com/mean00/avidemux2/commit/d7ecad79c55e6c21d6462
 ExclusiveArch:  i686 x86_64
 
 # Utilities
-BuildRequires:  cmake3 gcc-c++ yasm
+BuildRequires:  cmake gcc-c++ yasm
 %{?el7:BuildRequires: epel-rpm-macros}
 BuildRequires:  gettext intltool
 BuildRequires:  libxslt
@@ -144,7 +144,7 @@ export LDFLAGS="%{optflags} -lc -Wl,--as-needed"
 # Build avidemux_core
 mkdir build_avidemux_core
 pushd build_avidemux_core
-%cmake3 -DCMAKE_BUILD_TYPE=RelWithDebInfo \
+%cmake -DCMAKE_BUILD_TYPE=RelWithDebInfo \
         -DCMAKE_CXX_STANDARD=14 \
 		../avidemux_core
 %cmake_build
@@ -157,7 +157,7 @@ popd
 # Build cli interface
 mkdir build_avidemux_cli
 pushd build_avidemux_cli
-%cmake3 -DCMAKE_BUILD_TYPE=RelWithDebInfo \
+%cmake -DCMAKE_BUILD_TYPE=RelWithDebInfo \
         -DFAKEROOT=%{_pkgbuilddir}/fakeRoot \
 		../avidemux/cli
 %cmake_build
@@ -168,7 +168,7 @@ popd
 # Build QT5 gui
 mkdir build_avidemux_qt4
 pushd build_avidemux_qt4
-%cmake3 -DCMAKE_BUILD_TYPE=RelWithDebInfo \
+%cmake -DCMAKE_BUILD_TYPE=RelWithDebInfo \
        -DFAKEROOT=%{_pkgbuilddir}/fakeRoot \
        -DENABLE_QT5=TRUE \
 	   ../avidemux/qt4
@@ -180,7 +180,7 @@ popd
 # Build avidemux_plugins_common
 mkdir build_plugins_common
 pushd build_plugins_common
-%cmake3 -DCMAKE_BUILD_TYPE=RelWithDebInfo \
+%cmake -DCMAKE_BUILD_TYPE=RelWithDebInfo \
        -DFAKEROOT=%{_pkgbuilddir}/fakeRoot \
        -DAVIDEMUX_SOURCE_DIR=%{_builddir}/%{name}_%{version} \
        -DENABLE_QT5=TRUE \
@@ -196,7 +196,7 @@ popd
 # Build avidemux_plugins_cli
 mkdir build_plugins_cli
 pushd build_plugins_cli
-%cmake3 -DCMAKE_BUILD_TYPE=RelWithDebInfo \
+%cmake -DCMAKE_BUILD_TYPE=RelWithDebInfo \
        -DFAKEROOT=%{_pkgbuilddir}/fakeRoot \
        -DAVIDEMUX_SOURCE_DIR=%{_builddir}/%{name}_%{version} \
        -DENABLE_QT5=TRUE \
@@ -212,7 +212,7 @@ popd
 # Build avidemux_plugins_qt5
 mkdir build_plugins_qt5
 pushd build_plugins_qt5
-%cmake3 -DCMAKE_BUILD_TYPE=RelWithDebInfo \
+%cmake -DCMAKE_BUILD_TYPE=RelWithDebInfo \
        -DFAKEROOT=%{_pkgbuilddir}/fakeRoot \
        -DAVIDEMUX_SOURCE_DIR=%{_builddir}/%{name}_%{version} \
        -DENABLE_QT5=TRUE \
@@ -313,6 +313,12 @@ fi
 
 
 %changelog
+* Sun Jun 13 2021 Robert-André Mauchin <zebob.m@gmail.com> - 2.7.8-5
+- Rebuild for new aom
+
+* Wed Apr 14 2021 Leigh Scott <leigh123linux@gmail.com> - 2.7.8-4
+- Rebuild for new x265
+
 * Wed Mar 10 2021 Leigh Scott <leigh123linux@gmail.com> - 2.7.8-3
 - Resolve name clash between H264 and HEVC encoders (rfbz#5949)
 
