@@ -10,7 +10,7 @@
 
 Name:           avidemux
 Version:        2.7.8
-Release:        5%{?dist}
+Release:        6%{?dist}
 Summary:        Graphical video editing and transcoding tool
 
 License:        GPLv2+
@@ -313,6 +313,9 @@ fi
 
 
 %changelog
+* Sat Jul 10 2021 Sérgio Basto <sergio@serjux.com> - 2.7.8-6
+- Mass rebuild for x264-0.163
+
 * Sun Jun 13 2021 Robert-André Mauchin <zebob.m@gmail.com> - 2.7.8-5
 - Rebuild for new aom
 
