@@ -9,16 +9,14 @@
 %global _lto_cflags %{nil}
 
 Name:           avidemux
-Version:        2.7.8
-Release:        5%{?dist}
+Version:        2.8.0
+Release:        1%{?dist}
 Summary:        Graphical video editing and transcoding tool
 
 License:        GPLv2+
 URL:            http://www.avidemux.org
 Source0:        http://downloads.sourceforge.net/%{name}/%{name}_%{version}.tar.gz
 
-Patch0:         https://github.com/mean00/avidemux2/commit/991bd96c4b729e62300caf87ff343b046f41616f.patch#/force_currentTime.patch
-Patch1:         https://github.com/mean00/avidemux2/commit/d7ecad79c55e6c21d6462bc69d2d0491efe3c184.patch#/fix_encoder_name.patch
 
 # Don't try to build on arm, aarch64 or ppc
 ExclusiveArch:  i686 x86_64
@@ -313,6 +311,15 @@ fi
 
 
 %changelog
+* Tue Dec 28 2021 Leigh Scott <leigh123linux@gmail.com> - 2.8.0-1
+- Update to 2.8.0.
+
+* Mon Aug 02 2021 RPM Fusion Release Engineering <leigh123linux@gmail.com> - 2.7.8-7
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_35_Mass_Rebuild
+
+* Sat Jul 10 2021 Sérgio Basto <sergio@serjux.com> - 2.7.8-6
+- Mass rebuild for x264-0.163
+
 * Sun Jun 13 2021 Robert-André Mauchin <zebob.m@gmail.com> - 2.7.8-5
 - Rebuild for new aom
 
