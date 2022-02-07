@@ -10,7 +10,7 @@
 
 Name:           avidemux
 Version:        2.8.0
-Release:        1%{?dist}
+Release:        2%{?dist}
 Summary:        Graphical video editing and transcoding tool
 
 License:        GPLv2+
@@ -311,6 +311,9 @@ fi
 
 
 %changelog
+* Mon Feb 07 2022 Leigh Scott <leigh123linux@gmail.com> - 2.8.0-2
+- Rebuild for libvpx
+
 * Tue Dec 28 2021 Leigh Scott <leigh123linux@gmail.com> - 2.8.0-1
 - Update to 2.8.0.
 
