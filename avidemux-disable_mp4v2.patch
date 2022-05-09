@@ -1,0 +1,38 @@
+Index: avidemux_2.8.0/avidemux_plugins/ADM_muxers/CMakeLists.txt
+===================================================================
+--- avidemux_2.8.0.orig/avidemux_plugins/ADM_muxers/CMakeLists.txt
++++ avidemux_2.8.0/avidemux_plugins/ADM_muxers/CMakeLists.txt
+@@ -16,7 +16,5 @@ IF(WIN32)
+          ENDIF ("${CROSS_C_COMPILER}" STREQUAL "clang")
+         ENDIF(MSVC) 
+         # With clang no exception in the compiler for the moment, so no mp4v2
+-ELSE(WIN32 )
+-        ADD_SUBDIRECTORY(muxerMp4v2)
+ ENDIF(WIN32)
+ 
+Index: avidemux_2.8.0/avidemux_plugins/CMakeLists.txt
+===================================================================
+--- avidemux_2.8.0.orig/avidemux_plugins/CMakeLists.txt
++++ avidemux_2.8.0/avidemux_plugins/CMakeLists.txt
+@@ -72,7 +72,6 @@ INCLUDE_DIRECTORIES("${AVIDEMUX_SEARCH_I
+ OPTION(USE_EXTERNAL_LIBASS "Use system installed libass library." OFF)
+ OPTION(USE_EXTERNAL_LIBMAD "Use system installed libmad library." OFF)
+ OPTION(USE_EXTERNAL_LIBA52 "Use system installed liba52 library." OFF)
+-OPTION(USE_EXTERNAL_MP4V2 "Use system installed libmp4v2 library." OFF)
+ 
+ INCLUDE(FindPkgConfig)
+ 
+@@ -96,13 +95,6 @@ IF(USE_EXTERNAL_LIBA52)
+         INCLUDE_DIRECTORIES(SYSTEM ${LIBA52_INCLUDE_DIR})
+ ENDIF()
+ 
+-# libmp4v2
+-IF(USE_EXTERNAL_MP4V2)
+-        FIND_PATH(MP4V2_INCLUDE_DIR mp4v2/mp4v2.h)
+-        FIND_LIBRARY(MP4V2_LIBRARIES mp4v2)
+-        INCLUDE_DIRECTORIES(SYSTEM ${MP4V2_INCLUDE_DIR})
+-ENDIF()
+-
+ IF (FRESH_BUILD)
+ 	MESSAGE("")
+ ENDIF (FRESH_BUILD)

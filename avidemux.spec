@@ -10,13 +10,15 @@
 
 Name:           avidemux
 Version:        2.8.0
-Release:        2%{?dist}
+Release:        3%{?dist}
 Summary:        Graphical video editing and transcoding tool
 
 License:        GPLv2+
 URL:            http://www.avidemux.org
 Source0:        http://downloads.sourceforge.net/%{name}/%{name}_%{version}.tar.gz
 
+Patch0:         https://github.com/mean00/avidemux2/compare/2.8.0...support_2.8.0.patch
+Patch1:         avidemux-disable_mp4v2.patch
 
 # Don't try to build on arm, aarch64 or ppc
 ExclusiveArch:  i686 x86_64
@@ -42,7 +44,6 @@ BuildRequires:  libXmu-devel
 BuildRequires:  jack-audio-connection-kit-devel
 BuildRequires:  libaom-devel
 BuildRequires:  libass-devel
-BuildRequires:  libmp4v2-devel
 BuildRequires:  vapoursynth-devel
 
 # Sound out
@@ -186,7 +187,6 @@ pushd build_plugins_common
        -DUSE_EXTERNAL_LIBASS=TRUE \
        -DUSE_EXTERNAL_LIBMAD=TRUE \
        -DUSE_EXTERNAL_LIBA52=TRUE \
-       -DUSE_EXTERNAL_MP4V2=TRUE \
 	   ../avidemux_plugins
 %cmake_build
 popd
@@ -202,7 +202,6 @@ pushd build_plugins_cli
        -DUSE_EXTERNAL_LIBASS=TRUE \
        -DUSE_EXTERNAL_LIBMAD=TRUE \
        -DUSE_EXTERNAL_LIBA52=TRUE \
-       -DUSE_EXTERNAL_MP4V2=TRUE \
 	   ../avidemux_plugins
 %cmake_build
 popd
@@ -218,7 +217,6 @@ pushd build_plugins_qt5
        -DUSE_EXTERNAL_LIBASS=TRUE \
        -DUSE_EXTERNAL_LIBMAD=TRUE \
        -DUSE_EXTERNAL_LIBA52=TRUE \
-       -DUSE_EXTERNAL_MP4V2=TRUE \
 	   ../avidemux_plugins
 %cmake_build
 popd
@@ -278,11 +276,13 @@ fi
 %license COPYING
 %dir %{_datadir}/avidemux6
 %{_libdir}/libADM*
+%exclude %{_libdir}/libADM_openGLQT*.so
 %exclude %{_libdir}/libADM_render*
 %exclude %{_libdir}/libADM_UI*
 # Catch the stuff missed using install_manifest.txt
 %dir %{_libdir}/ADM_plugins6
-%dir %{_libdir}/ADM_plugins6/*
+%dir %{_libdir}/ADM_plugins6/videoEncoders
+%dir %{_libdir}/ADM_plugins6/videoFilters
 %dir %{_libdir}/ADM_plugins6/autoScripts/lib
 
 %files cli -f build_plugins_cli/install_manifest.txt
@@ -311,6 +311,10 @@ fi
 
 
 %changelog
+* Mon May 09 2022 Richard Shaw <hobbes1069@gmail.com> - 2.8.0-3
+- Disable mp4v2 as it is no longer maintained, fixes BZ#6291.
+- Add commits from support_2.8.0 branch to fix crashes as suggested by upstream.
+
 * Mon Feb 07 2022 Leigh Scott <leigh123linux@gmail.com> - 2.8.0-2
 - Rebuild for libvpx
 
