@@ -10,7 +10,7 @@
 
 Name:           avidemux
 Version:        2.8.0
-Release:        3%{?dist}
+Release:        4%{?dist}
 Summary:        Graphical video editing and transcoding tool
 
 License:        GPLv2+
@@ -311,6 +311,9 @@ fi
 
 
 %changelog
+* Sun Jun 12 2022 Sérgio Basto <sergio@serjux.com> - 2.8.0-4
+- Mass rebuild for x264-0.164
+
 * Mon May 09 2022 Richard Shaw <hobbes1069@gmail.com> - 2.8.0-3
 - Disable mp4v2 as it is no longer maintained, fixes BZ#6291.
 - Add commits from support_2.8.0 branch to fix crashes as suggested by upstream.
