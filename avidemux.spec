@@ -10,7 +10,7 @@
 
 Name:           avidemux
 Version:        2.8.0
-Release:        5%{?dist}
+Release:        6%{?dist}
 Summary:        Graphical video editing and transcoding tool
 
 License:        GPLv2+
@@ -311,6 +311,10 @@ fi
 
 
 %changelog
+* Sat Aug 06 2022 RPM Fusion Release Engineering <sergiomb@rpmfusion.org> - 2.8.0-6
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_37_Mass_Rebuild and ffmpeg
+  5.1
+
 * Thu Jun 23 2022 Robert-André Mauchin <zebob.m@gmail.com> - 2.8.0-5
 - Rebuilt for new AOM
 
