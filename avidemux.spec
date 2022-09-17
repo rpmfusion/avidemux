@@ -9,16 +9,15 @@
 %global _lto_cflags %{nil}
 
 Name:           avidemux
-Version:        2.8.0
-Release:        6%{?dist}
+Version:        2.8.1
+Release:        1%{?dist}
 Summary:        Graphical video editing and transcoding tool
 
 License:        GPLv2+
 URL:            http://www.avidemux.org
 Source0:        http://downloads.sourceforge.net/%{name}/%{name}_%{version}.tar.gz
 
-Patch0:         https://github.com/mean00/avidemux2/compare/2.8.0...support_2.8.0.patch
-Patch1:         avidemux-disable_mp4v2.patch
+Patch0:         avidemux-disable_mp4v2.patch
 
 # Don't try to build on arm, aarch64 or ppc
 ExclusiveArch:  i686 x86_64
@@ -311,6 +310,9 @@ fi
 
 
 %changelog
+* Sat Sep 17 2022 Leigh Scott <leigh123linux@gmail.com> - 2.8.1-1
+- Update to 2.8.1.
+
 * Sat Aug 06 2022 RPM Fusion Release Engineering <sergiomb@rpmfusion.org> - 2.8.0-6
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_37_Mass_Rebuild and ffmpeg
   5.1
