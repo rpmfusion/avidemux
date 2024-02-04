@@ -15,10 +15,10 @@
 + libavcodec/x86/mathops.h | 26 +++++++++++++++++++++++---
 + 1 file changed, 23 insertions(+), 3 deletions(-)
 +
-+diff --git a/libavcodec/x86/mathops.h b/libavcodec/x86/mathops.h
++diff --git libavcodec/x86/mathops.h libavcodec/x86/mathops.h
 +index 6298f5ed19..ca7e2dffc1 100644
-+--- a/libavcodec/x86/mathops.h
-++++ b/libavcodec/x86/mathops.h
++--- libavcodec/x86/mathops.h
+++++ libavcodec/x86/mathops.h
 +@@ -35,12 +35,20 @@
 + static av_always_inline av_const int MULL(int a, int b, unsigned shift)
 + {
