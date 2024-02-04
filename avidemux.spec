@@ -18,6 +18,7 @@ URL:            http://www.avidemux.org
 Source0:        http://downloads.sourceforge.net/%{name}/%{name}_%{version}.tar.gz
 
 Patch0:         avidemux-disable_mp4v2.patch
+Patch1:         ffmpeg_buildfix.patch
 
 # Don't try to build on arm, aarch64 or ppc
 ExclusiveArch:  i686 x86_64
