@@ -1,3 +1,11 @@
+%global commit 601e92dabd4c1d2dcde639557d12cc1043e96669
+%global commitdate 20240430
+%global shortcommit %(c=%{commit}; echo ${c:0:7})
+
+%global commit0 1ac2cab673c89e18c3819cca3f8749da85550d6c
+%global commitdate0 20240316
+%global shortcommit0 %(c=%{commit0}; echo ${c:0:7})
+
 %global _pkgbuilddir %{_builddir}/%{name}_%{version}
 
 # Turn off the brp-python-bytecompile script as in this case the scripts are
@@ -5,29 +13,25 @@
 %global __os_install_post %(echo '%{__os_install_post}' | sed -e 's!/usr/lib[^[:space:]]*/brp-python-bytecompile[[:space:]].*$!!g')
 # Use old cmake macro
 %global __cmake_in_source_build 1
-# Disable LTO, internal ffmpeg probably needs to be built with --enable-lto
-%global _lto_cflags %{nil}
 
 Name:           avidemux
-Version:        2.8.1
-Release:        4%{?dist}
+Version:        2.8.2
+Release:        1%{?commitdate:^git%{commitdate}.%{shortcommit}}%{?dist}
 Summary:        Graphical video editing and transcoding tool
 
 License:        GPLv2+
 URL:            http://www.avidemux.org
-Source0:        http://downloads.sourceforge.net/%{name}/%{name}_%{version}.tar.gz
+Source0:        https://github.com/mean00/avidemux2/archive/%{commit}/%{name}-%{commit}.tar.gz
+#Source0:        http://downloads.sourceforge.net/%%{name}/%%{name}_%%{version}.tar.gz
+Source1:        https://github.com/mean00/avidemux2_i18n/archive/%{commit0}/%{name}_i18n-%{commit0}.tar.gz
 
 Patch0:         avidemux-disable_mp4v2.patch
-Patch1:         ffmpeg_buildfix.patch
-Patch2:         5b637ae04773b417c9e6b47ba015abf458a9c151.patch
-Patch3:         https://github.com/mean00/avidemux2/commit/466d7c7198e5ea02092ab37b76c832473ac540f3.patch
 
 # Don't try to build on arm, aarch64 or ppc
-ExclusiveArch:  i686 x86_64
+ExclusiveArch:  x86_64
 
 # Utilities
 BuildRequires:  cmake gcc-c++ yasm
-%{?el7:BuildRequires: epel-rpm-macros}
 BuildRequires:  gettext intltool
 BuildRequires:  libxslt
 BuildRequires:  desktop-file-utils
@@ -71,9 +75,7 @@ BuildRequires:  twolame-devel
 BuildRequires:  opus-devel
 
 # Video Codecs
-%if 0%{?fedora} || 0%{?rhel} > 7
 BuildRequires:  libvpx-devel
-%endif
 BuildRequires:  xvidcore-devel >= 1.0.2
 BuildRequires:  x264-devel
 BuildRequires:  x265-devel
@@ -107,8 +109,8 @@ This package contains the runtime libraries for %{name}.
 
 %package qt
 Summary:        Qt interface for %{name}
-BuildRequires:  qt5-qtbase-devel
-BuildRequires:  qt5-linguist
+BuildRequires:  qt6-qtbase-devel
+BuildRequires:  qt6-linguist
 BuildRequires:  libxslt
 Provides:       %{name}-gui = %{version}-%{release}
 Requires:       %{name}-libs%{?_isa} = %{version}-%{release}
@@ -130,7 +132,8 @@ This package contains translation files for %{name}.
 
 
 %prep
-%autosetup -p1 -n %{name}_%{version}
+%autosetup -p1 %{?commitdate:-n %{name}2-%{commit}}
+tar -xf %{SOURCE1} -C avidemux/qt4/i18n --strip 1
 
 # Remove sources of bundled libraries.
 rm -rf avidemux_plugins/ADM_audioDecoders/ADM_ad_ac3/ADM_liba52 \
@@ -166,12 +169,12 @@ pushd build_avidemux_cli
 make install DESTDIR=%{_pkgbuilddir}/fakeRoot
 popd
 
-# Build QT5 gui
-mkdir build_avidemux_qt4
-pushd build_avidemux_qt4
+# Build QT6 gui
+mkdir build_avidemux_qt6
+pushd build_avidemux_qt6
 %cmake -DCMAKE_BUILD_TYPE=RelWithDebInfo \
        -DFAKEROOT=%{_pkgbuilddir}/fakeRoot \
-       -DENABLE_QT5=TRUE \
+       -DENABLE_QT6=TRUE \
 	   ../avidemux/qt4
 %cmake_build
 
@@ -184,7 +187,7 @@ pushd build_plugins_common
 %cmake -DCMAKE_BUILD_TYPE=RelWithDebInfo \
        -DFAKEROOT=%{_pkgbuilddir}/fakeRoot \
        -DAVIDEMUX_SOURCE_DIR=%{_builddir}/%{name}_%{version} \
-       -DENABLE_QT5=TRUE \
+       -DENABLE_QT6=TRUE \
        -DPLUGIN_UI=COMMON \
        -DUSE_EXTERNAL_LIBASS=TRUE \
        -DUSE_EXTERNAL_LIBMAD=TRUE \
@@ -199,7 +202,7 @@ pushd build_plugins_cli
 %cmake -DCMAKE_BUILD_TYPE=RelWithDebInfo \
        -DFAKEROOT=%{_pkgbuilddir}/fakeRoot \
        -DAVIDEMUX_SOURCE_DIR=%{_builddir}/%{name}_%{version} \
-       -DENABLE_QT5=TRUE \
+       -DENABLE_QT6=TRUE \
        -DPLUGIN_UI=CLI \
        -DUSE_EXTERNAL_LIBASS=TRUE \
        -DUSE_EXTERNAL_LIBMAD=TRUE \
@@ -208,14 +211,14 @@ pushd build_plugins_cli
 %cmake_build
 popd
 
-# Build avidemux_plugins_qt5
-mkdir build_plugins_qt5
-pushd build_plugins_qt5
+# Build avidemux_plugins_qt6
+mkdir build_plugins_qt6
+pushd build_plugins_qt6
 %cmake -DCMAKE_BUILD_TYPE=RelWithDebInfo \
        -DFAKEROOT=%{_pkgbuilddir}/fakeRoot \
        -DAVIDEMUX_SOURCE_DIR=%{_builddir}/%{name}_%{version} \
-       -DENABLE_QT5=TRUE \
        -DPLUGIN_UI=QT4 \
+       -DENABLE_QT6=TRUE \
        -DUSE_EXTERNAL_LIBASS=TRUE \
        -DUSE_EXTERNAL_LIBMAD=TRUE \
        -DUSE_EXTERNAL_LIBA52=TRUE \
@@ -226,10 +229,10 @@ popd
 %install
 %make_install -C build_avidemux_core
 %make_install -C build_avidemux_cli
-%make_install -C build_avidemux_qt4
+%make_install -C build_avidemux_qt6
 %make_install -C build_plugins_common
 %make_install -C build_plugins_cli
-%make_install -C build_plugins_qt5
+%make_install -C build_plugins_qt6
 
 # Remove useless devel files
 rm -rf %{buildroot}%{_includedir}/%{name}
@@ -251,25 +254,6 @@ appstream-util validate-relax --nonet \
 %ldconfig_scriptlets qt
 %ldconfig_scriptlets cli
 
-
-%if 0%{?el7}
-%post
-/bin/touch --no-create %{_datadir}/icons/hicolor &>/dev/null || :
-/usr/bin/update-desktop-database &> /dev/null || :
-
-%postun
-if [ $1 -eq 0 ] ; then
-    /bin/touch --no-create %{_datadir}/icons/hicolor &>/dev/null
-    /usr/bin/gtk-update-icon-cache %{_datadir}/icons/hicolor &>/dev/null || :
-    /bin/touch --no-create %{_datadir}/icons/%{name} &>/dev/null
-    /usr/bin/gtk-update-icon-cache %{_datadir}/icons/%{name} &>/dev/null || :
-fi
-/usr/bin/update-desktop-database &> /dev/null || :
-
-%posttrans
-/usr/bin/gtk-update-icon-cache %{_datadir}/icons/hicolor &>/dev/null || :
-/usr/bin/gtk-update-icon-cache %{_datadir}/icons/%{name} &>/dev/null || :
-%endif
 
 %files
 %doc AUTHORS README
@@ -294,25 +278,29 @@ fi
 %{_libdir}/libADM_render6_cli.so
 
 %files qt 
-%{_bindir}/avidemux3_qt5
-%{_bindir}/avidemux3_jobs_qt5
-%{_bindir}/vsProxy_gui_qt5
+%{_bindir}/avidemux3_qt6
+%{_bindir}/avidemux3_jobs_qt6
+%{_bindir}/vsProxy_gui_qt6
 %{_libdir}/libADM_openGLQT*.so
 %{_libdir}/libADM_UIQT*.so
-%{_libdir}/libADM_render6_QT5.so
+%{_libdir}/libADM_render6_QT6.so
 %{_datadir}/applications/org.avidemux.Avidemux.desktop
 %{_datadir}/metainfo/org.avidemux.Avidemux.appdata.xml
 %{_datadir}/icons/hicolor/*/apps/org.avidemux.Avidemux.png
 # QT plugins
-%{_libdir}/ADM_plugins6/videoEncoders/qt5/
-%{_libdir}/ADM_plugins6/videoFilters/qt5/
+%{_libdir}/ADM_plugins6/videoEncoders/qt6/
+%{_libdir}/ADM_plugins6/videoFilters/qt6/
 %{_libdir}/ADM_plugins6/shaderDemo/
 
 %files i18n
-%{_datadir}/avidemux6/qt5/i18n/
+%{_datadir}/avidemux6/qt6/i18n/
 
 
 %changelog
+* Tue May 14 2024 Leigh Scott <leigh123linux@gmail.com> - 2.8.2-1^git20240430.601e92d
+- Update to git snapshot
+- Switch to Qt6
+
 * Sat Apr 06 2024 Leigh Scott <leigh123linux@gmail.com> - 2.8.1-4
 - Rebuild for new x265 version
 
