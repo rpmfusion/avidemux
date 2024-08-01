@@ -16,7 +16,7 @@
 
 Name:           avidemux
 Version:        2.8.2
-Release:        1%{?commitdate:^git%{commitdate}.%{shortcommit}}%{?dist}
+Release:        2%{?commitdate:^git%{commitdate}.%{shortcommit}}%{?dist}
 Summary:        Graphical video editing and transcoding tool
 
 License:        GPLv2+
@@ -297,6 +297,9 @@ appstream-util validate-relax --nonet \
 
 
 %changelog
+* Thu Aug 01 2024 RPM Fusion Release Engineering <sergiomb@rpmfusion.org> - 2.8.2-2^git20240430.601e92d
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_41_Mass_Rebuild
+
 * Tue May 14 2024 Leigh Scott <leigh123linux@gmail.com> - 2.8.2-1^git20240430.601e92d
 - Update to git snapshot
 - Switch to Qt6
