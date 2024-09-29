@@ -1,7 +1,6 @@
-Index: avidemux_2.8.0/avidemux_plugins/ADM_muxers/CMakeLists.txt
-===================================================================
---- avidemux_2.8.0.orig/avidemux_plugins/ADM_muxers/CMakeLists.txt
-+++ avidemux_2.8.0/avidemux_plugins/ADM_muxers/CMakeLists.txt
+diff -uNrp a/avidemux_plugins/ADM_muxers/CMakeLists.txt b/avidemux_plugins/ADM_muxers/CMakeLists.txt
+--- a/avidemux_plugins/ADM_muxers/CMakeLists.txt	2024-09-28 20:35:12.000000000 +0100
++++ b/avidemux_plugins/ADM_muxers/CMakeLists.txt	2024-09-29 12:05:22.954738356 +0100
 @@ -16,7 +16,5 @@ IF(WIN32)
           ENDIF ("${CROSS_C_COMPILER}" STREQUAL "clang")
          ENDIF(MSVC) 
@@ -10,10 +9,9 @@ Index: avidemux_2.8.0/avidemux_plugins/ADM_muxers/CMakeLists.txt
 -        ADD_SUBDIRECTORY(muxerMp4v2)
  ENDIF(WIN32)
  
-Index: avidemux_2.8.0/avidemux_plugins/CMakeLists.txt
-===================================================================
---- avidemux_2.8.0.orig/avidemux_plugins/CMakeLists.txt
-+++ avidemux_2.8.0/avidemux_plugins/CMakeLists.txt
+diff -uNrp a/avidemux_plugins/CMakeLists.txt b/avidemux_plugins/CMakeLists.txt
+--- a/avidemux_plugins/CMakeLists.txt	2024-09-28 20:35:12.000000000 +0100
++++ b/avidemux_plugins/CMakeLists.txt	2024-09-29 12:04:21.098610942 +0100
 @@ -72,7 +72,6 @@ INCLUDE_DIRECTORIES("${AVIDEMUX_SEARCH_I
  OPTION(USE_EXTERNAL_LIBASS "Use system installed libass library." OFF)
  OPTION(USE_EXTERNAL_LIBMAD "Use system installed libmad library." OFF)
@@ -23,16 +21,16 @@ Index: avidemux_2.8.0/avidemux_plugins/CMakeLists.txt
  INCLUDE(FindPkgConfig)
  
 @@ -96,13 +95,6 @@ IF(USE_EXTERNAL_LIBA52)
-         INCLUDE_DIRECTORIES(SYSTEM ${LIBA52_INCLUDE_DIR})
+   INCLUDE_DIRECTORIES(SYSTEM ${LIBA52_INCLUDE_DIR})
  ENDIF()
  
 -# libmp4v2
 -IF(USE_EXTERNAL_MP4V2)
--        FIND_PATH(MP4V2_INCLUDE_DIR mp4v2/mp4v2.h)
--        FIND_LIBRARY(MP4V2_LIBRARIES mp4v2)
--        INCLUDE_DIRECTORIES(SYSTEM ${MP4V2_INCLUDE_DIR})
+-  FIND_PATH(MP4V2_INCLUDE_DIR mp4v2/mp4v2.h)
+-  FIND_LIBRARY(MP4V2_LIBRARIES mp4v2)
+-  INCLUDE_DIRECTORIES(SYSTEM ${MP4V2_INCLUDE_DIR})
 -ENDIF()
 -
  IF (FRESH_BUILD)
- 	MESSAGE("")
+   MESSAGE("")
  ENDIF (FRESH_BUILD)
