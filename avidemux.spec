@@ -1,9 +1,9 @@
-%global commit 601e92dabd4c1d2dcde639557d12cc1043e96669
-%global commitdate 20240430
+%global commit 506a9ee43ad15b452d5f232a151a795cc8503918
+%global commitdate 20240928
 %global shortcommit %(c=%{commit}; echo ${c:0:7})
 
-%global commit0 1ac2cab673c89e18c3819cca3f8749da85550d6c
-%global commitdate0 20240316
+%global commit0 b91c7f7c26577e5be005b094604f813058c31682
+%global commitdate0 20240815
 %global shortcommit0 %(c=%{commit0}; echo ${c:0:7})
 
 %global _pkgbuilddir %{_builddir}/%{name}_%{version}
@@ -16,7 +16,7 @@
 
 Name:           avidemux
 Version:        2.8.2
-Release:        2%{?commitdate:^git%{commitdate}.%{shortcommit}}%{?dist}
+Release:        3%{?commitdate:^git%{commitdate}.%{shortcommit}}%{?dist}
 Summary:        Graphical video editing and transcoding tool
 
 License:        GPLv2+
@@ -140,6 +140,8 @@ rm -rf avidemux_plugins/ADM_audioDecoders/ADM_ad_ac3/ADM_liba52 \
        avidemux_plugins/ADM_audioDecoders/ADM_ad_mad/ADM_libMad \
        avidemux_plugins/ADM_videoFilters6/ass/ADM_libass \
        avidemux_plugins/ADM_muxers/muxerMp4v2/libmp4v2
+
+sed -i -e 's@avidemux3_qt5@avidemux3_qt6@g' avidemux/qt4/xdg_data/org.avidemux.Avidemux.desktop
 
 
 %build
@@ -297,6 +299,10 @@ appstream-util validate-relax --nonet \
 
 
 %changelog
+* Sun Sep 29 2024 Leigh Scott <leigh123linux@gmail.com> - 2.8.2-3^git20240928.506a9ee
+- Fix desktop file (rfbz#7068)
+- Update git snapshot
+
 * Thu Aug 01 2024 RPM Fusion Release Engineering <sergiomb@rpmfusion.org> - 2.8.2-2^git20240430.601e92d
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_41_Mass_Rebuild
 
