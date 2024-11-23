@@ -1,9 +1,9 @@
-%global commit 506a9ee43ad15b452d5f232a151a795cc8503918
-%global commitdate 20240928
+%global commit b74c1a154abc7cf5d65518d8d37afe1aeb1bd4fd
+%global commitdate 20241122
 %global shortcommit %(c=%{commit}; echo ${c:0:7})
 
-%global commit0 b91c7f7c26577e5be005b094604f813058c31682
-%global commitdate0 20240815
+%global commit0 05a39a119e4cd0268b13fa4266a77a45cd38ccb2
+%global commitdate0 20241118
 %global shortcommit0 %(c=%{commit0}; echo ${c:0:7})
 
 %global _pkgbuilddir %{_builddir}/%{name}_%{version}
@@ -16,7 +16,7 @@
 
 Name:           avidemux
 Version:        2.8.2
-Release:        4%{?commitdate:^git%{commitdate}.%{shortcommit}}%{?dist}
+Release:        5%{?commitdate:^git%{commitdate}.%{shortcommit}}%{?dist}
 Summary:        Graphical video editing and transcoding tool
 
 License:        GPLv2+
@@ -26,6 +26,7 @@ Source0:        https://github.com/mean00/avidemux2/archive/%{commit}/%{name}-%{
 Source1:        https://github.com/mean00/avidemux2_i18n/archive/%{commit0}/%{name}_i18n-%{commit0}.tar.gz
 
 Patch0:         avidemux-disable_mp4v2.patch
+Patch1:         fix_incompatible_types.patch
 
 # Don't try to build on arm, aarch64 or ppc
 ExclusiveArch:  x86_64
@@ -299,6 +300,9 @@ appstream-util validate-relax --nonet \
 
 
 %changelog
+* Sat Nov 23 2024 Leigh Scott <leigh123linux@gmail.com> - 2.8.2-5^git20241122.b74c1a1
+- Update snapshot to fix qt build issue
+
 * Sat Nov 23 2024 Leigh Scott <leigh123linux@gmail.com> - 2.8.2-4^git20240928.506a9ee
 - Rebuild for new x265
 

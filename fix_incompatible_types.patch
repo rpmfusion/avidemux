@@ -1,0 +1,20 @@
+--- a/avidemux_plugins/ADM_videoEncoder/x265/ADM_x265Setup.cpp
++++ b/avidemux_plugins/ADM_videoEncoder/x265/ADM_x265Setup.cpp
+@@ -216,13 +216,15 @@ bool x265Encoder::setup(void)
+                         {
+                              param.rc.bStatWrite=1;
+                              param.rc.bStatRead=0;
+-                             param.rc.statFileName=strdup(logFile);
++                             strncpy(param.rc.statFileName, logFile, sizeof(param.rc.statFileName) - 1);
++                             param.rc.statFileName[sizeof(param.rc.statFileName) - 1] = '\0';
+  
+                         }else
+                         {
+                              param.rc.bStatWrite=0;
+                              param.rc.bStatRead=1;
+-                             param.rc.statFileName=strdup(logFile);
++                             strncpy(param.rc.statFileName, logFile, sizeof(param.rc.statFileName) - 1);
++                             param.rc.statFileName[sizeof(param.rc.statFileName) - 1] = '\0';
+                              if(!ADM_fileExist(logFile))
+                              {
+                                    ADM_error("Logfile %s does not exist \n",logFile);
