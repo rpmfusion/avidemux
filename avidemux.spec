@@ -16,7 +16,7 @@
 
 Name:           avidemux
 Version:        2.8.2
-Release:        3%{?commitdate:^git%{commitdate}.%{shortcommit}}%{?dist}
+Release:        4%{?commitdate:^git%{commitdate}.%{shortcommit}}%{?dist}
 Summary:        Graphical video editing and transcoding tool
 
 License:        GPLv2+
@@ -299,6 +299,9 @@ appstream-util validate-relax --nonet \
 
 
 %changelog
+* Sat Nov 23 2024 Leigh Scott <leigh123linux@gmail.com> - 2.8.2-4^git20240928.506a9ee
+- Rebuild for new x265
+
 * Sun Sep 29 2024 Leigh Scott <leigh123linux@gmail.com> - 2.8.2-3^git20240928.506a9ee
 - Fix desktop file (rfbz#7068)
 - Update git snapshot
