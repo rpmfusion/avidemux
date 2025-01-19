@@ -1,9 +1,9 @@
-%global commit b74c1a154abc7cf5d65518d8d37afe1aeb1bd4fd
-%global commitdate 20241122
+%global commit 49b04e3d8887b1c5193ff9a9f7ee99b2284c2023
+%global commitdate 20250119
 %global shortcommit %(c=%{commit}; echo ${c:0:7})
 
-%global commit0 05a39a119e4cd0268b13fa4266a77a45cd38ccb2
-%global commitdate0 20241118
+%global commit0 4d2693414068eb60ed9eea5720d8fa916ac7ab1a
+%global commitdate0 20250119
 %global shortcommit0 %(c=%{commit0}; echo ${c:0:7})
 
 %global _pkgbuilddir %{_builddir}/%{name}_%{version}
@@ -16,7 +16,7 @@
 
 Name:           avidemux
 Version:        2.8.2
-Release:        5%{?commitdate:^git%{commitdate}.%{shortcommit}}%{?dist}
+Release:        6%{?commitdate:^git%{commitdate}.%{shortcommit}}%{?dist}
 Summary:        Graphical video editing and transcoding tool
 
 License:        GPLv2+
@@ -24,9 +24,6 @@ URL:            http://www.avidemux.org
 Source0:        https://github.com/mean00/avidemux2/archive/%{commit}/%{name}-%{commit}.tar.gz
 #Source0:        http://downloads.sourceforge.net/%%{name}/%%{name}_%%{version}.tar.gz
 Source1:        https://github.com/mean00/avidemux2_i18n/archive/%{commit0}/%{name}_i18n-%{commit0}.tar.gz
-
-Patch0:         avidemux-disable_mp4v2.patch
-Patch1:         fix_incompatible_types.patch
 
 # Don't try to build on arm, aarch64 or ppc
 ExclusiveArch:  x86_64
@@ -142,8 +139,8 @@ rm -rf avidemux_plugins/ADM_audioDecoders/ADM_ad_ac3/ADM_liba52 \
        avidemux_plugins/ADM_videoFilters6/ass/ADM_libass \
        avidemux_plugins/ADM_muxers/muxerMp4v2/libmp4v2
 
-sed -i -e 's@avidemux3_qt5@avidemux3_qt6@g' avidemux/qt4/xdg_data/org.avidemux.Avidemux.desktop
-
+sed -i -e 's@avidemux3_qt5@env QT_QPA_PLATFORM=xcb avidemux3_qt6@g' \
+ avidemux/qt4/xdg_data/org.avidemux.Avidemux.desktop
 
 %build
 export LDFLAGS="%{optflags} -lc -Wl,--as-needed"
@@ -237,8 +234,6 @@ popd
 %make_install -C build_plugins_cli
 %make_install -C build_plugins_qt6
 
-# Remove useless devel files
-rm -rf %{buildroot}%{_includedir}/%{name}
 
 # FFMpeg libraries are not being installed as executable.
 chmod +x %{buildroot}%{_libdir}/libADM6*.so.*
@@ -260,6 +255,8 @@ appstream-util validate-relax --nonet \
 
 %files
 %doc AUTHORS README
+# Exclude useless devel files
+%exclude %{_includedir}/
 
 %files libs -f build_plugins_common/install_manifest.txt
 %license COPYING
@@ -300,6 +297,9 @@ appstream-util validate-relax --nonet \
 
 
 %changelog
+* Sun Jan 19 2025 Leigh Scott <leigh123linux@gmail.com> - 2.8.2-6^git20250119.49b04e3
+- Update git snapshot
+
 * Sat Nov 23 2024 Leigh Scott <leigh123linux@gmail.com> - 2.8.2-5^git20241122.b74c1a1
 - Update snapshot to fix qt build issue
 
