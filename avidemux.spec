@@ -1,9 +1,9 @@
-%global commit 49b04e3d8887b1c5193ff9a9f7ee99b2284c2023
-%global commitdate 20250119
+%global commit 8c482973c17c9b007444fc3f67e12b2942506701
+%global commitdate 20260103
 %global shortcommit %(c=%{commit}; echo ${c:0:7})
 
-%global commit0 4d2693414068eb60ed9eea5720d8fa916ac7ab1a
-%global commitdate0 20250119
+%global commit0 b7393340eda6fa2aebaeeeae9014b923ad82e407
+%global commitdate0 20251013
 %global shortcommit0 %(c=%{commit0}; echo ${c:0:7})
 
 %global _pkgbuilddir %{_builddir}/%{name}_%{version}
@@ -16,20 +16,21 @@
 
 Name:           avidemux
 Version:        2.8.2
-Release:        10%{?commitdate:^git%{commitdate}.%{shortcommit}}%{?dist}
+Release:        11%{?commitdate:^git%{commitdate}.%{shortcommit}}%{?dist}
 Summary:        Graphical video editing and transcoding tool
 
 License:        GPLv2+
 URL:            http://www.avidemux.org
 Source0:        https://github.com/mean00/avidemux2/archive/%{commit}/%{name}-%{commit}.tar.gz
-#Source0:        http://downloads.sourceforge.net/%%{name}/%%{name}_%%{version}.tar.gz
 Source1:        https://github.com/mean00/avidemux2_i18n/archive/%{commit0}/%{name}_i18n-%{commit0}.tar.gz
 
 # Don't try to build on arm, aarch64 or ppc
 ExclusiveArch:  x86_64
 
 # Utilities
-BuildRequires:  cmake gcc-c++ yasm
+BuildRequires:  cmake
+BuildRequires:  gcc-c++
+BuildRequires:  yasm
 BuildRequires:  gettext intltool
 BuildRequires:  libxslt
 BuildRequires:  desktop-file-utils
@@ -45,7 +46,7 @@ BuildRequires:  freetype-devel
 BuildRequires:  fribidi-devel
 BuildRequires:  libXv-devel
 BuildRequires:  libXmu-devel
-BuildRequires:  jack-audio-connection-kit-devel
+BuildRequires:  pkgconfig(jack)
 BuildRequires:  libaom-devel
 BuildRequires:  libass-devel
 BuildRequires:  vapoursynth-devel
@@ -139,8 +140,8 @@ rm -rf avidemux_plugins/ADM_audioDecoders/ADM_ad_ac3/ADM_liba52 \
        avidemux_plugins/ADM_videoFilters6/ass/ADM_libass \
        avidemux_plugins/ADM_muxers/muxerMp4v2/libmp4v2
 
-sed -i -e 's@avidemux3_qt5@env QT_QPA_PLATFORM=xcb avidemux3_qt6@g' \
- avidemux/qt4/xdg_data/org.avidemux.Avidemux.desktop
+#sed -i -e 's@avidemux3_qt5@env QT_QPA_PLATFORM=xcb avidemux3_qt6@g' \
+ #avidemux/qt4/xdg_data/org.avidemux.Avidemux.desktop
 
 %build
 export LDFLAGS="%{optflags} -lc -Wl,--as-needed"
@@ -297,6 +298,9 @@ appstream-util validate-relax --nonet \
 
 
 %changelog
+* Fri Mar 20 2026 Nicolas Chauvet <kwizart@gmail.com> - 2.8.2-11^git20260103.8c48297
+- Update snapshot
+
 * Fri Mar 20 2026 Nicolas Chauvet <kwizart@gmail.com> - 2.8.2-10^git20250119.49b04e3
 - Rebuilt for libvpx-1.16.0
 
