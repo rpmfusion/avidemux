@@ -277,7 +277,6 @@ appstream-util validate-relax --nonet \
 
 %files cli -f build_plugins_cli/install_manifest.txt
 %{_bindir}/avidemux3_cli
-%{_bindir}/vsProxy
 %{_libdir}/libADM_UI_Cli*.so
 %{_libdir}/libADM_render6_cli.so
 
