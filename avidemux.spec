@@ -24,7 +24,6 @@ URL:            http://www.avidemux.org
 Source0:        https://github.com/mean00/avidemux2/archive/%{commit}/%{name}-%{commit}.tar.gz
 #Source0:        http://downloads.sourceforge.net/%%{name}/%%{name}_%%{version}.tar.gz
 Source1:        https://github.com/mean00/avidemux2_i18n/archive/%{commit0}/%{name}_i18n-%{commit0}.tar.gz
-Patch0: https://github.com/mean00/avidemux2/commit/23b1d8fb1e931660a1a8f1f3cab20186a7b74eb0.patch
 
 # Don't try to build on arm, aarch64 or ppc
 ExclusiveArch:  x86_64
