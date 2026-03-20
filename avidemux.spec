@@ -277,13 +277,18 @@ appstream-util validate-relax --nonet \
 
 %files cli -f build_plugins_cli/install_manifest.txt
 %{_bindir}/avidemux3_cli
+%if 0%{?fedora} < 45
+%{_bindir}/vsProxy
+%endif
 %{_libdir}/libADM_UI_Cli*.so
 %{_libdir}/libADM_render6_cli.so
 
 %files qt 
 %{_bindir}/avidemux3_qt6
 %{_bindir}/avidemux3_jobs_qt6
+%if 0%{?fedora} < 45
 %{_bindir}/vsProxy_gui_qt6
+%endif
 %{_libdir}/libADM_openGLQT*.so
 %{_libdir}/libADM_UIQT*.so
 %{_libdir}/libADM_render6_QT6.so
