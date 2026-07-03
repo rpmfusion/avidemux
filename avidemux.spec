@@ -1,8 +1,8 @@
-%global commit0 8c482973c17c9b007444fc3f67e12b2942506701
-%global commitdate 20260103
+%global commit0 290ed57063eb4ba1aa955edec41bef2ae2ea966e
+%global commitdate 20260702
 %global shortcommit0 %(c=%{commit0}; echo ${c:0:7})
 
-%global commit1 b7393340eda6fa2aebaeeeae9014b923ad82e407
+%global commit1 0cad855374472ceccd39169894fc2d8f4c35f918
 %global shortcommit1 %(c=%{commit1}; echo ${c:0:7})
 
 %global _pkgbuilddir %{_builddir}/%{name}_%{version}
@@ -17,7 +17,7 @@
 
 Name:           avidemux
 Version:        2.8.2
-Release:        12%{?commitdate:^git%{commitdate}.%{shortcommit0}}%{?dist}
+Release:        13%{?commitdate:^git%{commitdate}.%{shortcommit0}}%{?dist}
 Summary:        Graphical video editing and transcoding tool
 
 License:        GPLv2+
@@ -304,6 +304,9 @@ appstream-util validate-relax --nonet \
 
 
 %changelog
+* Fri Jul 03 2026 Nicolas Chauvet <kwizart@gmail.com> - 2.8.2-13^git20260702.290ed57
+- Update snapshot
+
 * Mon Apr 20 2026 Leigh Scott <leigh123linux@gmail.com> - 2.8.2-12^git20260103.8c48297
 - Rebuild for new x265
 
