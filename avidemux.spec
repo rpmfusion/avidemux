@@ -1,10 +1,9 @@
-%global commit 8c482973c17c9b007444fc3f67e12b2942506701
+%global commit0 8c482973c17c9b007444fc3f67e12b2942506701
 %global commitdate 20260103
-%global shortcommit %(c=%{commit}; echo ${c:0:7})
-
-%global commit0 b7393340eda6fa2aebaeeeae9014b923ad82e407
-%global commitdate0 20251013
 %global shortcommit0 %(c=%{commit0}; echo ${c:0:7})
+
+%global commit1 b7393340eda6fa2aebaeeeae9014b923ad82e407
+%global shortcommit1 %(c=%{commit1}; echo ${c:0:7})
 
 %global _pkgbuilddir %{_builddir}/%{name}_%{version}
 
@@ -18,13 +17,13 @@
 
 Name:           avidemux
 Version:        2.8.2
-Release:        12%{?commitdate:^git%{commitdate}.%{shortcommit}}%{?dist}
+Release:        12%{?commitdate:^git%{commitdate}.%{shortcommit0}}%{?dist}
 Summary:        Graphical video editing and transcoding tool
 
 License:        GPLv2+
 URL:            http://www.avidemux.org
-Source0:        https://github.com/mean00/avidemux2/archive/%{commit}/%{name}-%{commit}.tar.gz
-Source1:        https://github.com/mean00/avidemux2_i18n/archive/%{commit0}/%{name}_i18n-%{commit0}.tar.gz
+Source0:        https://github.com/mean00/avidemux2/archive/%{commit0}/%{name}-%{shortcommit0}.tar.gz
+Source1:        https://github.com/mean00/avidemux2_i18n/archive/%{commit1}/%{name}_i18n-%{shortcommit1}.tar.gz
 
 # Don't try to build on arm, aarch64 or ppc
 ExclusiveArch:  x86_64
@@ -134,7 +133,7 @@ This package contains translation files for %{name}.
 
 
 %prep
-%autosetup -p1 %{?commitdate:-n %{name}2-%{commit}}
+%autosetup -p1 %{?commitdate:-n %{name}2-%{commit0}}
 tar -xf %{SOURCE1} -C avidemux/qt4/i18n --strip 1
 
 # Remove sources of bundled libraries.
